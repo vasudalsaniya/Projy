@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+{% block title %}Master Control Panel{% endblock %}
+
+{% block content %}
+<style>
+    /* MODAL OVERLAY */
+    .modal {
+        display: none; 
+        position: fixed; 
+        z-index: 1000; 
+        left: 0; top: 0; 
+        width: 100%; height: 100%; 
+        background-color: rgba(0,0,0,0.6); /* Slightly darker overlay */
+        overflow-y: auto; 
+    }
+
+    /* MODAL BOX - FIXED FOR DARK MODE */
+    .modal-content {
+        background-color: var(--surface) !important; /* Adaptive background */
+        color: var(--text-main) !important;          /* Adaptive text */
+        margin: 5% auto; 
+        padding: 25px; 
+        border-radius: var(--radius); 
+        width: 90%; 
+        max-width: 450px; 
+        box-shadow: var(--shadow-md);
+        position: relative;
+        border: 1px solid var(--border);
+    }
+
+    .close-btn {
+        float: right; 
+        font-size: 24px; 
+        font-weight: bold; 
+        cursor: pointer;
+        color: var(--text-muted);
+    }
+    .close-btn:hover { color: var(--text-main); }
+
+    .form-group { margin-bottom: 15px; }
+    
+    /* Ensure form controls look correct in dark mode */
+    .modal-content input, 
+    .modal-content select, 
+    .modal-content textarea { 
+        background-color: var(--input-bg) !important;
+        color: var(--text-main) !important;
+        border: 1px solid var(--border);
+        width: 100%;
+        padding: 10px;
+        border-radius: 6px;
+        margin-top: 5px;
+    }
+    
+    .helptext { font-size: 0.8rem; color: var(--text-muted); display: block; margin-top: 5px; }
+
+    /* Yellow Box Fix for Dark Mode */
+    .pending-box {
+        background-color: var(--warning-bg) !important;
+        color: var(--warning-text) !important;
+        border: 1px solid var(--warning-border) !important;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+    }
+</style>
+
+<div class="container" style="max-width: 1100px; margin: 30px auto;">
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <div>
+            <h1 style="margin: 0; color: var(--text-main);">Admin Control Center</h1>
+            <p style="color: var(--text-muted);">System Overview & Management</p>
+        </div>
+        <a href="/admin/" class="btn" style="background: var(--text-muted); color: white;">Classic Admin</a>
+    </div>
+
+    {% if pending_hods_list or pending_recruiters_list %}
+    <div class="pending-box">
+        <h3 style="margin-top: 0; color: inherit;">⚠️ Pending Approvals</h3>
+        <table style="width: 100%; text-align: left; margin-top: 10px; border-collapse: collapse;">
+            {% for user in pending_hods_list %}
+                <tr style="border-bottom: 1px solid var(--warning-border);">
+                    <td style="padding: 12px 8px;"><strong>{{ user.username }}</strong> (HOD)</td>
+                    <td style="text-align: right;">
+                        <form method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="user_id" value="{{ user.id }}">
+                            <button type="submit" name="action" value="approve" class="btn" style="background: #28a745; padding: 6px 12px; font-size: 0.85rem;">Verify</button>
+                            <button type="submit" name="action" value="reject" class="btn" style="background: #dc3545; padding: 6px 12px; font-size: 0.85rem;">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+            {% for user in pending_recruiters_list %}
+                <tr style="border-bottom: 1px solid var(--warning-border);">
+                    <td style="padding: 12px 8px;"><strong>{{ user.username }}</strong> (Recruiter)</td>
+                    <td style="text-align: right;">
+                        <form method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="user_id" value="{{ user.id }}">
+                            <button type="submit" name="action" value="approve" class="btn" style="background: #28a745; padding: 6px 12px; font-size: 0.85rem;">Verify</button>
+                            <button type="submit" name="action" value="reject" class="btn" style="background: #dc3545; padding: 6px 12px; font-size: 0.85rem;">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    {% endif %}
+
+    <div class="grid-3" style="margin-bottom: 30px;">
+        <div class="card" style="text-align: center; border-top: 4px solid #007bff;">
+            <h2 style="color: #007bff;">{{ total_students }}</h2>
+            <p style="color: var(--text-muted);">Students</p>
+        </div>
+        <div class="card" style="text-align: center; border-top: 4px solid #28a745;">
+            <h2 style="color: #28a745;">{{ total_projects }}</h2>
+            <p style="color: var(--text-muted);">Projects</p>
+        </div>
+        <div class="card" style="text-align: center; border-top: 4px solid #17a2b8;">
+            <h2 style="color: #17a2b8;">{{ total_faculty }}</h2>
+            <p style="color: var(--text-muted);">Faculty</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>⚡ Quick Actions</h3>
+        <p style="color: var(--text-muted);">Add data without leaving the dashboard.</p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;">
+            <button onclick="openModal('modal-college')" class="btn" style="background: #007bff;">+ Add College</button>
+            <button onclick="openModal('modal-dept')" class="btn" style="background: #6c757d;">+ Add Dept</button>
+            <button onclick="openModal('modal-company')" class="btn" style="background: #17a2b8;">+ Add Company</button>
+            <button onclick="openModal('modal-user')" class="btn" style="background: #343a40;">+ Add User</button>
+        </div>
+    </div>
+
+</div>
+
+<div id="modal-college" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal('modal-college')">&times;</span>
+        <h3>Add New College</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="add_college" value="true">
+            {{ college_form.as_p }}
+            <button type="submit" class="btn" style="width: 100%; margin-top: 10px;">Save College</button>
+        </form>
+    </div>
+</div>
+
+<div id="modal-dept" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal('modal-dept')">&times;</span>
+        <h3>Add Department</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="add_dept" value="true">
+            {{ dept_form.as_p }}
+            <button type="submit" class="btn" style="width: 100%; margin-top: 10px;">Save Department</button>
+        </form>
+    </div>
+</div>
+
+<div id="modal-company" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal('modal-company')">&times;</span>
+        <h3>Add Company</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="add_company" value="true">
+            {{ company_form.as_p }}
+            <button type="submit" class="btn" style="width: 100%; margin-top: 10px;">Save Company</button>
+        </form>
+    </div>
+</div>
+
+<div id="modal-user" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal('modal-user')">&times;</span>
+        <h3>Add User</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="add_user" value="true">
+            {{ user_form.as_p }}
+            <button type="submit" class="btn" style="width: 100%; margin-top: 10px;">Create User</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openModal(id) {
+        document.getElementById(id).style.display = "block";
+    }
+    function closeModal(id) {
+        document.getElementById(id).style.display = "none";
+    }
+    window.onclick = function(event) {
+        if (event.target.className === 'modal') {
+            event.target.style.display = "none";
+        }
+    }
+</script>
+
+{% endblock %}

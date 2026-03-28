@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}College Registration{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 500px; margin: 2rem auto;">
+    <h2 class="text-center" style="color: var(--primary);">Join Your Campus</h2>
+    <p class="text-center text-muted">For Students, Faculty, and HODs</p>
+    
+    <hr>
+
+    <form method="post">
+        {% csrf_token %}
+        
+        <label>Username:</label>
+        {{ form.username }}
+        
+        <label>Email:</label>
+        {{ form.email }}
+
+        <label>Phone Number:</label>
+        {{ form.phone_number }}
+
+        <label>Select Your College:</label>
+        {{ form.college }}
+        
+        <label>Select Department:</label>
+        {{ form.department }}
+
+        <label>I am a:</label>
+        {{ form.role_choice }}
+
+        <div id="enrollment-container" style="display: none;">
+            <label>Enrollment Number:</label>
+            {{ form.enrollment_number }}
+            <small class="text-muted">Required for verification.</small>
+        </div>
+
+        <label>Password:</label>
+        {{ form.password }}
+
+        <label>Confirm Password:</label>
+        {{ form.confirm_password }}
+
+        <button type="submit" class="btn" style="width: 100%; margin-top: 20px;">Create Account</button>
+    </form>
+
+    <div class="text-center" style="margin-top: 15px;">
+        <small>Already have an account? <a href="{% url 'login' %}">Login here</a></small>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const roleDropdown = document.getElementById('id_role_choice');
+        const enrollmentContainer = document.getElementById('enrollment-container');
+        
+        // --- 1. ENROLLMENT NUMBER LOGIC ---
+        function toggleEnrollmentField() {
+            if (roleDropdown.value === 'STUDENT') {
+                enrollmentContainer.style.display = 'block';
+            } else {
+                enrollmentContainer.style.display = 'none';
+            }
+        }
+        toggleEnrollmentField();
+        roleDropdown.addEventListener('change', toggleEnrollmentField);
+
+        // --- 2. DYNAMIC DEPARTMENT LOGIC ---
+        const collegeDropdown = document.getElementById('id_college');
+        const departmentDropdown = document.getElementById('id_department');
+
+        collegeDropdown.addEventListener('change', function() {
+            const collegeId = this.value;
+            const url = "{% url 'ajax_load_departments' %}";  // Django URL
+
+            // Fetch departments for this college
+            fetch(`${url}?college=${collegeId}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Clear existing options
+                    departmentDropdown.innerHTML = '<option value="">Select Department</option>';
+                    // Add new options
+                    data.forEach(dept => {
+                        const option = document.createElement('option');
+                        option.value = dept.id;
+                        option.textContent = dept.name;
+                        departmentDropdown.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+        });
+    });
+</script>
+{% endblock %}

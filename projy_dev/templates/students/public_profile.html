@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}{{ student.user.username }} - Profile{% endblock %}
+
+{% block content %}
+<div class="grid-2">
+    <div class="card">
+        <div class="text-center">
+            <h2>{{ student.user.first_name }} {{ student.user.last_name }}</h2>
+            <p class="text-muted">Enrollment: {{ student.enrollment_number }}</p>
+            <p class="badge badge-success">Verified Student</p>
+        </div>
+        <hr>
+        <p><strong>College:</strong> {{ student.college.name }}</p>
+        <p><strong>Department:</strong> {{ student.department.name }}</p>
+        <p><strong>Semester:</strong> {{ student.semester }}</p>
+        
+        <hr>
+        <h3>Contact / Links</h3>
+        <p><strong>Email:</strong> {{ student.user.email }}</p>
+        {% if student.linkedin_url %}
+            <a href="{{ student.linkedin_url }}" target="_blank" class="btn btn-sm" style="width: 100%; margin-bottom: 5px; background: #0077b5;">LinkedIn</a>
+        {% endif %}
+        {% if student.github_url %}
+            <a href="{{ student.github_url }}" target="_blank" class="btn btn-sm" style="width: 100%; margin-bottom: 5px; background: #333;">GitHub</a>
+        {% endif %}
+        {% if student.resume %}
+            <a href="{{ student.resume.url }}" target="_blank" class="btn btn-sm" style="width: 100%; background: #28a745;">Download Resume</a>
+        {% endif %}
+    </div>
+
+    <div>
+        <h2>Project Portfolio</h2>
+        {% for project in projects %}
+        <div class="card">
+            <div style="display: flex; justify-content: space-between;">
+                <h3>{{ project.title }}</h3>
+                {% if project.is_verified %}
+                    <span class="badge badge-success">Verified</span>
+                {% endif %}
+            </div>
+            
+            <p>{{ project.description }}</p>
+            
+            <div style="margin-bottom: 10px;">
+                {% for lang in project.languages.all %}
+                    <span class="badge badge-warning">{{ lang.language_name }} ({{ lang.percentage }}%)</span>
+                {% endfor %}
+            </div>
+
+            {% if project.github_repo_link %}
+                <a href="{{ project.github_repo_link }}" target="_blank" style="color: blue; text-decoration: underline;">View Code</a>
+            {% endif %}
+            {% if project.video_demo %}
+                | <a href="{{ project.video_demo.url }}" target="_blank" style="color: red; text-decoration: underline;">Watch Demo</a>
+            {% endif %}
+        </div>
+        {% empty %}
+        <p>This student has not uploaded any public projects yet.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

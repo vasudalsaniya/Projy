@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Delete Project{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 500px; margin: 3rem auto; text-align: center; border: 2px solid #dc3545;">
+    <h2 style="color: #dc3545;">Are you sure?</h2>
+    <p>You are about to delete <strong>"{{ project.title }}"</strong>.</p>
+    <p>This action cannot be undone.</p>
+    
+    <form method="post">
+        {% csrf_token %}
+        <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+            <button type="submit" class="btn" style="background: #dc3545;">Yes, Delete it</button>
+            <a href="{% url 'student_dashboard' %}" class="btn" style="background: #6c757d;">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

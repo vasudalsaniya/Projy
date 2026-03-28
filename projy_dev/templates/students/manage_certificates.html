@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% block title %}Manage Certificates{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <a href="{% url 'student_dashboard' %}" class="btn btn-sm" style="background: var(--border); color: var(--text-main);">← Back to Dashboard</a>
+            <h1 style="margin: 0;">Manage Certificates</h1>
+        </div>
+        <button onclick="openCertModal(0)" class="btn">+ Add Certificate</button>
+    </div>
+
+    <div class="grid-3">
+        {% for cert in certificates %}
+        <div class="card" style="position: relative;">
+            
+            {% if cert.certificate_photo %}
+                <img src="{{ cert.certificate_photo.url }}" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; pointer-events: none; user-select: none;">
+            {% endif %}
+            
+            <h3 style="margin: 15px 0 5px 0;">{{ cert.title }}</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">{{ cert.description|truncatewords:20 }}</p>
+
+            <button onclick="openCertModal('{{ cert.id }}', '{{ cert.title|escapejs }}', '{{ cert.description|escapejs }}')" 
+                    class="btn btn-sm" 
+                    style="width: 100%; margin-top: 15px; background: #ffc107; color: #000; border: none;">
+                ✎ Edit Certificate
+            </button>
+        </div>
+        {% empty %}
+            <p>You haven't uploaded any certificates yet.</p>
+        {% endfor %}
+    </div>
+</div>
+
+<div id="certModal" class="modal">
+    <div class="modal-content" style="max-width: 600px;">
+        <span class="close-btn" onclick="closeModal('certModal')">&times;</span>
+        <h3 id="modalTitle">Add Certificate</h3>
+        
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="cert_id" id="certIdInput">
+
+            <div class="form-group">
+                <label>Certificate Title</label>
+                <input type="text" name="title" id="titleInput" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea name="description" id="descInput" class="form-control" rows="4" required></textarea>
+            </div>
+            <div class="form-group">
+                <label>Certificate Photo</label>
+                <input type="file" name="certificate_photo" class="form-control" accept="image/*" id="photoInput">
+                <small class="text-muted">Leave empty to keep existing photo (if editing).</small>
+            </div>
+            
+            <button type="submit" class="btn" style="width: 100%; margin-top: 15px;" id="submitBtn">Save Certificate</button>
+        </form>
+
+        <form id="deleteForm" method="post" action="" style="margin-top: 10px; display: none;">
+            {% csrf_token %}
+            <button type="submit" class="btn" style="width: 100%; background: #dc3545; color: white;" 
+                    onclick="return confirm('Are you sure you want to delete this certificate?');">
+                🗑️ Delete Certificate
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openCertModal(id, title = '', description = '') {
+        const modal = document.getElementById('certModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const submitBtn = document.getElementById('submitBtn');
+        const deleteForm = document.getElementById('deleteForm');
+        
+        document.getElementById('certIdInput').value = (id === 0) ? '' : id;
+        document.getElementById('titleInput').value = title;
+        document.getElementById('descInput').value = description;
+        
+        // Require photo only if creating new
+        document.getElementById('photoInput').required = (id === 0);
+
+        if (id === 0) {
+            modalTitle.innerText = "Add New Certificate";
+            submitBtn.innerText = "Upload Certificate";
+            deleteForm.style.display = "none";
+        } else {
+            modalTitle.innerText = "Edit Certificate";
+            submitBtn.innerText = "Save Changes";
+            deleteForm.style.display = "block";
+            
+            let deleteUrl = "{% url 'delete_certificate' 0 %}".replace('0', id);
+            deleteForm.action = deleteUrl;
+        }
+
+        modal.style.display = "block";
+    }
+
+    function closeModal(id) {
+        document.getElementById(id).style.display = "none";
+    }
+</script>
+{% endblock %}

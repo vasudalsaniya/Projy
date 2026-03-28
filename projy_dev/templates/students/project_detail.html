@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ project.title }}{% endblock %}
+
+{% block content %}
+
+<style>
+    /* Custom Layout for Project Detail Page */
+    .project-detail-container {
+        display: grid;
+        grid-template-columns: 1fr; /* Mobile: Stacked */
+        gap: 30px;
+        align-items: start;
+    }
+
+    @media (min-width: 992px) {
+        .project-detail-container {
+            /* Rigid constraints ensure the right column never gets squished */
+            grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr); 
+        }
+    }
+
+    .right-column {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        position: sticky;
+        top: 100px; 
+        height: fit-content;
+    }
+
+    .action-buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+    
+    /* FIX FOR LATEX OVERFLOW */
+    .description-content {
+        line-height: 1.8;
+        color: var(--text-main);
+        
+        /* These 3 lines guarantee text wraps and never breaks the grid */
+        overflow-wrap: break-word; 
+        word-wrap: break-word;
+        white-space: pre-wrap;
+    }
+</style>
+
+<div class="project-detail-container">
+    
+    <div class="card" style="background-color: var(--surface);">
+        {% if project.cover_image %}
+            <img src="{{ project.cover_image.url }}" style="width:100%; border-radius: 8px; margin-bottom: 20px; object-fit: cover; max-height: 450px;">
+        {% endif %}
+        
+        <h1 style="margin-top: 0; font-size: 2rem; color: var(--text-main);">{{ project.title }}</h1>
+        
+        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+            {% if project.is_verified %}
+                <span class="badge badge-success" style="padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.75rem;">Verified Project</span>
+            {% else %}
+                <span class="badge badge-warning" style="padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.75rem; background: var(--warning-bg); color: var(--warning-text); border: 1px solid var(--warning-border);">Pending Verification</span>
+            {% endif %}
+            
+            {% if project.is_public %}
+                <span class="badge" style="background:#e0f2fe; color:#0284c7; border:1px solid #bae6fd; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.75rem;">Public</span>
+            {% else %}
+                <span class="badge" style="background:var(--background); color:var(--text-muted); border:1px solid var(--border); padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.75rem;">Private</span>
+            {% endif %}
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid var(--border); margin: 20px 0;">
+        
+        <div class="description-content">
+            {{ project.description }}
+        </div>
+        
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px dashed var(--border); font-size: 0.9rem; color: var(--text-muted);">
+            <strong>Student:</strong> {{ project.student.user.first_name }} {{ project.student.user.last_name }} ({{ project.student.enrollment_number }})
+        </div>
+    </div>
+
+    <div class="right-column">
+        
+        <div class="card" style="background-color: var(--surface);">
+            <h3 style="margin-top: 0; color: var(--text-main);">Actions</h3>
+            
+            <div class="action-buttons">
+                {% if project.video_demo %}
+                    <a href="{{ project.video_demo.url }}" class="btn" style="background-color: #dc3545; width: 100%; text-align: center; padding: 10px;" target="_blank">
+                        ▶ Demo
+                    </a>
+                {% else %}
+                    <button class="btn" style="background-color: var(--border); color: var(--text-muted); cursor: not-allowed; width: 100%; padding: 10px;" disabled>
+                        No Demo
+                    </button>
+                {% endif %}
+
+                {% if project.github_repo_link %}
+                    <a href="{{ project.github_repo_link }}" class="btn" style="background-color: #24292e; width: 100%; text-align: center; padding: 10px;" target="_blank">
+                        GitHub
+                    </a>
+                {% else %}
+                    <button class="btn" style="background-color: var(--border); color: var(--text-muted); cursor: not-allowed; width: 100%; padding: 10px;" disabled>
+                        No Code
+                    </button>
+                {% endif %}
+            </div>
+
+            {% if request.user.is_superuser %}
+                <a href="{% url 'admin_control_panel' %}" class="btn" style="background: var(--border); color: var(--text-main); width: 100%;">Back to Admin</a>
+            {% elif request.user.role == 'HOD' %}
+                <a href="{% url 'hod_dashboard' %}" class="btn" style="background: var(--border); color: var(--text-main); width: 100%;">Back to HOD</a>
+            {% elif request.user.role == 'FACULTY' %}
+                <a href="{% url 'faculty_dashboard' %}" class="btn" style="background: var(--border); color: var(--text-main); width: 100%;">Back to Faculty</a>
+            {% elif request.user.role == 'RECRUITER' %}
+                <a href="{% url 'recruiter_dashboard' %}" class="btn" style="background: var(--border); color: var(--text-main); width: 100%;">Back to Recruiter</a>
+            {% else %}
+                <a href="{% url 'student_dashboard' %}" class="btn" style="background: var(--border); color: var(--text-main); width: 100%;">Back to Dashboard</a>
+            {% endif %}
+        </div>
+
+        <div class="card" style="background-color: var(--surface);">
+            <h3 style="margin-top: 0; color: var(--text-main);">Tech Stack</h3>
+            
+            {% if project.languages.all %}
+                <div style="display: flex; height: 12px; background-color: var(--border); border-radius: 6px; overflow: hidden; margin-bottom: 20px;">
+                    {% for lang in project.languages.all %}
+                        <div style="width: {{ lang.percentage }}%; background-color: {{ lang.get_color }};" title="{{ lang.language_name }}: {{ lang.percentage }}%"></div>
+                    {% endfor %}
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    {% for lang in project.languages.all %}
+                        <div style="display: flex; justify-content: space-between; align-items: center; color: var(--text-main);">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="width: 10px; height: 10px; border-radius: 50%; background-color: {{ lang.get_color }};"></span>
+                                <span style="font-weight: 500;">{{ lang.language_name }}</span>
+                            </div>
+                            <span style="font-size: 0.9rem; color: var(--text-muted);">{{ lang.percentage }}%</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted">No language analysis available.</p>
+            {% endif %}
+
+            {% if request.user == project.student.user %}
+                <div style="margin-top: 25px; padding-top: 20px; border-top: 1px dashed var(--border);">
+                    <h4 style="margin-top: 0; font-size: 1rem; color: var(--text-main);">Add Skill Manually</h4>
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ lang_form.as_p }}
+                        <button type="submit" class="btn btn-sm" style="width: 100%; margin-top: 5px;">Add</button>
+                    </form>
+                </div>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+{% endblock %}

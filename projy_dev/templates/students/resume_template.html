@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: 'Arial', sans-serif; line-height: 1.5; color: #333; margin: 0; padding: 40px; }
+        .resume-header { border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
+        .name { font-size: 28px; font-weight: bold; text-transform: uppercase; }
+        .contact-info { font-size: 12px; }
+        .section-title { font-weight: bold; text-transform: uppercase; border-bottom: 1px solid #ddd; margin: 20px 0 10px 0; }
+        .project-item { margin-bottom: 15px; }
+        .project-title { font-weight: bold; }
+        @media print { .no-print { display: none; } }
+    </style>
+</head>
+<body>
+    <div class="no-print" style="background: #f8d7da; padding: 10px; text-align: center; margin-bottom: 20px;">
+        <button onclick="window.print()" style="padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer;">
+            Download as PDF / Print
+        </button>
+    </div>
+
+    <div class="resume-header">
+        <div class="name">{{ profile.user.get_full_name }}</div>
+        <div class="contact-info">
+            {{ profile.user.email }} | {{ profile.user.phone_number }} | {{ profile.college.name }}
+        </div>
+    </div>
+
+    <div class="section-title">Professional Summary</div>
+    <p>{{ profile.bio }}</p>
+
+    <div class="section-title">Education</div>
+    <p><strong>{{ profile.college.name }}</strong><br>
+    {{ profile.education_details }} | Semester {{ profile.semester }}</p>
+
+    <div class="section-title">Technical Projects</div>
+    {% for project in projects %}
+    <div class="project-item">
+        <span class="project-title">{{ project.title }}</span> 
+        <p style="font-size: 13px; margin: 5px 0;">{{ project.description|truncatewords:40 }}</p>
+    </div>
+    {% endfor %}
+
+    <div class="section-title">Skills</div>
+    <p>{{ profile.skills_csv }}</p>
+</body>
+</html>

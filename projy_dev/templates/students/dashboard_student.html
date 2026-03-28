@@ -1,0 +1,581 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ user.username }}'s Dashboard{% endblock %}
+
+{% block content %}
+
+<style>
+    /* --- Layout Container --- */
+    .dashboard-container {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 30px;
+        margin-bottom: 4rem;
+        align-items: start;
+    }
+
+    @media (min-width: 992px) {
+        .dashboard-container {
+            grid-template-columns: 300px 1fr; /* Sidebar Fixed, Main Fluid */
+        }
+    }
+
+    /* --- Sidebar / Profile Card Styles --- */
+    .profile-card {
+        background-color: var(--surface) !important;
+        color: var(--text-main);
+        border-radius: 12px;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border);
+        padding: 2rem;
+        text-align: center;
+        position: sticky;
+        top: 100px;
+    }
+
+    .profile-img {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid var(--background);
+        box-shadow: var(--shadow-md);
+        margin-bottom: 15px;
+    }
+
+    .profile-placeholder {
+        width: 120px;
+        height: 120px;
+        background-color: var(--background);
+        color: var(--text-muted);
+        border-radius: 50%;
+        margin: 0 auto 15px auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 2rem;
+        border: 1px solid var(--border);
+    }
+
+    .profile-name { margin: 0; color: var(--text-main); font-weight: 700; }
+    .profile-username { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 10px; display: block;}
+
+    .info-list { text-align: left; font-size: 0.95rem; color: var(--text-muted); margin-top: 20px; }
+    .info-list p { margin-bottom: 8px; border-bottom: 1px dashed var(--border); padding-bottom: 8px; }
+    .info-list strong { color: var(--text-main); }
+
+    /* Social Buttons */
+    .btn-social {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        color: white;
+        text-decoration: none;
+        font-size: 0.9rem;
+        margin-bottom: 8px;
+        transition: opacity 0.2s;
+        text-align: center;
+        font-weight: 600;
+    }
+    .btn-social:hover { opacity: 0.9; color: white; }
+    .btn-github { background-color: #24292e; }
+    .btn-linkedin { background-color: #0077b5; }
+    .btn-resume { background-color: #6c757d; }
+
+    /* --- HORIZONTAL SLIDER STYLES --- */
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    
+    .btn-add-project {
+        background-color: var(--primary);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        border: none;
+        cursor: pointer;
+    }
+    
+    /* The Scroll Container */
+    .horizontal-scroll {
+        display: flex;
+        gap: 20px;
+        overflow-x: auto;
+        padding-bottom: 20px; 
+        padding-left: 2px;    
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch; 
+    }
+
+    .horizontal-scroll::-webkit-scrollbar { height: 8px; }
+    .horizontal-scroll::-webkit-scrollbar-track { background: var(--background); }
+    .horizontal-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    .horizontal-scroll::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+    /* Slider Card */
+    .slider-card {
+        min-width: 300px;
+        max-width: 300px;
+        flex-shrink: 0; 
+        background-color: var(--surface) !important;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        display: flex;
+        flex-direction: column; /* Crucial for keeping footer at bottom */
+    }
+    .slider-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-md);
+    }
+
+    /* Card Content Styles */
+    .project-img {
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+        background-color: var(--background);
+        border-bottom: 1px solid var(--border);
+    }
+    
+    .project-body { 
+        padding: 1.25rem; 
+        flex-grow: 1; /* Pushes the footer down */
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .project-title { margin: 0 0 10px 0; font-size: 1.15rem; color: var(--text-main); }
+    .project-title a { text-decoration: none; color: inherit; }
+    .project-title a:hover { color: var(--primary); }
+
+    .project-desc { color: var(--text-muted); font-size: 0.9rem; line-height: 1.5; margin-bottom: 15px; }
+
+    /* Card Footer */
+    .card-footer {
+        padding: 1rem;
+        background-color: var(--background);
+        border-top: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: auto; /* Aligns footer to the very bottom */
+    }
+    
+    .footer-row {
+        display: flex;
+        gap: 10px;
+        width: 100%;
+    }
+    
+    .btn-card {
+        flex: 1;
+        text-align: center;
+        padding: 8px;
+        font-size: 0.85rem;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 500;
+        cursor: pointer;
+        display: inline-block;
+    }
+    .btn-view { color: var(--primary); background: var(--surface); border: 1px solid var(--primary); }
+    .btn-view:hover { background: var(--background); }
+    .btn-edit { background-color: #ffc107; color: #000; border: 1px solid #ffc107; }
+    
+    /* --- Badges --- */
+    .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; }
+    .badge-success { background: var(--success-bg); color: var(--success-text); border: 1px solid var(--success-text); }
+    .badge-warning { background: var(--warning-bg); color: var(--warning-text); border: 1px solid var(--warning-border); }
+    .badge-private { background: #6c757d; color: white; border: 1px solid #545b62; }
+
+    /* --- Modal Styles --- */
+    .modal {
+        display: none; position: fixed; z-index: 2000; left: 0; top: 0; 
+        width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); overflow-y: auto;
+    }
+    .modal-content {
+        background-color: var(--surface); color: var(--text-main); margin: 5% auto; 
+        padding: 25px; border-radius: 8px; width: 90%; max-width: 500px;
+        box-shadow: var(--shadow-md); position: relative; border: 1px solid var(--border);
+    }
+
+    /* --- Tabs Styling --- */
+    .sidebar-tabs {
+        display: flex; margin-top: 15px; background: var(--background);
+        border-radius: 8px; padding: 4px;
+    }
+    .tab-btn {
+        flex: 1; padding: 8px; border: none; background: transparent;
+        color: var(--text-muted); font-weight: 600; font-size: 0.85rem;
+        cursor: pointer; border-radius: 6px; transition: all 0.2s;
+    }
+    .tab-btn.active {
+        background: var(--surface); color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    /* --- To-Do List Styling --- */
+    .todo-item {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 10px 0; border-bottom: 1px solid var(--border);
+    }
+    .todo-item:last-child { border-bottom: none; }
+    .todo-text { font-size: 0.9rem; color: var(--text-main); flex: 1; margin: 0 10px; text-align: left; }
+    .todo-completed { text-decoration: line-through; color: var(--text-muted); opacity: 0.6; }
+    .due-date { font-size: 0.75rem; margin-top: 2px; font-weight: 500; color: var(--text-muted); }
+    .due-date.overdue { color: #dc3545; }
+    .due-date.due-today { color: #ffc107; }
+    .close-btn { float: right; font-size: 24px; font-weight: bold; cursor: pointer; color: var(--text-muted); }
+    .close-btn:hover { color: var(--text-main); }
+    .form-group { margin-bottom: 15px; text-align: left; }
+    .form-control { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid var(--border); border-radius: 4px; background: var(--input-bg); color: var(--text-main);}
+    
+    /* Global Empty State Card */
+    .empty-state-card {
+        text-align: center; 
+        padding: 60px 20px; 
+        background-color: var(--surface) !important; 
+        border-radius: 12px; 
+        border: 1px dashed var(--border);
+        color: var(--text-main);
+    }
+</style>
+
+<div class="dashboard-container">
+    
+    <aside>
+        <div class="profile-card">
+            <div class="text-center">
+                {% if user.profile_pic %}
+                    <img src="{{ user.profile_pic.url }}" alt="Profile" class="profile-img">
+                {% else %}
+                    <div class="profile-placeholder">
+                        <span>{{ user.first_name|slice:":1" }}</span>
+                    </div>
+                {% endif %}
+                
+                <h3 class="profile-name">{{ user.first_name }} {{ user.last_name }}</h3>
+                <small class="profile-username">@{{ user.username }}</small>
+                
+                <div class="sidebar-tabs">
+                    <button class="tab-btn active" id="btn-profile" onclick="switchTab('profile')">Profile</button>
+                    <button class="tab-btn" id="btn-todo" onclick="switchTab('todo')">To-Do List</button>
+                </div>
+            </div>
+
+            <div id="section-profile">
+                {% if profile %}
+                    <div class="info-list">
+                        <p><strong>College:</strong> {{ profile.college.name }}</p>
+                        <p><strong>Dept:</strong> {{ profile.department.name }}</p>
+                        <p><strong>Enrollment:</strong> {{ profile.enrollment_number }}</p>
+                        <p>
+                            <strong>Semester:</strong> {{ profile.semester }}
+                            {% if profile.pending_semester %}
+                                <br><span class="badge badge-warning" style="font-size: 0.7rem; margin-top: 4px;">Pending: Sem {{ profile.pending_semester }}</span>
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        {% if profile.github_url %}
+                            <a href="{{ profile.github_url }}" target="_blank" class="btn-social btn-github">GitHub Profile</a>
+                        {% endif %}
+                        {% if profile.linkedin_url %}
+                            <a href="{{ profile.linkedin_url }}" target="_blank" class="btn-social btn-linkedin">LinkedIn Profile</a>
+                        {% endif %}
+                        {% if profile.resume %}
+                            <a href="{{ profile.resume.url }}" target="_blank" class="btn-social btn-resume">Download Resume</a>
+                        {% endif %}
+                        
+                        <button onclick="openModal('editProfileModal')" class="btn-social" style="background: #343a40; border: none; cursor: pointer; margin-top: 10px;">
+                            ✎ Edit Profile
+                        </button>
+
+                        <div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 20px;">
+                            <h4 style="margin-bottom: 10px; font-size: 0.9rem; color: var(--text-main); text-align: left;">Builder Tools</h4>
+                            <a href="{% url 'portfolio_builder' %}" class="btn btn-sm" style="width: 100%; margin-bottom: 10px; background: var(--accent);">🚀 Build / Edit Portfolio</a>
+                            <a href="{% url 'live_portfolio' %}" target="_blank" class="btn btn-sm" style="width: 100%; margin-bottom: 10px; background: var(--accent);">🚀 View Live Portfolio</a>
+                            <a href="{% url 'generate_resume' %}" target="_blank" class="btn btn-sm" style="width: 100%; margin-bottom: 10px; background: #34495e;">📄 Generate Resume</a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div id="section-todo" style="display: none; margin-top: 20px;">
+                <form method="post" style="display: flex; gap: 5px; margin-bottom: 15px; flex-wrap: wrap;">
+                    {% csrf_token %}
+                    <input type="hidden" name="add_todo" value="true">
+                    
+                    <input type="text" name="task" placeholder="New task..." required 
+                           style="flex: 1; min-width: 150px; padding: 8px; border: 1px solid var(--border); border-radius: 6px; margin: 0; background: var(--input-bg); color: var(--text-main);">
+                    
+                    <input type="date" name="due_date" title="Set End Date (Optional)"
+                           style="width: 130px; padding: 8px; border: 1px solid var(--border); border-radius: 6px; margin: 0; background: var(--input-bg); color: var(--text-muted); cursor: pointer;">
+                    
+                    <button type="submit" class="btn" style="padding: 8px 15px;">+</button>
+                </form>
+
+                <div style="max-height: 400px; overflow-y: auto;">
+                    {% for todo in todos %}
+                        <div class="todo-item" style="align-items: flex-start;">
+                            <form method="post" style="margin: 0; padding-top: 2px;">
+                                {% csrf_token %}
+                                <input type="hidden" name="toggle_todo" value="true">
+                                <input type="hidden" name="todo_id" value="{{ todo.id }}">
+                                <input type="checkbox" onchange="this.form.submit()" {% if todo.is_completed %}checked{% endif %} style="width: 16px; height: 16px; margin: 0; cursor: pointer;">
+                            </form>
+
+                            <div style="flex: 1; margin: 0 10px; text-align: left; display: flex; flex-direction: column;">
+                                <span class="todo-text {% if todo.is_completed %}todo-completed{% endif %}" style="margin: 0;">
+                                    {{ todo.task }}
+                                </span>
+                                
+                                {% if todo.due_date and not todo.is_completed %}
+                                    <small class="due-date {% if todo.is_overdue %}overdue{% elif todo.is_due_today %}due-today{% endif %}">
+                                        {% if todo.is_overdue %}⚠️ Overdue: 
+                                        {% elif todo.is_due_today %}⏰ Due Today: 
+                                        {% else %}🗓️ Due: 
+                                        {% endif %}
+                                        {{ todo.due_date|date:"M d, Y" }}
+                                    </small>
+                                {% endif %}
+                            </div>
+
+                            <form method="post" style="margin: 0;">
+                                {% csrf_token %}
+                                <input type="hidden" name="delete_todo" value="true">
+                                <input type="hidden" name="todo_id" value="{{ todo.id }}">
+                                <button type="submit" style="background: none; border: none; color: #dc3545; cursor: pointer; font-size: 1.2rem; padding: 0; line-height: 1;" title="Delete">×</button>
+                            </form>
+                        </div>
+                    {% empty %}
+                        <p style="font-size: 0.85rem; color: var(--text-muted); text-align: center; margin-top: 20px;">No pending tasks. You're all caught up!</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+        </div>
+    </aside>
+
+    <main>
+        <div class="section-header">
+            <h2 style="margin: 0; color: var(--text-main);">My Projects</h2>
+            <a href="{% url 'add_project' %}" class="btn-add-project">+ New Project</a>
+        </div>
+
+        {% if projects %}
+            <div class="horizontal-scroll">
+                {% for project in projects %}
+                <div class="slider-card">
+                    {% if project.cover_image %}
+                        <img src="{{ project.cover_image.url }}" alt="Cover" class="project-img">
+                    {% else %}
+                        <div class="project-img" style="display: flex; align-items: center; justify-content: center; color: var(--text-muted);">
+                            <span>No Cover</span>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="project-body">
+                        {% if project.needs_revision %}
+                            <div style="background: var(--error-bg); border-left: 4px solid #dc3545; padding: 10px; margin-bottom: 15px; border-radius: 4px;">
+                                <strong style="color: #dc3545; font-size: 0.85rem;">⚠️ Faculty Remarks:</strong>
+                                <p style="font-size: 0.85rem; margin: 5px 0 0 0; color: var(--text-main);">{{ project.faculty_remarks }}</p>
+                            </div>
+                        {% endif %}
+
+                        <h3 class="project-title">
+                            <a href="{% url 'project_detail' project.id %}">{{ project.title }}</a>
+                        </h3>
+                        <p class="project-desc">{{ project.description|truncatewords:10 }}</p>
+                        
+                        <div style="margin-top: auto; padding-top: 10px;">
+                            {% if project.is_verified %}
+                                <span class="badge badge-success">Verified</span>
+                            {% else %}
+                                <span class="badge badge-warning">Pending</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="card-footer">
+                        <div class="footer-row">
+                            <a href="{% url 'project_detail' project.id %}" class="btn-card btn-view">View</a>
+                            <a href="{% url 'edit_project' project.id %}" class="btn-card btn-edit">Edit</a>
+                        </div>
+                        
+                        {% if project.needs_revision %}
+                        <div class="footer-row">
+                            <a href="{% url 'mark_revision_done' project.id %}" class="btn-card" style="background: #28a745; color: white;">
+                                ✓ Mark Revisions as Fixed
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state-card">
+                <h3 style="margin-top: 0;">No Projects Yet!</h3>
+                <p style="color: var(--text-muted);">Your portfolio is empty. Add your first project.</p>
+            </div>
+        {% endif %}
+
+        <div class="section-header" style="margin-top: 50px;">
+            <h2 style="margin: 0; color: var(--text-main);">My Blogs</h2>
+            <a href="{% url 'manage_blogs' %}" class="btn-add-project" style="background: var(--accent);">Manage Blogs</a>
+        </div>
+
+        {% if blogs %}
+            <div class="horizontal-scroll">
+                {% for blog in blogs %}
+                <div class="slider-card">
+                    {% if blog.featured_image %}
+                        <img src="{{ blog.featured_image.url }}" style="width: 100%; height: 140px; object-fit: cover; border-bottom: 1px solid var(--border);">
+                    {% else %}
+                        <div style="width: 100%; height: 140px; background: var(--background); display: flex; align-items: center; justify-content: center; color: var(--text-muted); border-bottom: 1px solid var(--border);">
+                            <span>No Image</span>
+                        </div>
+                    {% endif %}
+
+                    <div class="project-body">
+                        <div style="margin-bottom: 10px;">
+                            {% if blog.is_private %}
+                                <span class="badge badge-private">🔒 Private</span>
+                            {% else %}
+                                <span class="badge badge-success">🌐 Public</span>
+                            {% endif %}
+                        </div>
+
+                        <h3 class="project-title">{{ blog.title|truncatechars:25 }}</h3>
+                        <p class="project-desc">{{ blog.content|truncatewords:12 }}</p>
+                        <small style="color: var(--text-muted); margin-top: auto;">{{ blog.created_at|date:"M d, Y" }}</small>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state-card">
+                <p style="color: var(--text-muted);">You haven't written any blogs yet.</p>
+                <a href="{% url 'manage_blogs' %}" style="color: var(--primary); font-weight: bold;">Write your first post &rarr;</a>
+            </div>
+        {% endif %}
+
+        <div class="section-header" style="margin-top: 40px;">
+            <h2 style="margin: 0; color: var(--text-main);">My Certificates</h2>
+            <a href="{% url 'manage_certificates' %}" class="btn-add-project" style="background: var(--accent);">Manage Certificates</a>
+        </div>
+
+        {% if certificates %}
+            <div class="horizontal-scroll">
+                {% for cert in certificates %}
+                <div class="slider-card">
+                    <img src="{{ cert.certificate_photo.url }}" style="width: 100%; height: 180px; object-fit: cover; pointer-events: none; user-select: none; border-bottom: 1px solid var(--border);">
+                    
+                    <div class="project-body">
+                        <h3 class="project-title" style="margin: 0 0 10px 0;">{{ cert.title|truncatechars:25 }}</h3>
+                        <p class="project-desc" style="margin: 0;">{{ cert.description|truncatewords:10 }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state-card">
+                <p style="margin: 0;">No certificates added yet.</p>
+            </div>
+        {% endif %}
+
+    </main>
+</div>
+
+<div id="editProfileModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal('editProfileModal')">&times;</span>
+        <h3 style="margin-top: 0; margin-bottom: 20px; color: var(--text-main);">Edit Profile</h3>
+        
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="edit_profile" value="true">
+            
+            <div class="form-group">
+                <label style="font-weight: 600; display: block; margin-bottom: 5px; color: var(--text-main);">Profile Photo</label>
+                <input type="file" name="profile_pic" class="form-control" accept="image/*">
+            </div>
+
+            <div class="form-group">
+                <label style="font-weight: 600; display: block; margin-bottom: 5px; color: var(--text-main);">Request Semester Change</label>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <span style="background: var(--background); padding: 10px; border-radius: 4px; color: var(--text-main);">Current: {{ profile.semester }}</span>
+                    <span style="color: var(--text-main);">➔</span>
+                    <input type="number" name="new_semester" class="form-control" style="width: 100px;" placeholder="New Sem" min="1" max="8">
+                </div>
+                <small style="color: var(--warning-text); display: block; margin-top: 4px;">⚠ Changes require Faculty approval.</small>
+            </div>
+
+            <div class="form-group">
+                <label style="font-weight: 600; display: block; margin-bottom: 5px; color: var(--text-main);">GitHub URL</label>
+                {{ profile_form.github_url }} 
+            </div>
+             <div class="form-group">
+                <label style="font-weight: 600; display: block; margin-bottom: 5px; color: var(--text-main);">LinkedIn URL</label>
+                {{ profile_form.linkedin_url }}
+            </div>
+            
+            <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                <label style="font-weight: 600; margin: 0; color: var(--text-main);">Profile Visibility:</label>
+                {{ profile_form.is_profile_public }} <span style="font-size: 0.9rem; color: var(--text-main);">Make Public</span>
+            </div>
+
+            <button type="submit" class="btn-add-project" style="width: 100%; margin-top: 10px;">Save Changes</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function openModal(id) {
+        document.getElementById(id).style.display = "block";
+    }
+    function closeModal(id) {
+        document.getElementById(id).style.display = "none";
+    }
+    window.onclick = function(event) {
+        if (event.target.className === 'modal') {
+            event.target.style.display = "none";
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const activeTab = localStorage.getItem('sidebarTab') || 'profile';
+        switchTab(activeTab);
+    });
+
+    function switchTab(tab) {
+        localStorage.setItem('sidebarTab', tab);
+        
+        document.getElementById('btn-profile').classList.remove('active');
+        document.getElementById('btn-todo').classList.remove('active');
+        document.getElementById('btn-' + tab).classList.add('active');
+
+        if (tab === 'profile') {
+            document.getElementById('section-profile').style.display = 'block';
+            document.getElementById('section-todo').style.display = 'none';
+        } else {
+            document.getElementById('section-profile').style.display = 'none';
+            document.getElementById('section-todo').style.display = 'block';
+        }
+    }
+</script>
+{% endblock %}

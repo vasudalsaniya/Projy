@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}Recruiter Portal{% endblock %}
+
+{% block content %}
+<div style="background: #0056b3; color: white; padding: 30px; border-radius: 8px; margin-bottom: 20px;">
+    <h1>Find Top Talent</h1>
+    <p>Search for skills like "Python", "Java", or "Django"</p>
+    
+    <form method="get" style="display: flex; gap: 10px; background: white; padding: 10px; border-radius: 4px;">
+        <input type="text" name="q" value="{{ query }}" placeholder="Search skills or projects..." style="flex: 3; margin: 0; border: none;">
+        
+        <select name="college" title="Select College" style="flex: 1; margin: 0; border: 1px solid #ddd;">
+            <option value="">All Colleges</option>
+            {% for col in all_colleges %}
+                <option value="{{ col.id }}" {% if selected_college == col.id %}selected{% endif %}>
+                    {{ col.name }}
+                </option>
+            {% endfor %}
+        </select>
+        
+        <button type="submit" class="btn" style="flex: 0.5;">Search</button>
+    </form>
+</div>
+
+<div class="grid-3">
+    {% for student in students %}
+    <div class="card">
+        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+             <div style="width: 50px; height: 50px; background: #ddd; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+                 {{ student.user.username|slice:":1" }}
+             </div>
+             <div>
+                 <h4 style="margin: 0;">{{ student.user.first_name }} {{ student.user.last_name }}</h4>
+                 <small class="text-muted">{{ student.department.name }}</small>
+             </div>
+        </div>
+        
+        <p style="font-size: 0.9rem;">
+            <strong>College:</strong> {{ student.college.name }}<br>
+            <strong>Enrollment:</strong> {{ student.enrollment_number }}
+        </p>
+
+        <div style="margin-bottom: 15px;">
+            {% for project in student.projects.all|slice:":3" %}
+                {% for lang in project.languages.all %}
+                    <span class="badge badge-success" style="margin-right: 3px;">{{ lang.language_name }}</span>
+                {% endfor %}
+            {% endfor %}
+        </div>
+
+        <a href="{% url 'student_public_profile' student.id %}" class="btn" style="width: 100%;">View Full Profile</a>
+    </div>
+    {% empty %}
+    <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 50px;">
+        <h3>No candidates found matching your criteria.</h3>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

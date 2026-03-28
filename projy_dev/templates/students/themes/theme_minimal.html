@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>{{ profile.user.get_full_name }} | {{ profile.job_title|default:"Portfolio" }}</title>
+  <meta name="description" content="{{ profile.bio|truncatewords:20 }}" />
+  <meta name="author" content="{{ profile.user.get_full_name }}" />
+
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b1220" />
+
+  {% if profile.user.profile_pic %}
+      <link rel="icon" href="{{ profile.user.profile_pic.url }}" type="image/png" />
+  {% endif %}
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#fff7ed', 100: '#ffedd5', 200: '#fed7aa', 300: '#fdba74',
+              400: '#fb923c', 500: '#f59e0b', 600: '#d97706', 700: '#b45309', 800: '#92400e', 900: '#78350f'
+            }
+          },
+          boxShadow: {
+            soft: '0 10px 30px rgba(0,0,0,0.15)',
+            glow: '0 0 30px rgba(245, 158, 11, 0.3)'
+          },
+          keyframes: {
+            fadeInUp: {
+              '0%': { opacity: 0, transform: 'translateY(10px)' },
+              '100%': { opacity: 1, transform: 'translateY(0)' }
+            },
+            fadeInDown: {
+              '0%': { opacity: 0, transform: 'translateY(-10px)' },
+              '100%': { opacity: 1, transform: 'translateY(0)' }
+            },
+            slideInLeft: {
+              '0%': { opacity: 0, transform: 'translateX(-20px)' },
+              '100%': { opacity: 1, transform: 'translateX(0)' }
+            },
+            floaty: {
+              '0%, 100%': { transform: 'translateY(0) scale(1)' },
+              '50%': { transform: 'translateY(-6px) scale(1.02)' }
+            },
+            blink: {
+              '0%, 100%': { opacity: 1 },
+              '50%': { opacity: 0 }
+            }
+          },
+          animation: {
+            fadeInUp: 'fadeInUp 700ms ease-out both',
+            fadeInDown: 'fadeInDown 500ms ease-out both',
+            slideInLeft: 'slideInLeft 600ms ease-out both',
+            floaty: 'floaty 6s ease-in-out infinite',
+            blink: 'blink 1s step-end infinite'
+          }
+        }
+      }
+    }
+  </script>
+
+  <script>
+    (function() {
+      const ls = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (ls === 'dark' || (!ls && prefersDark)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    })();
+  </script>
+
+  <style>
+    :root { --bg: #0b1220; }
+    body { font-family: 'Inter', sans-serif; }
+    html { scroll-behavior: smooth; }
+    section { scroll-margin-top: 88px; }
+    
+    .hover-lift { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .hover-lift:hover { transform: translateY(-2px); }
+    
+    .btn-primary {
+      position: relative; overflow: hidden; transition: all 0.3s ease;
+    }
+    .btn-primary::before {
+      content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+    .btn-primary:hover::before { left: 100%; }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 10px 25px rgba(245, 158, 11, 0.4); }
+    
+    .skill-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; }
+    .skill-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(99, 102, 241, 0.1));
+      opacity: 0; transition: opacity 0.3s ease;
+    }
+    .skill-card:hover::before { opacity: 1; }
+    .skill-card:hover { transform: translateY(-3px) scale(1.02); border-color: rgba(245, 158, 11, 0.5); }
+    
+    .project-card { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; }
+    .project-card:hover { transform: translateY(-8px); box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25); }
+    .project-card:hover .project-image { transform: scale(1.05); }
+    .project-image { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+    
+    .nav-link { position: relative; transition: all 0.3s ease; }
+    .nav-link::after {
+      content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px;
+      background: #f59e0b; transition: width 0.3s ease;
+    }
+    .nav-link:hover::after { width: 100%; }
+    
+    .social-link { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .social-link:hover { transform: translateY(-2px) scale(1.05); }
+    
+    .typing-cursor { display: inline-block; width: 3px; height: 1.2em; background: currentColor; margin-left: 2px; animation: blink 1s infinite; }
+    .header-blur { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+    
+    .scroll-indicator {
+      position: fixed; top: 0; left: 0; width: 0%; height: 3px;
+      background: linear-gradient(90deg, #f59e0b, #d97706); z-index: 100; transition: width 0.3s ease;
+    }
+  </style>
+</head>
+
+<body class="bg-white text-gray-900 dark:bg-[#0b1220] dark:text-gray-100">
+  <div class="scroll-indicator" id="scrollIndicator"></div>
+
+  <header class="fixed top-0 inset-x-0 z-50 header-blur bg-white/70 dark:bg-[#0b1220]/70 border-b border-gray-200/60 dark:border-white/10 animate-fadeInDown">
+    <div class="max-w-7xl mx-auto px-5 py-4 flex items-center justify-between">
+      <a href="#home" class="flex items-center gap-3 group hover-lift">
+        {% if profile.user.profile_pic %}
+            <img src="{{ profile.user.profile_pic.url }}" alt="Profile" class="w-9 h-9 rounded-full ring-2 ring-brand-500/30 group-hover:ring-brand-500/60 transition-all duration-300" />
+        {% else %}
+            <div class="w-9 h-9 rounded-full bg-gray-300 flex items-center justify-center text-gray-700 font-bold">{{ profile.user.first_name|slice:":1" }}</div>
+        {% endif %}
+        <span class="font-extrabold tracking-tight text-lg">{{ profile.user.get_full_name }}</span>
+      </a>
+      <nav class="hidden md:flex items-center gap-6 text-sm font-medium">
+        <a href="#about" class="nav-link hover:text-brand-500">About</a>
+        <a href="#projects" class="nav-link hover:text-brand-500">Projects</a>
+        <a href="#contact" class="nav-link hover:text-brand-500">Contact</a>
+        {% if profile.resume %}
+            <a href="{{ profile.resume.url }}" target="_blank" class="btn-primary inline-flex items-center px-3 py-1.5 rounded-lg bg-brand-500 text-white hover:bg-brand-600 shadow-soft">Resume</a>
+        {% endif %}
+      </nav>
+      <button id="themeToggle" aria-label="Toggle dark mode" class="ml-4 inline-flex items-center justify-center w-10 h-10 rounded-xl border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/10 transition-all duration-300 hover-lift">
+        <svg id="iconSun" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden dark:block transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 3v2m0 14v2m9-9h-2M5 12H3m15.364 6.364l-1.414-1.414M7.05 7.05 5.636 5.636m12.728 0-1.414 1.414M7.05 16.95l-1.414 1.414M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+        </svg>
+        <svg id="iconMoon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 dark:hidden transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+<section id="home" class="relative min-h-screen flex items-center overflow-hidden px-6">
+    <div class="absolute -top-24 -right-24 w-80 h-80 bg-brand-500/20 rounded-full blur-3xl animate-pulse"></div>
+    <div class="absolute -bottom-24 -left-24 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl animate-pulse"></div>
+
+    <div class="max-w-6xl mx-auto w-full grid md:grid-cols-2 items-center gap-12 mt-16">
+      
+      <div class="text-left">
+        <p class="text-brand-600 dark:text-brand-400 font-semibold tracking-wide mb-2 animate-slideInLeft">
+            {{ profile.job_title|default:"Software Developer" }}
+        </p>
+        
+        <h1 class="text-4xl md:text-6xl font-extrabold leading-tight min-h-[1.2em]">
+          <span id="typedTitle" class="inline-block"></span><span class="typing-cursor">&nbsp;</span>
+        </h1>
+
+        <p class="mt-5 text-lg text-gray-600 dark:text-gray-300 max-w-lg animate-fadeInUp" style="animation-delay: 0.3s;">
+            {{ profile.education_details|default:"B.Tech Student" }}
+        </p>
+
+        <div class="mt-7 flex flex-wrap gap-4 animate-fadeInUp justify-start" style="animation-delay: 0.5s;">
+          <a href="#projects" class="btn-primary inline-flex items-center px-6 py-3 rounded-xl bg-brand-500 text-white hover:bg-brand-600 shadow-soft">View Projects</a>
+          <a href="#contact" class="hover-lift inline-flex items-center px-6 py-3 rounded-xl border border-gray-300 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/10 transition-all duration-300">Contact</a>
+        </div>
+      </div>
+
+      <div class="flex justify-center md:justify-end items-center">
+        {% if profile.user.profile_pic %}
+            <img src="{{ profile.user.profile_pic.url }}" alt="Portrait" class="w-64 h-64 md:w-80 md:h-80 rounded-3xl object-cover ring-4 ring-brand-500/30 shadow-soft animate-floaty hover:ring-brand-500/50 transition-all duration-500" />
+        {% else %}
+            <div class="w-64 h-64 md:w-80 md:h-80 rounded-3xl ring-4 ring-brand-500/30 shadow-soft animate-floaty bg-gray-200 dark:bg-gray-800 flex items-center justify-center text-gray-400">No Photo</div>
+        {% endif %}
+      </div>
+    </div>
+</section>
+
+  <section id="about" class="py-24" data-reveal>
+    <div class="max-w-6xl mx-auto px-6">
+      <h2 class="text-3xl md:text-4xl font-extrabold mb-6">About Me</h2>
+      <p class="text-gray-700 dark:text-gray-300 max-w-3xl leading-relaxed whitespace-pre-wrap">{{ profile.bio|default:"Hello! I'm an enthusiastic student and developer." }}</p>
+
+      <div class="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-4" id="skills-grid">
+        </div>
+    </div>
+  </section>
+
+  <section id="projects" class="py-24 bg-gray-50 dark:bg-white/5" data-reveal>
+    <div class="max-w-6xl mx-auto px-6">
+      <h2 class="text-3xl md:text-4xl font-extrabold mb-3">Featured Projects</h2>
+      <p class="text-gray-700 dark:text-gray-300 mb-10">A showcase of my recent work and technical experiments.</p>
+
+      <div class="grid md:grid-cols-3 gap-6">
+        {% for project in projects %}
+        <article class="project-card group rounded-2xl overflow-hidden border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 shadow-soft flex flex-col">
+          {% if project.cover_image %}
+              <img src="{{ project.cover_image.url }}" alt="Project UI" class="project-image w-full h-44 object-cover" />
+          {% else %}
+              <div class="w-full h-44 bg-gray-200 dark:bg-gray-800 flex items-center justify-center text-gray-500">No Image</div>
+          {% endif %}
+          
+          <div class="p-5 flex flex-col flex-grow">
+            <h3 class="text-xl font-bold">{{ project.title }}</h3>
+            
+            <div class="flex flex-wrap gap-1 mt-2 mb-2">
+                {% for lang in project.languages.all %}
+                    <span class="text-xs px-2 py-1 rounded-md" style="background-color: {{ lang.get_color }}20; color: {{ lang.get_color }}; border: 1px solid {{ lang.get_color }}50;">{{ lang.language_name }}</span>
+                {% endfor %}
+            </div>
+
+            <p class="mt-2 text-sm text-gray-600 dark:text-gray-300 flex-grow">{{ project.description|truncatewords:20 }}</p>
+            
+            <div class="mt-4 flex flex-wrap gap-2">
+              <a href="{% url 'project_detail' project.id %}" target="_blank" rel="noopener" class="btn-primary px-3 py-1.5 rounded-lg bg-brand-500 text-white hover:bg-brand-600 text-sm">View Details</a>
+              {% if project.github_repo_link %}
+                  <a href="{{ project.github_repo_link }}" target="_blank" class="hover-lift px-3 py-1.5 rounded-lg border border-gray-300 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/10 text-sm transition-all duration-300">GitHub</a>
+              {% endif %}
+            </div>
+          </div>
+        </article>
+        {% empty %}
+            <p class="text-gray-500 italic">No public projects available to display yet.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="py-24" data-reveal>
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="grid md:grid-cols-2 gap-10 items-center">
+        <div>
+          <h2 class="text-3xl md:text-4xl font-extrabold mb-3">Let's work together</h2>
+          <p class="text-gray-700 dark:text-gray-300">Open to collaboration, job opportunities, and interesting projects.</p>
+          <div class="mt-6 flex flex-wrap gap-3">
+            <a href="mailto:{{ profile.user.email }}" class="btn-primary px-4 py-2 rounded-xl bg-brand-500 text-white hover:bg-brand-600 shadow-soft">Email Me</a>
+            
+            {% if profile.linkedin_url %}
+                <a href="{{ profile.linkedin_url }}" target="_blank" class="social-link px-4 py-2 rounded-xl border border-gray-300 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/10">LinkedIn</a>
+            {% endif %}
+            
+            {% if profile.github_url %}
+                <a href="{{ profile.github_url }}" target="_blank" class="social-link px-4 py-2 rounded-xl border border-gray-300 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/10">GitHub</a>
+            {% endif %}
+          </div>
+        </div>
+        <div class="relative">
+          {% if profile.user.profile_pic %}
+              <img src="{{ profile.user.profile_pic.url }}" alt="Profile" class="w-full max-w-sm mx-auto rounded-3xl ring-4 ring-brand-500/20 shadow-soft hover:ring-brand-500/40 transition-all duration-500 hover-lift object-cover" style="max-height: 400px;" />
+          {% else %}
+              <div class="w-full max-w-sm mx-auto h-64 rounded-3xl ring-4 ring-brand-500/20 shadow-soft bg-gray-200 dark:bg-gray-800"></div>
+          {% endif %}
+          <div class="absolute -z-10 -inset-6 bg-gradient-to-tr from-brand-500/10 to-indigo-500/10 rounded-[2rem] blur-2xl"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="py-8 border-t border-gray-200 dark:border-white/10">
+    <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+      <p class="text-sm text-gray-600 dark:text-gray-400">© <span id="year"></span> {{ profile.user.get_full_name }}. Built with Projy Ecosystem.</p>
+      <div class="flex items-center gap-4 text-sm">
+        <a href="#home" class="nav-link hover:text-brand-500">Top</a>
+        <a href="#about" class="nav-link hover:text-brand-500">About</a>
+        <a href="#projects" class="nav-link hover:text-brand-500">Projects</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Theme toggler
+    const toggleBtn = document.getElementById('themeToggle');
+    const sunIcon = document.getElementById('iconSun');
+    const moonIcon = document.getElementById('iconMoon');
+    
+    toggleBtn.addEventListener('click', () => {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      if (isDark) {
+        moonIcon.style.transform = 'rotate(180deg)';
+        sunIcon.style.transform = 'rotate(0deg)';
+      } else {
+        sunIcon.style.transform = 'rotate(180deg)';
+        moonIcon.style.transform = 'rotate(0deg)';
+      }
+    });
+
+    // Dynamic Skills Parsing from CSV
+    const rawSkills = "{{ profile.skills_csv|default:'' }}";
+    const skillsGrid = document.getElementById('skills-grid');
+    
+    if (rawSkills.trim() !== '') {
+        // Split by comma, remove whitespace, filter out empty strings
+        const skillsArray = rawSkills.split(',').map(s => s.trim()).filter(s => s);
+        
+        // Group skills into chunks of 3-4 per card so it looks like the template
+        let chunkSize = Math.ceil(skillsArray.length / 4);
+        if (chunkSize < 1) chunkSize = 1;
+        
+        for (let i = 0; i < skillsArray.length; i += chunkSize) {
+            const chunk = skillsArray.slice(i, i + chunkSize);
+            const bulletString = chunk.join(' • ');
+            const cardHTML = `<div class="skill-card p-4 rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 font-mono text-sm">${bulletString}</div>`;
+            skillsGrid.innerHTML += cardHTML;
+        }
+    } else {
+        skillsGrid.innerHTML = "<p class='text-gray-500 italic'>No specific skills listed.</p>";
+    }
+
+    // Typewriter effect
+    const titleEl = document.getElementById('typedTitle');
+    const text = "Hi, I'm {{ user.username }}";
+    let i = 0;
+    let isDeleting = false;
+    let typeSpeed = 100;
+
+    function type() {
+      const currentText = text.slice(0, i);
+      titleEl.textContent = currentText;
+
+      if (!isDeleting && i < text.length) {
+        // Typing phase
+        i++;
+        typeSpeed = 100; 
+      } else if (isDeleting && i > 0) {
+        // Deleting phase
+        i--;
+        typeSpeed = 50; 
+      } else if (!isDeleting && i === text.length) {
+        // Pause at the end before deleting
+        isDeleting = true;
+        typeSpeed = 2000; 
+      } else if (isDeleting && i === 0) {
+        // Pause at the start before re-typing
+        isDeleting = false;
+        typeSpeed = 500;
+      }
+
+      setTimeout(type, typeSpeed);
+    }
+
+    // Start the loop
+    window.addEventListener('load', () => { 
+        setTimeout(type, 500); 
+    });
+
+    // Scroll reveal
+    const revealEls = document.querySelectorAll('[data-reveal]');
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.classList.add('animate-fadeInUp');
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    revealEls.forEach((el) => io.observe(el));
+
+    // Scroll progress
+    const scrollIndicator = document.getElementById('scrollIndicator');
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.pageYOffset;
+      const docHeight = document.body.offsetHeight - window.innerHeight;
+      const scrollPercent = (scrollTop / docHeight) * 100;
+      scrollIndicator.style.width = scrollPercent + '%';
+    });
+
+    // Parallax background elements
+    window.addEventListener('scroll', () => {
+      const scrolled = window.pageYOffset;
+      const parallaxElements = document.querySelectorAll('[class*="blur-3xl"]');
+      parallaxElements.forEach((element, index) => {
+        const speed = 0.5 + (index * 0.1);
+        element.style.transform = `translateY(${scrolled * speed}px)`;
+      });
+    });
+
+    // Ripple effect on buttons
+    document.querySelectorAll('.btn-primary, .hover-lift').forEach(button => {
+      button.addEventListener('click', function(e) {
+        if(this.tagName === 'A' && this.getAttribute('href').startsWith('#')) {
+            // It's a smooth scroll link, don't prevent default, just do ripple
+        }
+      });
+    });
+  </script>
+</body>
+</html>

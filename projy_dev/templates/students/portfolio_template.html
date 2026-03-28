@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% block title %}{{ profile.user.first_name }}'s Portfolio{% endblock %}
+
+{% block content %}
+<style>
+    /* CSS to fix the overlapping images */
+    .project-card {
+        background-color: var(--surface);
+        border-radius: var(--radius);
+        overflow: hidden;
+        border: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        box-shadow: var(--shadow-sm);
+        transition: transform 0.2s ease;
+    }
+    .project-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); }
+    
+    .project-img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover; /* Forces image to stay within the box perfectly */
+        border-bottom: 1px solid var(--border);
+    }
+    
+    .project-body {
+        padding: 20px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .multi-progress-bar {
+        display: flex;
+        height: 8px;
+        background-color: var(--border);
+        border-radius: 4px;
+        overflow: hidden;
+        margin: 15px 0;
+    }
+    
+    .progress-segment { height: 100%; }
+    
+    .btn-view {
+        margin-top: auto;
+        display: block;
+        text-align: center;
+        padding: 10px;
+        background: var(--surface);
+        border: 1px solid var(--primary);
+        color: var(--primary);
+        border-radius: 6px;
+        font-weight: 600;
+    }
+    .btn-view:hover { background: var(--background); }
+</style>
+
+<div class="container">
+    <div class="card" style="text-align: center; padding: 50px; border-bottom: 5px solid var(--primary); background-color: var(--surface);">
+        {% if profile.user.profile_pic %}
+            <img src="{{ profile.user.profile_pic.url }}" style="width:150px; height:150px; border-radius:50%; object-fit:cover; border: 5px solid var(--background);">
+        {% endif %}
+        <h1 style="font-size: 3rem; margin: 10px 0; color: var(--text-main);">{{ profile.user.get_full_name }}</h1>
+        <p style="font-size: 1.2rem; color: var(--text-muted);">{{ profile.education_details }} | Semester {{ profile.semester }}</p>
+        <div style="display: flex; justify-content: center; gap: 15px; margin-top: 20px;">
+            <a href="{{ profile.github_url }}" class="btn btn-sm" target="_blank">GitHub</a>
+            <a href="{{ profile.linkedin_url }}" class="btn btn-sm" style="background:#0077b5;" target="_blank">LinkedIn</a>
+        </div>
+    </div>
+
+    <div class="card" style="margin-top: 30px; background-color: var(--surface); color: var(--text-main);">
+        <h3 style="margin-top: 0;">About Me</h3>
+        <p style="color: var(--text-muted); line-height: 1.6;">{{ profile.bio }}</p>
+    </div>
+
+    <h2 style="margin-top: 40px; color: var(--text-main);">Featured Projects</h2>
+    
+    <div class="grid-3">
+        {% for project in projects %}
+            <div class="project-card">
+                {% if project.cover_image %}
+                    <img src="{{ project.cover_image.url }}" class="project-img">
+                {% else %}
+                    <div class="project-img" style="display: flex; align-items: center; justify-content: center; background: var(--background); color: var(--text-muted);">No Cover</div>
+                {% endif %}
+                
+                <div class="project-body">
+                    <h3 style="margin: 0 0 10px 0; color: var(--text-main);">{{ project.title }}</h3>
+                    <div class="multi-progress-bar">
+                        {% for lang in project.languages.all %}
+                            <div class="progress-segment" style="width: {{ lang.percentage }}%; background-color: {{ lang.get_color }};"></div>
+                        {% endfor %}
+                    </div>
+                    <a href="{% url 'project_detail' project.id %}" class="btn-view">View Case Study</a>
+                </div>
+            </div>
+        {% empty %}
+            <p style="color: var(--text-muted);">No public projects available.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

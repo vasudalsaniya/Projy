@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+{% block title %}Faculty Dashboard{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 20px;">
+    <h1>Faculty Dashboard</h1>
+    <p>College: <strong>{% if college %}{{ college.name }}{% else %}Not Assigned{% endif %}</strong></p>
+</div>
+
+<div class="card">
+    <h3>🎓 Pending Student Approvals</h3>
+    <p class="text-muted" style="font-size: 0.9rem;">New students registering for the college.</p>
+    
+    {% if pending_students %}
+        <table style="width: 100%; text-align: left; border-collapse: collapse; margin-top: 15px;">
+            <thead>
+                <tr style="border-bottom: 2px solid var(--border);">
+                    <th style="padding: 10px;">Enrollment</th>
+                    <th>Name</th>
+                    <th>Dept</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in pending_students %}
+                <tr style="border-bottom: 1px solid var(--border);">
+                    <td style="padding: 10px;">{{ student.enrollment_number }}</td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            {% if student.user.profile_pic %}
+                                <img src="{{ student.user.profile_pic.url }}" style="width: 25px; height: 25px; border-radius: 50%; object-fit: cover;">
+                            {% endif %}
+                            {{ student.user.first_name }} {{ student.user.last_name }}
+                        </div>
+                    </td>
+                    <td>{{ student.department.name }}</td>
+                    <td>
+                        <a href="{% url 'approve_user' student.user.id %}" class="btn" style="padding: 5px 15px; font-size: 0.8rem; background: #28a745;">Approve</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="text-muted" style="padding: 10px; border: 1px dashed var(--border); border-radius: 5px; text-align: center;">No pending student registrations.</p>
+    {% endif %}
+</div>
+
+{% if semester_requests %}
+<div class="card" style="margin-top: 30px; border-top: 4px solid #ffc107;">
+    <h3>🔄 Semester Update Requests</h3>
+    <p class="text-muted" style="font-size: 0.9rem;">Students requesting to update their semester.</p>
+    
+    <table style="width: 100%; text-align: left; border-collapse: collapse; margin-top: 15px;">
+        <thead>
+            <tr style="border-bottom: 2px solid var(--border); background-color: var(--warning-bg); color: var(--warning-text);">
+                <th style="padding: 10px; color: inherit;">Student</th>
+                <th style="color: inherit;">Current</th>
+                <th style="color: inherit;">Requested</th>
+                <th style="color: inherit;">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for req in semester_requests %}
+            <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 10px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        {% if req.user.profile_pic %}
+                            <img src="{{ req.user.profile_pic.url }}" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
+                        {% endif %}
+                        <strong>{{ req.user.first_name }} {{ req.user.last_name }}</strong>
+                    </div>
+                </td>
+                <td>{{ req.semester }}</td>
+                <td style="color: #d39e00; font-weight: bold;">{{ req.pending_semester }}</td>
+                <td>
+                    <div style="display: flex; gap: 5px;">
+                        <a href="{% url 'approve_semester_change' req.id 'approve' %}" class="btn btn-sm" style="padding: 5px 10px; background: #28a745;">Approve</a>
+                        <a href="{% url 'approve_semester_change' req.id 'reject' %}" class="btn btn-sm" style="padding: 5px 10px; background: #dc3545;">Reject</a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+<div class="card" style="margin-top: 30px; border-top: 4px solid #007bff;">
+    <h3>📂 Project Approval Requests (My Mentees)</h3>
+    <p class="text-muted" style="font-size: 0.9rem;">Projects uploaded by students assigned to you.</p>
+    
+    {% if pending_projects %}
+        <table style="width: 100%; text-align: left; border-collapse: collapse; margin-top: 15px;">
+            <thead>
+                <tr style="border-bottom: 2px solid var(--border);">
+                    <th style="padding: 10px;">Student</th>
+                    <th>Project Title</th>
+                    <th>Date</th>
+                    <th>Links</th>
+                    <th>Action</th> </tr>
+            </thead>
+            <tbody>
+                {% for proj in pending_projects %}
+                <tr style="border-bottom: 1px solid var(--border);">
+                    <td style="padding: 10px;">
+                        <strong>{{ proj.student.user.first_name }} {{ proj.student.user.last_name }}</strong><br>
+                        <small class="text-muted">{{ proj.student.enrollment_number }}</small>
+                    </td>
+                    <td>{{ proj.title }}</td>
+                    <td>{{ proj.created_at|date:"M d" }}</td>
+                    
+                    <td>
+                        <div style="display: flex; flex-direction: column; gap: 5px;">
+                            <a href="{% url 'project_detail' proj.id %}" target="_blank" style="color: #007bff; text-decoration: none; font-weight: 500;">
+                                📄 View Details
+                            </a>
+                            
+                            {% if proj.video_demo %}
+                                <a href="{{ proj.video_demo.url }}" target="_blank" style="color: #dc3545; text-decoration: none; font-weight: 500;">
+                                    ▶ Watch Demo
+                                </a>
+                            {% endif %}
+                        </div>
+                    </td>
+
+                    <td>
+                        <div style="display: flex; gap: 5px; flex-direction: column;">
+                            <a href="{% url 'approve_project' proj.id %}" class="btn" style="padding: 5px 10px; background: #28a745; font-size: 0.85rem; text-align: center;">Approve</a>
+                            <button onclick="openRemarkModal({{ proj.id }}, '{{ proj.title|escapejs }}')" class="btn" style="padding: 5px 10px; background: #ffc107; color: #000; font-size: 0.85rem; text-align: center; border: none;">Leave Remark</button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="text-muted" style="padding: 20px; text-align: center; border: 1px dashed var(--border); border-radius: 5px; margin-top: 15px;">
+            No pending project approvals assigned to you.
+        </p>
+    {% endif %}
+</div>
+
+<div id="remarkModal" class="modal" style="display:none; position:fixed; z-index:3000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.5);">
+    <div class="modal-content" style="background:var(--surface); margin:10% auto; padding:20px; border-radius:8px; width:400px; color:var(--text-main);">
+        <span onclick="document.getElementById('remarkModal').style.display='none'" style="float:right; cursor:pointer; font-size:20px;">&times;</span>
+        <h3 id="remarkTitle" style="margin-top: 0;">Leave Remark</h3>
+        <form id="remarkForm" method="post" action="">
+            {% csrf_token %}
+            <textarea name="remarks" class="form-control" rows="4" placeholder="Tell the student what to fix..." required style="width:100%; margin-top:10px; background: var(--input-bg); color: var(--text-main); border: 1px solid var(--border);"></textarea>
+            <button type="submit" class="btn" style="width:100%; margin-top:15px; background:#ffc107; color:#000;">Send to Student</button>
+        </form>
+    </div>
+</div>
+
+<script>
+function openRemarkModal(id, title) {
+    document.getElementById('remarkTitle').innerText = "Remarks for: " + title;
+    let url = "{% url 'add_project_remark' 0 %}".replace('0', id);
+    document.getElementById('remarkForm').action = url;
+    document.getElementById('remarkModal').style.display = 'block';
+}
+</script>
+{% endblock %}

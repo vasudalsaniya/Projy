@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Projy - {% block title %}Portfolio Ecosystem{% endblock %}</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* =========================================
+         * 1. DESIGN TOKENS (Variables)
+         * =========================================
+         */
+        :root {
+            /* --- LIGHT THEME (Default) --- */
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --accent: #818cf8;
+
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --surface-transparent: rgba(255, 255, 255, 0.95);
+            --border: #e2e8f0;
+
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --input-bg: #ffffff;
+
+            --shadow-color: rgba(0, 0, 0, 0.05);
+
+            /* Status Colors (Keep roughly same, adjust borders for dark later) */
+            --success-bg: #ecfdf5; --success-text: #047857;
+            --error-bg: #fff1f2;   --error-text: #be123c;
+            --info-bg: #eff6ff;    --info-text: #1d4ed8;
+
+            /* Spacing & Shapes */
+            --radius: 12px;
+            --shadow-sm: 0 1px 2px 0 var(--shadow-color);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --container-width: 1200px;
+        }
+
+        /* --- DARK THEME OVERRIDES --- */
+        [data-theme="dark"] {
+            --primary: #6366f1;
+            --primary-hover: #818cf8;
+
+            --background: #0f172a;
+            --surface: #1e293b;
+            --surface-transparent: rgba(30, 41, 59, 0.95);
+            --border: #334155;
+
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --input-bg: #0f172a;
+
+            --shadow-color: rgba(0, 0, 0, 0.3);
+
+            /* Adjust status colors for dark mode readability */
+            --success-bg: #064e3b; --success-text: #6ee7b7;
+            --error-bg: #7f1d1d;   --error-text: #fda4af;
+            --info-bg: #1e3a8a;    --info-text: #93c5fd;
+        }
+
+        /* =========================================
+         * 2. GLOBAL RESET & BASE STYLES
+         * =========================================
+         */
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background);
+            color: var(--text-main);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            /* Smooth Color Transition when switching themes */
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        a { text-decoration: none; color: inherit; transition: color 0.2s ease; }
+        ul { list-style: none; padding: 0; margin: 0; }
+
+        /* =========================================
+         * 3. NAVIGATION BAR
+         * =========================================
+         */
+        .navbar {
+            background: var(--surface-transparent);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 1.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(8px);
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .nav-container {
+            max-width: var(--container-width);
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-links { display: flex; align-items: center; gap: 24px; }
+
+        .nav-links a {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover { color: var(--primary); }
+
+        /* Theme Toggle Button */
+        .theme-toggle-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 8px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        .theme-toggle-btn:hover {
+            background-color: var(--border);
+        }
+        .theme-icon { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+        /* Show Sun by default (assuming light), hide Moon */
+        .icon-sun { display: none; }
+        .icon-moon { display: block; }
+
+        /* If dark mode is active, swap icons */
+        [data-theme="dark"] .icon-sun { display: block; }
+        [data-theme="dark"] .icon-moon { display: none; }
+
+        /* User Profile Info */
+        .user-greeting {
+            background-color: var(--background);
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            color: var(--text-main);
+            border: 1px solid var(--border);
+        }
+
+        .btn-logout {
+            color: var(--error-text) !important;
+            font-size: 0.9rem;
+        }
+
+        /* Mobile Menu Toggle */
+        .menu-toggle {
+            display: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--text-main);
+        }
+
+        /* =========================================
+         * 4. LAYOUT UTILITIES
+         * =========================================
+         */
+        .container {
+            max-width: var(--container-width);
+            margin: 2.5rem auto;
+            padding: 0 20px;
+            flex: 1;
+            width: 100%;
+        }
+
+        .grid-2 { display: grid; gap: 30px; grid-template-columns: 1fr; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; }
+
+        @media (min-width: 992px) {
+            .grid-2 { grid-template-columns: 320px 1fr; }
+        }
+
+        /* =========================================
+         * 5. COMPONENTS
+         * =========================================
+         */
+        .card {
+            background: var(--surface);
+            padding: 30px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            height: 100%;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn {
+            background: var(--primary);
+            color: #ffffff; /* Always white text on primary button */
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-block;
+            text-align: center;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn:hover {
+            background: var(--primary-hover);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+        }
+
+        .btn-sm { padding: 8px 16px; font-size: 0.85rem; }
+
+        /* Form Inputs */
+        label { display: block; font-weight: 500; margin-bottom: 6px; color: var(--text-main); }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: inherit;
+            background: var(--input-bg);
+            color: var(--text-main);
+            transition: border-color 0.2s, box-shadow 0.2s, background-color 0.3s, color 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+        }
+
+        /* Badges */
+        .badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+        }
+        .badge-success { background: var(--success-bg); color: var(--success-text); border: 1px solid var(--success-text); }
+        .badge-warning { background: #fffbeb; color: #b45309; border: 1px solid #b45309; }
+        /* Dark mode overrides for badges happen via variables */
+
+        /* =========================================
+         * 6. ALERTS / TOAST MESSAGES
+         * =========================================
+         */
+        .messages-container {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 2000;
+            width: 350px;
+        }
+
+        .alert {
+            padding: 16px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            border-left: 4px solid transparent;
+            box-shadow: var(--shadow-md);
+            background: var(--surface);
+            font-size: 0.95rem;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .alert-success { border-color: var(--success-text); background: var(--success-bg); color: var(--success-text); }
+        .alert-error, .alert-danger { border-color: var(--error-text); background: var(--error-bg); color: var(--error-text); }
+        .alert-info { border-color: var(--info-text); background: var(--info-bg); color: var(--info-text); }
+
+        /* =========================================
+         * 7. FOOTER
+         * =========================================
+         */
+        footer {
+            background-color: var(--surface);
+            border-top: 1px solid var(--border);
+            padding: 40px 0;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        /* =========================================
+         * 8. MOBILE RESPONSIVENESS
+         * =========================================
+         */
+        @media (max-width: 768px) {
+            .navbar { padding: 1rem; }
+            .menu-toggle { display: block; }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--surface);
+                flex-direction: column;
+                align-items: stretch;
+                padding: 20px;
+                border-bottom: 1px solid var(--border);
+                box-shadow: var(--shadow-md);
+            }
+
+            .nav-links.active { display: flex; }
+
+            .nav-links a, .user-greeting {
+                margin: 5px 0;
+                text-align: center;
+                padding: 10px;
+            }
+
+            .user-greeting { margin-bottom: 15px; }
+
+            /* Center theme toggle on mobile menu */
+            .theme-toggle-btn { margin: 10px auto; }
+        }
+
+        /* NOTIFICATION BELL STYLES */
+        .notification-wrapper { position: relative; display: flex; align-items: center; margin-right: 15px; }
+        .bell-icon { width: 24px; height: 24px; cursor: pointer; color: var(--text-main); }
+        .badge-count {
+            position: absolute; top: -5px; right: -5px;
+            background: #dc3545; color: white; border-radius: 50%;
+            padding: 2px 6px; font-size: 0.7rem; font-weight: bold;
+        }
+        .notification-dropdown {
+            display: none; position: absolute; top: 40px; right: -50px;
+            width: 320px; background: var(--surface); border: 1px solid var(--border);
+            border-radius: 8px; box-shadow: var(--shadow-md); z-index: 2000;
+            max-height: 400px; overflow-y: auto;
+        }
+        .notification-dropdown.active { display: block; }
+        .notif-item {
+            display: block; padding: 12px 15px; border-bottom: 1px solid var(--border);
+            color: var(--text-main); text-decoration: none; font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+        .notif-item:hover { background: var(--background); }
+        .notif-item:last-child { border-bottom: none; }
+
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+    </script>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="
+                {% if user.is_authenticated %}
+                    {% if user.is_superuser or user.role == 'ADMIN' %}
+                        {% url 'admin_control_panel' %}
+                    {% elif user.role == 'HOD' %}
+                        {% url 'hod_dashboard' %}
+                    {% elif user.role == 'FACULTY' %}
+                        {% url 'faculty_dashboard' %}
+                    {% elif user.role == 'RECRUITER' %}
+                        {% url 'recruiter_dashboard' %}
+                    {% else %}
+                        {% url 'student_dashboard' %}
+                    {% endif %}
+                {% else %}
+                    /
+                {% endif %}
+            " class="brand">
+                Projy<span style="color:var(--text-main); font-weight:300;">Ecosystem</span>
+            </a>
+
+            <div class="menu-toggle" id="mobile-menu">
+                <span>&#9776;</span>
+            </div>
+
+            <div class="nav-links" id="nav-links">
+
+                <div class="nav-links" id="nav-links">
+    
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle Dark Mode">
+                    <svg class="theme-icon icon-sun" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    <svg class="theme-icon icon-moon" viewBox="0 0 24 24">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </button>
+
+                {% if user.is_authenticated %}
+                    
+                    {% if user.is_superuser or user.role == 'ADMIN' %}
+                        <a href="{% url 'admin_control_panel' %}" style="color: #d97706; font-weight: 700;">
+                            ★ Admin Control
+                        </a>
+                    {% endif %}
+
+                    <div class="notification-wrapper">
+                        <svg class="bell-icon" id="bell-btn" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                        {% if unread_count > 0 %}
+                            <span class="badge-count">{{ unread_count }}</span>
+                        {% endif %}
+                        
+                        <div class="notification-dropdown" id="notif-dropdown">
+                            <div style="padding: 10px 15px; font-weight: bold; border-bottom: 1px solid var(--border); background: var(--background);">
+                                Notifications
+                            </div>
+                            {% for notif in unread_notifications %}
+                                <a href="{% url 'read_notification' notif.id %}" class="notif-item">
+                                    <div style="font-weight: 600;">{{ notif.message }}</div>
+                                    <small style="color: var(--text-muted);">{{ notif.created_at|timesince }} ago</small>
+                                </a>
+                            {% empty %}
+                                <div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 0.9rem;">
+                                    No new notifications.
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="user-greeting" style="display: flex; align-items: center; gap: 8px; padding: 4px 12px;">
+                        {% if user.profile_pic %}
+                            <img src="{{ user.profile_pic.url }}" style="width: 25px; height: 25px; border-radius: 50%; object-fit: cover;">
+                        {% endif %}
+
+                        <span>{{ user.username }}</span>
+
+                        {% if user.get_role_display %}
+                            <span style="opacity: 0.7; font-size: 0.8em;">| {{ user.get_role_display }}</span>
+                        {% endif %}
+                    </div>
+
+                    <a href="{% url 'logout' %}" class="btn-logout">Logout</a> 
+                    
+                {% else %}
+                    <a href="{% url 'login' %}">Login</a>
+                    <a href="{% url 'signup_college' %}">For Colleges</a>
+                    <a href="{% url 'signup_recruiter' %}" class="btn btn-sm">For Recruiters</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        {% if messages %}
+            <div class="messages-container">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <div style="max-width: var(--container-width); margin: 0 auto;">
+            <p>&copy; {% now "Y" %} Projy Project Ecosystem. Built for Connections.</p>
+        </div>
+    </footer>
+
+    <script>
+        // 1. Mobile Menu Logic
+        const menuToggle = document.getElementById('mobile-menu');
+        const navLinks = document.getElementById('nav-links');
+
+        if (menuToggle) {
+            menuToggle.addEventListener('click', function() {
+                navLinks.classList.toggle('active');
+            });
+        }
+
+        // 2. Dark Mode Toggle Logic
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const htmlElement = document.documentElement;
+
+        themeToggleBtn.addEventListener('click', () => {
+            const currentTheme = htmlElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+            // Set Attribute for CSS
+            htmlElement.setAttribute('data-theme', newTheme);
+
+            // Save to LocalStorage
+            localStorage.setItem('theme', newTheme);
+        });
+
+        // 3. Message Auto-Dismissal
+        setTimeout(function() {
+            const messages = document.querySelector('.messages-container');
+            if (messages) {
+                messages.style.transition = 'opacity 0.5s ease';
+                messages.style.opacity = '0';
+                setTimeout(() => messages.remove(), 500);
+            }
+        }, 4000);
+
+        const bellBtn = document.getElementById('bell-btn');
+        const notifDropdown = document.getElementById('notif-dropdown');
+        if (bellBtn) {
+            bellBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                notifDropdown.classList.toggle('active');
+            });
+            window.addEventListener('click', function() {
+                if (notifDropdown.classList.contains('active')) {
+                    notifDropdown.classList.remove('active');
+                }
+            });
+        }
+        
+    </script>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>
