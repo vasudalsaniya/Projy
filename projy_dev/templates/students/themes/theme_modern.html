@@ -1,314 +1,464 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ profile.user.get_full_name }} - Portfolio</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ profile.user.get_full_name|default:"Portfolio" }} | Portfolio</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,600&display=swap" rel="stylesheet">
 
-        :root {
-            --bg-color: #121212;
-            --surface-color: #1e1e1f;
-            --border-color: #383838;
-            --primary-color: #ffdb70;
-            --text-main: #fafafa;
-            --text-muted: #d6d6d6;
-            --text-lighter: #a0a0a0;
-        }
+  <style>
+    /*-----------------------------------*\
+      #CUSTOM PROPERTIES FROM REFERENCE
+    \*-----------------------------------*/
+    :root {
+      --bg-gradient-onyx: linear-gradient(to bottom right, hsl(240, 1%, 25%) 3%, hsl(0, 0%, 19%) 97%);
+      --bg-gradient-jet: linear-gradient(to bottom right, hsla(240, 1%, 18%, 0.251) 0%, hsla(240, 2%, 11%, 0) 100%), hsl(240, 2%, 13%);
+      --bg-gradient-yellow-1: linear-gradient(to bottom right, hsl(45, 100%, 71%) 0%, hsla(36, 100%, 69%, 0) 50%);
+      --bg-gradient-yellow-2: linear-gradient(135deg, hsla(45, 100%, 71%, 0.251) 0%, hsla(35, 100%, 68%, 0) 59.86%), hsl(240, 2%, 13%);
+      --border-gradient-onyx: linear-gradient(to bottom right, hsl(0, 0%, 25%) 0%, hsla(0, 0%, 25%, 0) 50%);
+      --text-gradient-yellow: linear-gradient(to right, hsl(45, 100%, 72%), hsl(35, 100%, 68%));
+      
+      --jet: hsl(0, 0%, 22%);
+      --onyx: hsl(240, 1%, 17%);
+      --eerie-black-1: hsl(240, 2%, 13%);
+      --eerie-black-2: hsl(240, 2%, 12%);
+      --smoky-black: hsl(0, 0%, 7%);
+      --white-1: hsl(0, 0%, 100%);
+      --white-2: hsl(0, 0%, 98%);
+      --orange-yellow-crayola: hsl(45, 100%, 72%);
+      --vegas-gold: hsl(45, 54%, 58%);
+      --light-gray: hsl(0, 0%, 84%);
+      --light-gray-70: hsla(0, 0%, 84%, 0.7);
+      --bittersweet-shimmer: hsl(0, 43%, 51%);
+      
+      --ff-poppins: 'Poppins', sans-serif;
+      
+      --fs-1: 24px; --fs-2: 18px; --fs-3: 17px; --fs-4: 16px;
+      --fs-5: 15px; --fs-6: 14px; --fs-7: 13px; --fs-8: 11px;
+      
+      --fw-300: 300; --fw-400: 400; --fw-500: 500; --fw-600: 600;
+      
+      --shadow-1: -4px 8px 24px hsla(0, 0%, 0%, 0.25);
+      --shadow-2: 0 16px 30px hsla(0, 0%, 0%, 0.25);
+      --shadow-3: 0 16px 40px hsla(0, 0%, 0%, 0.25);
+      --shadow-4: 0 25px 50px hsla(0, 0%, 0%, 0.15);
+      --shadow-5: 0 24px 80px hsla(0, 0%, 0%, 0.25);
+      
+      --transition-1: 0.25s ease;
+      --transition-2: 0.5s ease-in-out;
+    }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-            padding: 40px 20px;
-            display: flex;
-            justify-content: center;
-            line-height: 1.6;
-        }
+    /*-----------------------------------*\
+      #RESET
+    \*-----------------------------------*/
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    a { text-decoration: none; }
+    li { list-style: none; }
+    img, ion-icon, a, button, time, span { display: block; }
+    button { font: inherit; background: none; border: none; text-align: left; cursor: pointer; }
+    input, textarea { display: block; width: 100%; background: none; font: inherit; }
+    ::selection { background: var(--orange-yellow-crayola); color: var(--smoky-black); }
+    :focus { outline-color: var(--orange-yellow-crayola); }
+    html { font-family: var(--ff-poppins); }
+    body { background: var(--smoky-black); color: var(--light-gray); }
 
-        .layout {
-            display: grid;
-            grid-template-columns: 280px 1fr;
-            gap: 25px;
-            max-width: 1200px;
-            width: 100%;
-            align-items: start;
-        }
+    /*-----------------------------------*\
+      #REUSED STYLE
+    \*-----------------------------------*/
+    .sidebar, article {
+      background: var(--eerie-black-2);
+      border: 1px solid var(--jet);
+      border-radius: 20px;
+      padding: 15px;
+      box-shadow: var(--shadow-1);
+      z-index: 1;
+    }
+    .separator { width: 100%; height: 1px; background: var(--jet); margin: 16px 0; }
+    .icon-box {
+      position: relative; background: var(--border-gradient-onyx); width: 30px; height: 30px;
+      border-radius: 8px; display: flex; justify-content: center; align-items: center;
+      font-size: 16px; color: var(--orange-yellow-crayola); box-shadow: var(--shadow-1); z-index: 1;
+    }
+    .icon-box::before {
+      content: ""; position: absolute; inset: 1px; background: var(--eerie-black-1);
+      border-radius: inherit; z-index: -1;
+    }
+    .icon-box ion-icon { --ionicon-stroke-width: 35px; }
+    article { display: none; }
+    article.active { display: block; animation: fade 0.5s ease backwards; }
+    @keyframes fade { 0% { opacity: 0; } 100% { opacity: 1; } }
+    .h2, .h3, .h4, .h5 { color: var(--white-2); text-transform: capitalize; }
+    .h2 { font-size: var(--fs-1); } .h3 { font-size: var(--fs-2); }
+    .h4 { font-size: var(--fs-4); } .h5 { font-size: var(--fs-7); font-weight: var(--fw-500); }
+    .article-title { position: relative; padding-bottom: 7px; }
+    .article-title::after {
+      content: ""; position: absolute; bottom: 0; left: 0; width: 30px; height: 3px;
+      background: var(--text-gradient-yellow); border-radius: 3px;
+    }
+    .content-card {
+      position: relative; background: var(--border-gradient-onyx); padding: 15px;
+      padding-top: 45px; border-radius: 14px; box-shadow: var(--shadow-2); cursor: pointer; z-index: 1;
+    }
+    .content-card::before {
+      content: ""; position: absolute; inset: 1px; background: var(--bg-gradient-jet);
+      border-radius: inherit; z-index: -1;
+    }
 
-        /* --- SIDEBAR --- */
-        .sidebar {
-            background: var(--surface-color);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            padding: 30px;
-            position: sticky;
-            top: 40px;
-            text-align: center;
-        }
+    /*-----------------------------------*\
+      #MAIN
+    \*-----------------------------------*/
+    main { margin: 15px 12px; margin-bottom: 75px; min-width: 259px; }
 
-        .avatar {
-            width: 150px; height: 150px;
-            border-radius: 20px;
-            object-fit: cover;
-            background: #2b2b2c;
-            margin: 0 auto 20px auto;
-        }
+    /*-----------------------------------*\
+      #SIDEBAR
+    \*-----------------------------------*/
+    .sidebar { margin-bottom: 15px; max-height: 112px; overflow: hidden; transition: var(--transition-2); }
+    .sidebar.active { max-height: 405px; }
+    .sidebar-info { position: relative; display: flex; justify-content: flex-start; align-items: center; gap: 15px; }
+    .avatar-box { background: var(--bg-gradient-onyx); border-radius: 20px; overflow: hidden; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center;}
+    .avatar-box img { width: 100%; height: 100%; object-fit: cover; }
+    .info-content .name { color: var(--white-2); font-size: var(--fs-3); font-weight: var(--fw-500); letter-spacing: -0.25px; margin-bottom: 10px; }
+    .info-content .title { color: var(--white-1); background: var(--onyx); font-size: var(--fs-8); font-weight: var(--fw-300); width: max-content; padding: 3px 12px; border-radius: 8px; }
+    .info_more-btn {
+      position: absolute; top: -15px; right: -15px; border-radius: 0 15px; font-size: 13px; color: var(--orange-yellow-crayola);
+      background: var(--border-gradient-onyx); padding: 10px; box-shadow: var(--shadow-2); transition: var(--transition-1); z-index: 1;
+    }
+    .info_more-btn::before { content: ""; position: absolute; inset: 1px; border-radius: inherit; background: var(--bg-gradient-jet); transition: var(--transition-1); z-index: -1; }
+    .info_more-btn:hover, .info_more-btn:focus { background: var(--bg-gradient-yellow-1); }
+    .info_more-btn span { display: none; }
+    .sidebar-info_more { opacity: 0; visibility: hidden; transition: var(--transition-2); }
+    .sidebar.active .sidebar-info_more { opacity: 1; visibility: visible; }
+    
+    .contacts-list { display: grid; grid-template-columns: 1fr; gap: 16px; }
+    .contact-item { min-width: 100%; display: flex; align-items: center; gap: 16px; }
+    .contact-info { max-width: calc(100% - 46px); width: calc(100% - 46px); }
+    .contact-title { color: var(--light-gray-70); font-size: var(--fs-8); text-transform: uppercase; margin-bottom: 2px; }
+    .contact-info :is(.contact-link, time, address) { color: var(--white-2); font-size: var(--fs-7); }
+    
+    .social-list { display: flex; justify-content: flex-start; align-items: center; gap: 15px; padding-bottom: 4px; padding-left: 7px; }
+    .social-item .social-link { color: var(--light-gray-70); font-size: 18px; }
+    .social-item .social-link:hover { color: var(--light-gray); }
 
-        .name { font-size: 1.5rem; font-weight: 600; margin: 0 0 10px 0; }
-        .title-badge {
-            background: #2b2b2c; color: var(--text-main); font-size: 0.8rem;
-            padding: 5px 15px; border-radius: 8px; display: inline-block; margin-bottom: 25px;
-        }
+    /*-----------------------------------*\
+      #NAVBAR
+    \*-----------------------------------*/
+    .navbar {
+      position: fixed; bottom: 0; left: 0; width: 100%; background: hsla(240, 1%, 17%, 0.75);
+      backdrop-filter: blur(10px); border: 1px solid var(--jet); border-radius: 12px 12px 0 0; box-shadow: var(--shadow-2); z-index: 5;
+    }
+    .navbar-list { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; padding: 0 10px; }
+    .navbar-link { color: var(--light-gray); font-size: var(--fs-8); padding: 20px 7px; transition: color var(--transition-1); }
+    .navbar-link.active { color: var(--orange-yellow-crayola); }
 
-        .contact-list { border-top: 1px solid var(--border-color); padding-top: 20px; text-align: left; }
-        .contact-item { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
-        .icon-box {
-            width: 40px; height: 40px; background: #2b2b2c; border-radius: 10px;
-            display: flex; align-items: center; justify-content: center; color: var(--primary-color);
-        }
-        .contact-info p { margin: 0; font-size: 0.75rem; color: var(--text-lighter); text-transform: uppercase; }
-        .contact-info span { font-size: 0.85rem; color: var(--text-main); }
+    /*-----------------------------------*\
+      #ABOUT & RESUME
+    \*-----------------------------------*/
+    .about .article-title, .resume .article-title { margin-bottom: 30px; }
+    .about-text { color: var(--light-gray); font-size: var(--fs-6); font-weight: var(--fw-300); font-family: 'General Sans', sans-serif; line-height: 1.6;}
+    
+    .timeline { margin-bottom: 30px; }
+    .timeline .title-wrapper { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; }
+    .timeline-list { font-size: var(--fs-6); margin-left: 45px; }
+    .timeline-item { position: relative; }
+    .timeline-item:not(:last-child) { margin-bottom: 20px; }
+    .timeline-item-title { font-size: var(--fs-6); line-height: 1.3; margin-bottom: 7px; }
+    .timeline-list span { color: var(--vegas-gold); font-weight: var(--fw-400); line-height: 1.6; }
+    .timeline-item:not(:last-child)::before { content: ""; position: absolute; top: -25px; left: -30px; width: 1px; height: calc(100% + 50px); background: var(--jet); }
+    .timeline-item::after { content: ""; position: absolute; top: 5px; left: -33px; height: 6px; width: 6px; background: var(--text-gradient-yellow); border-radius: 50%; box-shadow: 0 0 0 4px var(--jet); }
+    .timeline-text { color: var(--light-gray); font-weight: var(--fw-300); line-height: 1.6; }
+    
+    .skills-title { margin-bottom: 20px; }
+    .skills-list { padding: 20px; }
+    .skills-item:not(:last-child) { margin-bottom: 15px; }
+    .skill .title-wrapper { display: flex; align-items: center; gap: 5px; margin-bottom: 8px; justify-content: space-between;}
+    .skill .title-wrapper data { color: var(--light-gray); font-size: var(--fs-7); font-weight: var(--fw-300); }
+    .skill-progress-bg { background: var(--jet); width: 100%; height: 8px; border-radius: 10px; }
+    .skill-progress-fill { background: var(--text-gradient-yellow); height: 100%; border-radius: inherit; }
 
-        /* --- MAIN CONTENT --- */
-        .main-content {
-            background: var(--surface-color);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            position: relative;
-            padding: 30px;
-            min-height: 600px;
-        }
+    /*-----------------------------------*\
+      #PORTFOLIO
+    \*-----------------------------------*/
+    .project-list { display: grid; grid-template-columns: 1fr; gap: 30px; margin-bottom: 10px; }
+    .project-item { display: block; animation: scaleUp 0.25s ease forwards; }
+    @keyframes scaleUp { 0% { transform: scale(0.5); } 100% { transform: scale(1); } }
+    .project-img { position: relative; width: 100%; height: 200px; border-radius: 16px; overflow: hidden; margin-bottom: 15px; background: #222;}
+    .project-img::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: transparent; z-index: 1; transition: var(--transition-1); }
+    .project-item > a:hover .project-img::before { background: hsla(0, 0%, 0%, 0.5); }
+    .project-item-icon-box {
+      --scale: 0.8; background: var(--jet); color: var(--orange-yellow-crayola); position: absolute;
+      top: 50%; left: 50%; transform: translate(-50%, -50%) scale(var(--scale)); font-size: 20px;
+      padding: 18px; border-radius: 12px; opacity: 0; z-index: 1; transition: var(--transition-1);
+    }
+    .project-item > a:hover .project-item-icon-box { --scale: 1; opacity: 1; }
+    .project-img img { width: 100%; height: 100%; object-fit: cover; transition: var(--transition-1); }
+    .project-item > a:hover img { transform: scale(1.1); }
+    .project-title { color: var(--white-2); font-size: var(--fs-5); font-weight: var(--fw-400); text-transform: capitalize; line-height: 1.3; margin-left: 10px;}
+    .project-category { color: var(--light-gray-70); font-size: var(--fs-6); font-weight: var(--fw-300); margin-left: 10px; margin-top: 5px;}
 
-        /* NAVBAR */
-        .navbar {
-            position: absolute;
-            top: 0; right: 0;
-            background: #2b2b2c;
-            border-radius: 0 20px 0 20px;
-            display: flex;
-            padding: 15px 30px;
-            gap: 25px;
-        }
-        .nav-link {
-            color: var(--text-main);
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: color 0.3s;
-        }
-        .nav-link:hover, .nav-link.active { color: var(--primary-color); }
+    /*-----------------------------------*\
+      #CONTACT
+    \*-----------------------------------*/
+    .input-wrapper { display: grid; grid-template-columns: 1fr; gap: 25px; margin-bottom: 25px; }
+    .form-input { color: var(--white-2); font-size: var(--fs-6); font-weight: var(--fw-400); padding: 13px 20px; border: 1px solid var(--jet); border-radius: 14px; outline: none; }
+    .form-input:focus { border-color: var(--orange-yellow-crayola); }
+    textarea.form-input { min-height: 100px; height: 120px; resize: vertical; margin-bottom: 25px; }
+    .form-btn {
+      position: relative; width: 100%; background: var(--border-gradient-onyx); color: var(--orange-yellow-crayola);
+      display: flex; justify-content: center; align-items: center; gap: 10px; padding: 13px 20px; border-radius: 14px; font-size: var(--fs-6); box-shadow: var(--shadow-3); transition: var(--transition-1);
+    }
+    .form-btn::before { content: ""; position: absolute; inset: 1px; background: var(--bg-gradient-jet); border-radius: inherit; z-index: -1; transition: var(--transition-1); }
+    .form-btn:hover { background: var(--bg-gradient-yellow-1); }
+    .form-btn:hover::before { background: var(--bg-gradient-yellow-2); }
 
-        /* TABS */
-        .tab-section { display: none; animation: fadeIn 0.5s ease; padding-top: 40px; }
-        .tab-section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .section-title {
-            font-size: 2rem; font-weight: 600; margin: 0 0 20px 0;
-            position: relative; display: inline-block; padding-bottom: 15px;
-        }
-        .section-title::after {
-            content: ''; position: absolute; bottom: 0; left: 0;
-            width: 40px; height: 5px; background: var(--primary-color); border-radius: 3px;
-        }
-
-        /* --- ABOUT TAB --- */
-        .bio-text { color: var(--text-muted); line-height: 1.8; font-size: 0.95rem; }
-
-        /* --- RESUME TAB --- */
-        .timeline { border-left: 1px solid var(--border-color); margin-left: 20px; padding-left: 30px; position: relative; margin-bottom: 40px;}
-        .timeline-icon { position: absolute; left: -20px; top: 0; width: 40px; height: 40px; background: #2b2b2c; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--primary-color); box-shadow: 0 0 0 8px var(--surface-color); }
-        .timeline-item { position: relative; margin-bottom: 30px; }
-        .timeline-item::before { content: ''; position: absolute; left: -34px; top: 6px; width: 8px; height: 8px; border-radius: 50%; background: var(--primary-color); box-shadow: 0 0 0 4px #2b2b2c; }
-        .timeline-title { font-size: 1rem; font-weight: 600; margin: 0; }
-        .timeline-date { color: var(--primary-color); font-size: 0.85rem; margin: 5px 0; }
-        .timeline-desc { color: var(--text-muted); font-size: 0.9rem; }
-
-        /* Skills */
-        .skills-container { background: #2b2b2c; border-radius: 14px; padding: 25px; }
-        .skill-item { margin-bottom: 20px; }
-        .skill-item:last-child { margin-bottom: 0; }
-        .skill-title { font-size: 0.9rem; font-weight: 500; margin-bottom: 8px; display: flex; justify-content: space-between;}
-        .skill-bar { height: 8px; background: #383838; border-radius: 4px; overflow: hidden; }
-        .skill-fill { height: 100%; background: var(--primary-color); border-radius: 4px; }
-
-        /* --- PROJECT TAB --- */
-        .project-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
-        .project-card {
-            background: #2b2b2c; border-radius: 14px; overflow: hidden;
-            cursor: pointer; transition: transform 0.2s; text-decoration: none; color: inherit;
-        }
-        .project-card:hover { transform: translateY(-5px); }
-        .project-img { width: 100%; height: 180px; object-fit: cover; }
-        .project-info { padding: 15px; }
-        .project-category { color: var(--primary-color); font-size: 0.8rem; margin-bottom: 5px; }
-        .project-name { font-size: 1.1rem; font-weight: 600; margin: 0; }
-
-        /* --- CONTACT TAB --- */
-        .contact-form { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .contact-form textarea { grid-column: span 2; }
-        .form-input {
-            background: #2b2b2c; border: 1px solid var(--border-color); color: var(--text-main);
-            padding: 15px; border-radius: 10px; font-family: inherit; font-size: 0.9rem; outline: none;
-        }
-        .form-input:focus { border-color: var(--primary-color); }
-        .btn-submit {
-            grid-column: span 2; justify-self: end; background: transparent; border: 1px solid var(--primary-color);
-            color: var(--primary-color); padding: 12px 25px; border-radius: 10px; cursor: pointer; font-weight: 500;
-            display: flex; align-items: center; gap: 10px; transition: 0.2s;
-        }
-        .btn-submit:hover { background: var(--primary-color); color: var(--bg-color); }
-
-        @media (max-width: 992px) {
-            .layout { grid-template-columns: 1fr; }
-            .navbar { position: static; border-radius: 0 0 20px 20px; justify-content: center; }
-            .project-grid { grid-template-columns: 1fr; }
-            .contact-form { grid-template-columns: 1fr; }
-            .contact-form textarea, .btn-submit { grid-column: span 1; }
-        }
-    </style>
+    /*-----------------------------------*\
+      #RESPONSIVE
+    \*-----------------------------------*/
+    @media (min-width: 580px) {
+      :root { --fs-1: 32px; --fs-2: 24px; --fs-3: 26px; --fs-4: 18px; --fs-6: 15px; --fs-7: 15px; --fs-8: 12px; }
+      .sidebar, article { width: 520px; margin-inline: auto; padding: 30px; }
+      main { margin-top: 60px; margin-bottom: 100px; }
+      .sidebar { max-height: 180px; margin-bottom: 30px; }
+      .sidebar.active { max-height: 584px; }
+      .avatar-box { width: 120px; height: 120px; border-radius: 30px; }
+      .info_more-btn { top: -30px; right: -30px; padding: 10px 15px; }
+      .info_more-btn span { display: block; font-size: var(--fs-8); }
+      .info_more-btn ion-icon { display: none; }
+      .navbar { border-radius: 20px 20px 0 0; }
+    }
+    @media (min-width: 768px) {
+      .sidebar, article { width: 700px; }
+      .contacts-list { grid-template-columns: 1fr 1fr; gap: 30px 15px; }
+      .project-list { grid-template-columns: 1fr 1fr; }
+      .input-wrapper { grid-template-columns: 1fr 1fr; }
+      .form-btn { width: max-content; margin-left: auto; }
+    }
+    @media (min-width: 1024px) {
+      .sidebar, article { width: 950px; box-shadow: var(--shadow-5); }
+      .main-content { position: relative; width: max-content; margin: auto; }
+      .navbar { position: absolute; bottom: auto; top: 0; left: auto; right: 0; width: max-content; border-radius: 0 20px; padding: 0 20px; box-shadow: none; }
+      .project-list { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (min-width: 1250px) {
+      .sidebar, article { width: auto; }
+      article { min-height: 100%; }
+      main { max-width: 1200px; margin-inline: auto; display: flex; justify-content: center; align-items: stretch; gap: 25px; }
+      .main-content { min-width: 75%; width: 75%; margin: 0; }
+      .sidebar { position: sticky; top: 60px; max-height: max-content; height: 100%; margin-bottom: 0; padding-top: 60px; z-index: 1; }
+      .sidebar-info { flex-direction: column; }
+      .avatar-box { width: 150px; height: 150px;}
+      .info_more-btn { display: none; }
+      .sidebar-info_more { opacity: 1; visibility: visible; }
+      .contacts-list { grid-template-columns: 1fr; }
+      .separator:last-of-type { margin: 15px 0; opacity: 0; }
+      .social-list { justify-content: center; }
+    }
+  </style>
 </head>
 <body>
 
-<div class="layout">
-    
-    <aside class="sidebar">
-        {% if profile.user.profile_pic %}
-            <img src="{{ profile.user.profile_pic.url }}" class="avatar" alt="Avatar">
-        {% else %}
-            <div class="avatar" style="display:flex; align-items:center; justify-content:center; color: #555;">No Photo</div>
-        {% endif %}
+  <main>
+    <aside class="sidebar" data-sidebar>
+      <div class="sidebar-info">
+        <figure class="avatar-box">
+          {% if profile.user.profile_pic %}
+            <img src="{{ profile.user.profile_pic.url }}" alt="{{ profile.user.get_full_name }}">
+          {% else %}
+            <div style="width: 100%; height: 100%; background: var(--jet); display: flex; align-items: center; justify-content: center; color: var(--light-gray);">Photo</div>
+          {% endif %}
+        </figure>
+        <div class="info-content">
+          <h1 class="name" title="{{ profile.user.username }}" style="text-align: center;">{{ profile.user.username }}</h1>
+          <p class="title">{{ profile.job_title|default:"Developer" }}</p>
+        </div>
+        <button class="info_more-btn" data-sidebar-btn>
+          <span>Show Contacts</span>
+          <ion-icon name="chevron-down"></ion-icon>
+        </button>
+      </div>
+
+      <div class="sidebar-info_more">
+        <div class="separator"></div>
+        <ul class="contacts-list">
+          <li class="contact-item">
+            <div class="icon-box"><ion-icon name="mail-outline"></ion-icon></div>
+            <div class="contact-info">
+              <p class="contact-title">Email</p>
+              <a href="mailto:{{ profile.user.email }}" class="contact-link">{{ profile.user.email }}</a>
+            </div>
+          </li>
+          <li class="contact-item">
+            <div class="icon-box"><ion-icon name="phone-portrait-outline"></ion-icon></div>
+            <div class="contact-info">
+              <p class="contact-title">Phone</p>
+              <a href="tel:{{ profile.phone_number }}" class="contact-link">{{ profile.user.phone_number|default:"N/A" }}</a>
+            </div>
+          </li>
+          <li class="contact-item">
+            <div class="icon-box"><ion-icon name="calendar-outline"></ion-icon></div>
+            <div class="contact-info">
+              <p class="contact-title">Birthday</p>
+              <time>{{ profile.birthday|date:"F d, Y"|default:"N/A" }}</time>
+            </div>
+          </li>
+          <li class="contact-item">
+            <div class="icon-box"><ion-icon name="location-outline"></ion-icon></div>
+            <div class="contact-info">
+              <p class="contact-title">Location</p>
+              <address>{{ profile.location|default:"N/A" }}</address>
+            </div>
+          </li>
+        </ul>
+
+        <div class="separator"></div>
         
-        <h1 class="name">{{ profile.user.get_full_name }}</h1>
-        <div class="title-badge">{{ profile.job_title|default:"Student" }}</div>
-
-        <div class="contact-list">
-            <div class="contact-item">
-                <div class="icon-box">✉</div>
-                <div class="contact-info">
-                    <p>Email</p>
-                    <span>{{ profile.user.email }}</span>
-                </div>
-            </div>
-            <div class="contact-item">
-                <div class="icon-box">📱</div>
-                <div class="contact-info">
-                    <p>Phone</p>
-                    <span>{{ profile.user.phone_number|default:"N/A" }}</span>
-                </div>
-            </div>
-            <div class="contact-item">
-                <div class="icon-box">📅</div>
-                <div class="contact-info">
-                    <p>Birthday</p>
-                    <span>{{ profile.birthday|date:"F d, Y"|default:"N/A" }}</span>
-                </div>
-            </div>
-            <div class="contact-item">
-                <div class="icon-box">📍</div>
-                <div class="contact-info">
-                    <p>Location</p>
-                    <span>{{ profile.location|default:"N/A" }}</span>
-                </div>
-            </div>
-        </div>
-
-        <div style="display:flex; gap:15px; justify-content:center; margin-top: 20px;">
-            {% if profile.github_url %}<a href="{{ profile.github_url }}" target="_blank" style="color: var(--text-muted); text-decoration:none;">GitHub</a>{% endif %}
-            {% if profile.linkedin_url %}<a href="{{ profile.linkedin_url }}" target="_blank" style="color: var(--text-muted); text-decoration:none;">LinkedIn</a>{% endif %}
-        </div>
+        <ul class="social-list">
+          {% if profile.linkedin_url %}
+          <li class="social-item">
+            <a href="{{ profile.linkedin_url }}" target="_blank" class="social-link"><ion-icon name="logo-linkedin"></ion-icon></a>
+          </li>
+          {% endif %}
+          {% if profile.github_url %}
+          <li class="social-item">
+            <a href="{{ profile.github_url }}" target="_blank" class="social-link"><ion-icon name="logo-github"></ion-icon></a>
+          </li>
+          {% endif %}
+        </ul>
+      </div>
     </aside>
 
-    <main class="main-content">
+    <div class="main-content">
+      
+      <nav class="navbar">
+        <ul class="navbar-list">
+          <li class="navbar-item"><button class="navbar-link active" data-nav-link>About</button></li>
+          <li class="navbar-item"><button class="navbar-link" data-nav-link>Resume</button></li>
+          <li class="navbar-item"><button class="navbar-link" data-nav-link>Projects</button></li>
+          <li class="navbar-item"><button class="navbar-link" data-nav-link>Contact</button></li>
+        </ul>
+      </nav>
+
+      <article class="about active" data-page="about">
+        <header><h2 class="h2 article-title">About me</h2></header>
+        <section class="about-text">
+          <p>{{ profile.bio|linebreaksbr|default:"No biography provided." }}</p>
+        </section>
+      </article>
+
+      <article class="resume" data-page="resume">
+        <header><h2 class="h2 article-title">Resume</h2></header>
         
-        <nav class="navbar">
-            <span class="nav-link active" onclick="showTab('about')">About</span>
-            <span class="nav-link" onclick="showTab('resume')">Resume</span>
-            <span class="nav-link" onclick="showTab('project')">Project</span>
-            <span class="nav-link" onclick="showTab('contact')">Contact</span>
-        </nav>
-
-        <section id="about" class="tab-section active">
-            <h2 class="section-title">About Me</h2>
-            <p class="bio-text">{{ profile.bio|linebreaksbr }}</p>
+        <section class="timeline">
+          <div class="title-wrapper">
+            <div class="icon-box"><ion-icon name="book-outline"></ion-icon></div>
+            <h3 class="h3">Education</h3>
+          </div>
+          <ol class="timeline-list">
+            <li class="timeline-item">
+              <h4 class="h4 timeline-item-title">{{ profile.education_details|default:"Degree/Program" }}</h4>
+              <span>Semester {{ profile.semester|default:"N/A" }}</span>
+              <p class="timeline-text">{{ profile.college.name|default:"College Name" }}</p>
+            </li>
+          </ol>
         </section>
 
-        <section id="resume" class="tab-section">
-            <h2 class="section-title">Resume</h2>
-            
-            <div style="margin-top: 30px;">
-                <div class="timeline">
-                    <div class="timeline-icon">🎓</div>
-                    <div class="timeline-item">
-                        <h4 class="timeline-title">{{ profile.education_details }}</h4>
-                        <div class="timeline-date">{{ profile.college.name }} — Semester {{ profile.semester }}</div>
-                    </div>
-                </div>
+        <section class="skill">
+          <h3 class="h3 skills-title">My skills</h3>
+          <ul class="skills-list content-card" id="dynamic-skills-list">
+          </ul>
+        </section>
+      </article>
+
+      <article class="Projects" data-page="projects">
+        <header><h2 class="h2 article-title" style="margin-bottom: 1rem;">Projects</h2></header>
+        <section class="projects">
+          <ul class="project-list">
+            {% for project in projects %}
+            <li class="project-item active">
+              <a href="{% url 'project_detail' project.id %}" target="_blank">
+                <figure class="project-img">
+                  <div class="project-item-icon-box"><ion-icon name="eye-outline"></ion-icon></div>
+                  {% if project.cover_image %}
+                    <img src="{{ project.cover_image.url }}" alt="{{ project.title }}" loading="lazy">
+                  {% else %}
+                    <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#555; background:#222;">No Image</div>
+                  {% endif %}
+                </figure>
+                <h3 class="project-title">{{ project.title }}</h3>
+                <p class="project-category">{{ project.description|truncatewords:10 }}</p>
+              </a>
+            </li>
+            {% empty %}
+                <p style="color: var(--light-gray);">No projects published yet.</p>
+            {% endfor %}
+          </ul>
+        </section>
+      </article>
+
+      <article class="contact" data-page="contact">
+        <header><h2 class="h2 article-title" style="margin-bottom: 1rem;">Contact</h2></header>
+        <section class="contact-form">
+          <h3 class="h3 form-title">Send a Message</h3>
+          <form action="mailto:{{ profile.user.email }}" method="POST" class="form" enctype="text/plain">
+            <div class="input-wrapper">
+              <input type="text" name="fullname" class="form-input" placeholder="Full name" required>
+              <input type="email" name="email" class="form-input" placeholder="Email address" required>
             </div>
-
-            <h3 style="font-size: 1.5rem; margin-bottom: 20px;">My Skills</h3>
-            <div class="skills-container" id="skills-box">
-                </div>
+            <textarea name="message" class="form-input" placeholder="Your Message" required></textarea>
+            <button class="form-btn" type="submit">
+              <ion-icon name="paper-plane"></ion-icon>
+              <span>Send Message</span>
+            </button>
+          </form>
         </section>
+      </article>
 
-        <section id="project" class="tab-section">
-            <h2 class="section-title">Portfolio</h2>
-            
-            <div class="project-grid">
-                {% for project in projects %}
-                <a href="{% url 'project_detail' project.id %}" target="_blank" class="project-card">
-                    {% if project.cover_image %}
-                        <img src="{{ project.cover_image.url }}" class="project-img">
-                    {% else %}
-                        <div class="project-img" style="display:flex; align-items:center; justify-content:center; color:#555;">No Image</div>
-                    {% endif %}
-                    <div class="project-info">
-                        <h4 class="project-name">{{ project.title }}</h4>
-                        <p class="bio-text" style="font-size: 0.8rem; margin:5px 0;">{{ project.description|truncatewords:10 }}</p>
-                    </div>
-                </a>
-                {% empty %}
-                <p>No projects published yet.</p>
-                {% endfor %}
-            </div>
-        </section>
+    </div>
+  </main>
 
-        <section id="contact" class="tab-section">
-            <h2 class="section-title">Contact</h2>
-            
-            <form class="contact-form" action="mailto:{{ profile.user.email }}" method="post" enctype="text/plain">
-                <input type="text" class="form-input" placeholder="Full name" required>
-                <input type="email" class="form-input" placeholder="Email address" required>
-                <textarea class="form-input" rows="5" placeholder="Your Message" required></textarea>
-                <button type="submit" class="btn-submit">
-                    Send Message ✈
-                </button>
-            </form>
-        </section>
+  <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 
-    </main>
+  <script>
+    'use strict';
 
-</div>
-
-<script>
-    // Tab Switching Logic
-    function showTab(tabId) {
-        // Hide all sections
-        document.querySelectorAll('.tab-section').forEach(sec => sec.classList.remove('active'));
-        // Deactivate all nav links
-        document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
-        
-        // Show target section and activate link
-        document.getElementById(tabId).classList.add('active');
-        event.target.classList.add('active');
+    // --- SIDEBAR TOGGLE (Mobile) ---
+    const elementToggleFunc = function (elem) { elem.classList.toggle("active"); }
+    const sidebar = document.querySelector("[data-sidebar]");
+    const sidebarBtn = document.querySelector("[data-sidebar-btn]");
+    
+    if (sidebarBtn && sidebar) {
+        sidebarBtn.addEventListener("click", function () { elementToggleFunc(sidebar); });
     }
 
-    // Dynamic Skills Parsing from CSV
+    // --- NAVIGATION (Tabs) ---
+    const navigationLinks = document.querySelectorAll("[data-nav-link]");
+    const pages = document.querySelectorAll("[data-page]");
+
+    for (let i = 0; i < navigationLinks.length; i++) {
+      navigationLinks[i].addEventListener("click", function () {
+        const clickedTab = this.innerHTML.toLowerCase();
+        
+        for (let j = 0; j < pages.length; j++) {
+          if (clickedTab === pages[j].dataset.page) {
+            pages[j].classList.add("active");
+            navigationLinks[j].classList.add("active");
+            window.scrollTo(0, 0);
+          } else {
+            pages[j].classList.remove("active");
+            navigationLinks[j].classList.remove("active");
+          }
+        }
+      });
+    }
+
+    // --- DYNAMIC SKILLS PARSING FROM DJANGO CSV ---
     const rawSkills = "{{ profile.skills_csv|default:'' }}";
-    const skillsContainer = document.getElementById('skills-box');
+    const skillsContainer = document.getElementById('dynamic-skills-list');
     
     if (rawSkills.trim() !== '') {
         const skillsArray = rawSkills.split(',');
@@ -319,23 +469,22 @@
                 const randomWidth = Math.floor(Math.random() * (95 - 60 + 1) + 60);
                 
                 const skillHTML = `
-                    <div class="skill-item">
-                        <div class="skill-title">
-                            <span>${skillName}</span>
-                            <span>${randomWidth}%</span>
+                    <li class="skills-item skill">
+                        <div class="title-wrapper">
+                            <h5 class="h5">${skillName}</h5>
+                            <data value="${randomWidth}">${randomWidth}%</data>
                         </div>
-                        <div class="skill-bar">
-                            <div class="skill-fill" style="width: ${randomWidth}%;"></div>
+                        <div class="skill-progress-bg">
+                            <div class="skill-progress-fill" style="width: ${randomWidth}%;"></div>
                         </div>
-                    </div>
+                    </li>
                 `;
                 skillsContainer.innerHTML += skillHTML;
             }
         });
     } else {
-        skillsContainer.innerHTML = "<p style='color: var(--text-muted); margin:0;'>No skills listed.</p>";
+        skillsContainer.innerHTML = "<p style='color: var(--light-gray);'>No skills listed.</p>";
     }
-</script>
-
+  </script>
 </body>
 </html>
