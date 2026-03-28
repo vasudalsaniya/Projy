@@ -33,11 +33,6 @@
             position: relative; 
         }
 
-        /* Forces cursor to hide everywhere when Pac-Man is active */
-        body.pacman-active, body.pacman-active * {
-            cursor: none !important;
-        }
-
         /* --- NAVIGATION --- */
         .navbar {
             display: flex;
@@ -170,7 +165,6 @@
         }
         .status-dot { width: 8px; height: 8px; background: #a1a1aa; border-radius: 50%;}
 
-        /* Quote & Generic Content Boxes */
         .content-box {
             border: 1px solid var(--border-color); padding: 25px; margin-bottom: 30px; border-radius: 6px;
         }
@@ -200,7 +194,143 @@
         .btn-primary { border-color: var(--accent-color); color: var(--accent-color); }
         .btn-primary:hover { background: rgba(185, 131, 255, 0.1); }
 
-        /* --- 3. SKILLS & ABOUT BOX DESIGN (Restored Original) --- */
+        /* --- NEW: PROJECT DETAIL VIEW --- */
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        .detail-cover {
+            width: 100%;
+            height: auto;
+            max-height: 400px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+        .detail-main-card, .detail-side-card {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px;
+        }
+        .detail-side-card {
+            margin-bottom: 20px;
+        }
+        .detail-title {
+            font-size: 2rem;
+            color: var(--text-main);
+            margin-bottom: 15px;
+            font-weight: 800;
+        }
+        .detail-badges {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .badge {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .badge-verified { background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .badge-private { background: rgba(255, 255, 255, 0.05); color: var(--text-muted); border: 1px solid var(--border-color); }
+        
+        .detail-desc {
+            color: var(--text-muted);
+            line-height: 1.7;
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+        }
+        .detail-student {
+            font-family: var(--font-mono);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px dashed var(--border-color);
+            padding-top: 15px;
+        }
+
+        .side-title {
+            font-size: 1.1rem;
+            color: var(--text-main);
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        .action-btn-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .btn-action {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: 0.2s;
+            border: none;
+        }
+        .btn-demo { background: #e11d48; color: #fff; }
+        .btn-demo:hover { background: #be123c; }
+        .btn-github { background: #2e2e36; color: var(--text-main); }
+        .btn-github:hover { background: #3f3f46; }
+        .btn-back {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-back:hover { background: var(--border-color); }
+
+        .tech-bar {
+            display: flex;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .tech-bar-segment { flex: 1; }
+        .tech-bar-segment:nth-child(1), .tech-dot-1 { background-color: #3b82f6; } 
+        .tech-bar-segment:nth-child(2), .tech-dot-2 { background-color: #b983ff; } 
+        .tech-bar-segment:nth-child(3), .tech-dot-3 { background-color: #f59e0b; } 
+        .tech-bar-segment:nth-child(4), .tech-dot-4 { background-color: #ef4444; } 
+        .tech-bar-segment:nth-child(5), .tech-dot-5 { background-color: #10b981; } 
+        .tech-bar-segment:nth-child(n+6), .tech-dot:nth-child(n+6) { background-color: var(--border-color); }
+        
+        .tech-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .tech-list li {
+            display: flex;
+            align-items: center;
+            color: var(--text-main);
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+        .tech-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        /* --- 3. SKILLS & ABOUT BOX DESIGN --- */
         .skills-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -233,14 +363,77 @@
         .exp-bullets li { margin-bottom: 8px; }
 
         /* --- 5. CONTACTS --- */
-        .contacts-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-            align-items: start;
+        .contacts-header-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            margin-top: 50px;
+            width: 100%;
         }
-        .contacts-text { color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; font-family: var(--font-mono); }
-        .contacts-box { margin-bottom: 0; }
+        .contacts-header-container .section-title { margin-right: 20px; }
+        .contacts-header-container .title-line {
+            flex-grow: 1;
+            height: 1px;
+            background-color: var(--accent-color);
+            opacity: 0.5;
+            margin: 0;
+        }
+        
+        .contacts-content-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start; 
+            gap: 40px;
+            margin-bottom: 60px;
+            width: 100%;
+        }
+        .contacts-text-column {
+            flex: 1;
+            color: var(--text-main); 
+            font-size: 0.9rem;
+            font-family: var(--font-mono);
+            line-height: 1.7;
+            padding-top: 2px; 
+        }
+        .contacts-card-column {
+            flex: 1;
+            display: flex;
+        }
+        .contact-card {
+            background-color: transparent; 
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 20px 25px;
+            width: 100%; 
+            font-family: var(--font-mono);
+            box-sizing: border-box;
+        }
+        .contact-card h3 {
+            font-weight: 400; 
+            font-size: 0.95rem;
+            color: var(--text-main);
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        .contact-card p {
+            font-size: 0.9rem;
+            color: var(--text-main);
+            margin: 8px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        .contact-label { color: var(--text-muted); }
+        .contact-card a {
+            color: var(--text-main);
+            text-decoration: none;
+            transition: color 0.3s;
+            word-break: break-all;
+        }
+        .contact-card a:hover {
+            color: var(--accent-color);
+            text-decoration: underline;
+        }
 
         /* --- FOOTER --- */
         .main-footer { padding: 40px 20px; border-top: 1px solid var(--border-color); margin-top: 80px; font-family: var(--font-mono); font-size: 0.85rem; max-width: 900px; margin-left: auto; margin-right: auto; }
@@ -288,40 +481,65 @@
         input:checked + .slider { background-color: #3b82f6; }
         input:checked + .slider:before { transform: translateX(20px); }
 
+        /* * PERFECT PIXELATED PAC-MAN 
+         * Smooth outer circle, but a blocky pixelated mouth! 
+         */
+        @keyframes pacman-chomp {
+            0%, 49% {
+                /* Open pixelated mouth */
+                clip-path: polygon(
+                    100% 0%, 0% 0%, 0% 100%, 100% 100%,
+                    100% 75%, 80% 75%, 80% 60%, 55% 60%, 
+                    55% 40%, 80% 40%, 80% 25%, 100% 25%
+                );
+            }
+            50%, 100% {
+                /* Closed pixelated mouth */
+                clip-path: polygon(
+                    100% 0%, 0% 0%, 0% 100%, 100% 100%,
+                    100% 55%, 55% 55%, 55% 45%, 100% 45%
+                );
+            }
+        }
+
         #pacman-follower {
             position: fixed;
-            width: 34px;
-            height: 34px;
+            width: 38px; /* Perfect medium size */
+            height: 38px;
             background: var(--accent-color);
-            border-radius: 50%;
+            border-radius: 50%; /* Smooth outer edge */
             pointer-events: none;
             z-index: 999999;
             display: none;
-            box-shadow: 0 0 15px var(--accent-color);
-            clip-path: polygon(100% 74%, 40% 50%, 100% 26%, 100% 0, 0 0, 0 100%, 100% 100%);
-            transition: opacity 0.2s;
+            
+            /* Snaps perfectly between open and closed like a true 8-bit game */
+            animation: pacman-chomp 0.4s infinite;
+            will-change: transform; 
         }
         
+        /* The square eye inside Pac-Man */
         #pacman-follower::after {
             content: '';
             position: absolute;
-            top: 20%;
-            left: 50%;
+            top: 15%;
+            left: 55%;
             width: 6px;
             height: 6px;
             background: var(--bg-color);
+            border-radius: 0; 
         }
 
         @media (max-width: 768px) {
-            .hero-container, .skills-container, .contacts-container { grid-template-columns: 1fr; text-align: center; }
+            .hero-container, .skills-container, .contacts-content-container, .detail-grid { grid-template-columns: 1fr; text-align: center; flex-direction: column; align-items: center;}
             .image-decor-container::before, .image-decor-container::after { display: none; }
             .status-badge { margin-left: 0; }
             .exp-header { flex-direction: column; align-items: flex-start; gap: 5px; }
             .nav-links { display: none; }
-            .title-line { display: none; }
+            .contacts-header-container .title-line { display: none; }
             .footer-top { flex-direction: column; gap: 20px; text-align: left; }
             .footer-right { text-align: left; }
             .social-icons { justify-content: flex-start; }
+            .contacts-card-column { width: 100%; justify-content: center; }
             
             .pacman-toggle-wrapper {
                 transform: scale(0.85);
@@ -407,11 +625,7 @@
                     <h3 class="card-title">{{ project.title }}</h3>
                     <p class="card-desc">{{ project.description|truncatewords:12 }}</p>
                     <div class="card-footer">
-                        {% if project.video_demo %}
-                            <a href="{{ project.video_demo.url }}" target="_blank" class="btn btn-primary">Live</a>
-                        {% else %}
-                            <a href="{% url 'project_detail' project.id %}" target="_blank" class="btn btn-primary">Details</a>
-                        {% endif %}
+                        <button onclick="showProjectDetail('project-detail-{{ project.id }}')" class="btn btn-primary">View Details</button>
                         
                         {% if project.github_repo_link %}
                             <a href="{{ project.github_repo_link }}" target="_blank" class="btn">Code</a>
@@ -493,23 +707,34 @@
             {% endfor %}
         </div>
 
-        <div class="section-header">
+        <div class="contacts-header-container">
             <h2 class="section-title">contacts</h2>
-            <div class="title-line" style="width: 200px;"></div>
+            <div class="title-line"></div>
         </div>
-        <div class="contacts-container">
-            <div class="contacts-text">
-                I'm always open to discussing new projects, creative ideas, or opportunities to be part of your visions.
+        <div class="contacts-content-container">
+            <div class="contacts-text-column">
+                <p>I'm interested in freelance opportunities. However, if you have other request or question, don't hesitate to contact me.</p>
             </div>
-            <div class="content-box contacts-box">
-                <h3 style="margin-bottom: 15px; font-size: 0.9rem; color: var(--text-main);">Message me here</h3>
-                <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-muted); line-height: 1.8;">
-                    Email: <a href="mailto:{{ profile.user.email }}" style="color: var(--text-muted); text-decoration: none;">{{ profile.user.email|default:"Not Provided" }}</a><br>
+            <div class="contacts-card-column">
+                <div class="contact-card">
+                    <h3>Message me here</h3>
                     {% if profile.github_url %}
-                    GitHub: <a href="{{ profile.github_url }}" target="_blank" style="color: var(--text-muted); text-decoration: none;">{{ profile.github_url }}</a><br>
+                    <p>
+                        <span class="contact-label">GitHub:</span>
+                        <a href="{{ profile.github_url }}" target="_blank">{{ profile.github_url|cut:"https://"|cut:"http://"|default:"github.com/username" }}</a>
+                    </p>
                     {% endif %}
                     {% if profile.linkedin_url %}
-                    LinkedIn: <a href="{{ profile.linkedin_url }}" target="_blank" style="color: var(--text-muted); text-decoration: none;">{{ profile.linkedin_url }}</a>
+                    <p>
+                        <span class="contact-label">LinkedIn:</span>
+                        <a href="{{ profile.linkedin_url }}" target="_blank">{{ profile.linkedin_url|cut:"https://"|cut:"http://"|default:"linkedin.com/in/username" }}</a>
+                    </p>
+                    {% endif %}
+                    {% if profile.user.email %}
+                    <p>
+                        <span class="contact-label">Email:</span>
+                        <a href="mailto:{{ profile.user.email }}">{{ profile.user.email }}</a>
+                    </p>
                     {% endif %}
                 </div>
             </div>
@@ -540,11 +765,7 @@
                     <h3 class="card-title">{{ project.title }}</h3>
                     <p class="card-desc">{{ project.description|truncatewords:15 }}</p>
                     <div class="card-footer">
-                        {% if project.video_demo %}
-                            <a href="{{ project.video_demo.url }}" target="_blank" class="btn btn-primary">Live</a>
-                        {% else %}
-                            <a href="{% url 'project_detail' project.id %}" target="_blank" class="btn btn-primary">Details</a>
-                        {% endif %}
+                        <button onclick="showProjectDetail('project-detail-{{ project.id }}')" class="btn btn-primary">View Details</button>
                         
                         {% if project.github_repo_link %}
                             <a href="{{ project.github_repo_link }}" target="_blank" class="btn">Code</a>
@@ -560,7 +781,8 @@
 
     <section id="blog" class="page-section">
         <div class="section-header">
-            <h2 class="section-title">blog</h2> </div>
+            <h2 class="section-title">blog</h2>
+        </div>
         <div class="grid-container">
             {% for blog in blogs %}
             <div class="card">
@@ -614,6 +836,76 @@
         </div>
     </section>
 
+    {% for project in projects %}
+    <section id="project-detail-{{ project.id }}" class="page-section">
+        <div class="detail-grid">
+            
+            <div class="detail-left">
+                {% if project.cover_image %}
+                <img src="{{ project.cover_image.url }}" alt="{{ project.title }}" class="detail-cover">
+                {% else %}
+                <div class="detail-cover" style="background:#222; display:flex; align-items:center; justify-content:center; color:#555; height:300px;">No Cover Image</div>
+                {% endif %}
+                
+                <div class="detail-main-card">
+                    <h1 class="detail-title">{{ project.title }}</h1>
+                    <div class="detail-badges">
+                        <span class="badge badge-verified">VERIFIED PROJECT</span>
+                        <span class="badge badge-private">PUBLIC</span>
+                    </div>
+                    <div class="detail-desc">
+                        {{ project.description }}
+                    </div>
+                    <div class="detail-student">
+                        Developer: {{ profile.user.username|default:"developer" }}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="detail-right">
+                <div class="detail-side-card">
+                    <h3 class="side-title">Actions</h3>
+                    <div class="action-btn-group">
+                        {% if project.video_demo %}
+                        <a href="{{ project.video_demo.url }}" target="_blank" class="btn-action btn-demo">▶ Demo</a>
+                        {% endif %}
+                        {% if project.github_repo_link %}
+                        <a href="{{ project.github_repo_link }}" target="_blank" class="btn-action btn-github">GitHub</a>
+                        {% endif %}
+                    </div>
+                    <button onclick="switchTab('projects')" class="btn-back">Back to Dashboard</button>
+                </div>
+                
+                <div class="detail-side-card">
+                    <h3 class="side-title">Tech Stack</h3>
+                    
+                    <div class="tech-bar">
+                        {% for lang in project.languages.all %}
+                            <div class="tech-bar-segment"></div>
+                        {% empty %}
+                            <div class="tech-bar-segment" style="background-color: var(--border-color);"></div>
+                        {% endfor %}
+                    </div>
+                    
+                    <ul class="tech-list">
+                        {% for lang in project.languages.all %}
+                        <li>
+                            <div>
+                                <span class="tech-dot tech-dot-{{ forloop.counter }}"></span>
+                                {{ lang.language_name }}
+                            </div>
+                        </li>
+                        {% empty %}
+                        <li style="color: var(--text-muted)">Tech Stack Hidden</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </section>
+    {% endfor %}
+
     <footer class="main-footer">
         <div class="footer-top">
             <div class="footer-left">
@@ -664,13 +956,11 @@
         if (rawSkills.trim() !== '') {
             const skillsArray = rawSkills.split(',').map(s => s.trim()).filter(s => s);
             skillsArray.forEach(skill => {
-                // Add to Home Section
                 const pillHome = document.createElement('span');
                 pillHome.className = 'skill-pill';
                 pillHome.textContent = skill;
                 if(homeSkillsContainer) homeSkillsContainer.appendChild(pillHome);
 
-                // Add to About Section
                 const pillAbout = document.createElement('span');
                 pillAbout.className = 'skill-pill';
                 pillAbout.textContent = skill;
@@ -698,26 +988,57 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // --- PAC-MAN MODE LOGIC ---
+        function showProjectDetail(detailId) {
+            document.querySelectorAll('.page-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+
+            const detailSection = document.getElementById(detailId);
+            if(detailSection) {
+                detailSection.classList.add('active');
+            }
+
+            const activeLink = document.getElementById('link-projects');
+            if(activeLink) activeLink.classList.add('active');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // --- PAC-MAN MODE LOGIC (Smooth Gliding) ---
         const toggleSwitch = document.getElementById('pacman-switch');
         const pacmanFollower = document.getElementById('pacman-follower');
+        
         let isPacmanActive = false;
         let mouseX = window.innerWidth / 2;
         let mouseY = window.innerHeight / 2;
+        
+        let pacmanX = mouseX;
+        let pacmanY = mouseY;
+        
         let currentAngle = 0;
+        let targetAngle = 0;
+        let animationFrameId;
 
         if (toggleSwitch && pacmanFollower) {
             toggleSwitch.addEventListener('change', function(e) {
                 isPacmanActive = e.target.checked;
                 if (isPacmanActive) {
                     pacmanFollower.style.display = 'block';
-                    // Snap to current mouse instantly on toggle
-                    pacmanFollower.style.left = mouseX + 'px';
-                    pacmanFollower.style.top = mouseY + 'px';
-                    document.body.classList.add('pacman-active'); 
+                    
+                    // FIXED: Negative offset so it leads the cursor by being slightly above and to the left!
+                    const offsetX = -25;
+                    const offsetY = -25;
+                    pacmanX = mouseX + offsetX;
+                    pacmanY = mouseY + offsetY;
+                    
+                    cancelAnimationFrame(animationFrameId);
+                    animatePacman();
                 } else {
                     pacmanFollower.style.display = 'none';
-                    document.body.classList.remove('pacman-active');
+                    cancelAnimationFrame(animationFrameId);
                 }
             });
 
@@ -731,19 +1052,36 @@
                 const dx = e.clientX - mouseX;
                 const dy = e.clientY - mouseY;
                 
+                if (Math.abs(dx) > 1 || Math.abs(dy) > 1) {
+                    targetAngle = Math.atan2(dy, dx) * (180 / Math.PI);
+                }
+                
                 mouseX = e.clientX;
                 mouseY = e.clientY;
-
-                // Calculate rotation angle to face direction of movement
-                if (Math.abs(dx) > 1 || Math.abs(dy) > 1) {
-                    currentAngle = Math.atan2(dy, dx) * (180 / Math.PI);
-                }
-
-                // Apply position and rotation
-                pacmanFollower.style.left = mouseX + 'px';
-                pacmanFollower.style.top = mouseY + 'px';
-                pacmanFollower.style.transform = `translate(-50%, -50%) rotate(${currentAngle}deg)`;
             });
+
+            function animatePacman() {
+                if (!isPacmanActive) return;
+
+                // Set target offset so it leads the cursor (in front of arrow tip)
+                const targetX = mouseX - 25; 
+                const targetY = mouseY - 25; 
+
+                // Lerp for smooth following
+                pacmanX += (targetX - pacmanX) * 0.15;
+                pacmanY += (targetY - pacmanY) * 0.15;
+
+                // Lerp for smooth angle rotation
+                let angleDiff = targetAngle - currentAngle;
+                angleDiff = ((angleDiff + 180) % 360 + 360) % 360 - 180;
+                currentAngle += angleDiff * 0.2;
+
+                pacmanFollower.style.left = pacmanX + 'px';
+                pacmanFollower.style.top = pacmanY + 'px';
+                pacmanFollower.style.transform = `translate(-50%, -50%) rotate(${currentAngle}deg)`;
+
+                animationFrameId = requestAnimationFrame(animatePacman);
+            }
         }
     </script>
 </body>
