@@ -12,6 +12,7 @@ urlpatterns = [
     # Portfolio & Resume
     path('my-portfolio/', views.live_portfolio, name='live_portfolio'),
     path('generate-resume/', views.generate_resume, name='generate_resume'),
+    path('portfolio/<str:username>/<str:enrollment>/<str:college_name>/', views.live_portfolio, name='live_portfolio'),
     # Blogs
     path('blogs/manage/', views.manage_blogs, name='manage_blogs'),
     path('blogs/delete/<int:blog_id>/', views.delete_blog, name='delete_blog'),
