@@ -1,130 +1,153 @@
-{% extends 'base.html' %}
-{% block title %}HOD Dashboard{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faculty Profile Detail</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #0b1120; color: #f8fafc; font-family: 'Inter', sans-serif; }
+        .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .gradient-text { background: linear-gradient(90deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
 
-{% block content %}
-<div class="container" style="max-width: 1000px; margin: 30px auto;">
-    
-    <div style="background: linear-gradient(135deg, #007bff, #0056b3); color: white; padding: 30px; border-radius: 10px; margin-bottom: 30px;">
-        <h1 style="margin: 0;">HOD Dashboard</h1>
-        <p style="opacity: 0.9; margin-top: 5px;">Managing: <strong>{{ college.name }}</strong></p>
+    <div class="max-w-5xl mx-auto">
+        <button class="mb-6 flex items-center text-slate-400 hover:text-white transition">
+            <i class="fas fa-arrow-left mr-2"></i> Back to Directory
+        </button>
+
+        <div class="glass-card rounded-3xl p-8 mb-8 flex flex-col md:flex-row items-center gap-8">
+            <div class="relative">
+                <div class="w-32 h-32 rounded-full border-4 border-sky-500 overflow-hidden shadow-xl shadow-sky-500/20">
+                    <img src="https://ui-avatars.com/api/?name=John+Smith&background=0ea5e9&color=fff&size=128" alt="Profile">
+                </div>
+                <div class="absolute -bottom-2 -right-2 bg-green-500 w-6 h-6 rounded-full border-4 border-[#1e293b]"></div>
+            </div>
+            
+            <div class="text-center md:text-left flex-grow">
+                <h1 class="text-4xl font-bold">Dr. John Smith</h1>
+                <p class="text-sky-400 font-medium tracking-wide uppercase text-sm mt-1">Data Science & AI Specialization</p>
+                <div class="flex flex-wrap justify-center md:justify-start gap-4 mt-4 text-slate-400 text-sm">
+                    <span><i class="fas fa-building mr-2"></i>Computer Engineering</span>
+                    <span><i class="fas fa-briefcase mr-2"></i>12 Years Experience</span>
+                    <span><i class="fas fa-envelope mr-2"></i>john.smith@silveroak.edu</span>
+                </div>
+            </div>
+
+            <div class="flex gap-2">
+                <button class="bg-sky-600 hover:bg-sky-500 px-6 py-2 rounded-xl font-semibold transition shadow-lg shadow-sky-600/20">Message</button>
+                <button class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-xl transition"><i class="fas fa-ellipsis-v"></i></button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="glass-card p-6 rounded-2xl text-center">
+                <p class="text-slate-400 text-sm uppercase font-semibold">Total Mentees</p>
+                <h2 class="text-3xl font-bold mt-2 text-white">86</h2>
+            </div>
+            <div class="glass-card p-6 rounded-2xl text-center">
+                <p class="text-slate-400 text-sm uppercase font-semibold">Active Projects</p>
+                <h2 class="text-3xl font-bold mt-2 text-white">24</h2>
+            </div>
+            <div class="glass-card p-6 rounded-2xl text-center">
+                <p class="text-slate-400 text-sm uppercase font-semibold">Certificates Verified</p>
+                <h2 class="text-3xl font-bold mt-2 text-white">142</h2>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            <div class="glass-card p-8 rounded-3xl">
+                <h3 class="text-xl font-bold mb-6">Mentee Skill Distribution</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="h-64">
+                        <p class="text-center text-xs text-slate-400 mb-2 font-bold uppercase">Languages Used</p>
+                        <canvas id="langChart"></canvas>
+                    </div>
+                    <div class="h-64">
+                        <p class="text-center text-xs text-slate-400 mb-2 font-bold uppercase">Development Fields</p>
+                        <canvas id="fieldChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <div class="glass-card p-6 rounded-2xl">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold">Recent Mentee Projects</h3>
+                        <a href="#" class="text-sky-400 text-xs hover:underline">View All</a>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="bg-slate-800/50 p-3 rounded-lg flex justify-between items-center border border-slate-700">
+                            <div>
+                                <p class="font-medium text-sm">Portfolio Ecosystem "Projy"</p>
+                                <p class="text-xs text-slate-500 italic">By Vas - Django & Tailwind</p>
+                            </div>
+                            <span class="text-xs bg-yellow-500/10 text-yellow-500 px-2 py-1 rounded">In Review</span>
+                        </div>
+                        <div class="bg-slate-800/50 p-3 rounded-lg flex justify-between items-center border border-slate-700">
+                            <div>
+                                <p class="font-medium text-sm">AI Stock Predictor</p>
+                                <p class="text-xs text-slate-500 italic">By Dhara - Python & LSTM</p>
+                            </div>
+                            <span class="text-xs bg-green-500/10 text-green-500 px-2 py-1 rounded">Verified</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card p-6 rounded-2xl">
+                    <h3 class="font-bold mb-4">Verification Dispute History</h3>
+                    <div class="text-center py-4 text-slate-500 text-sm italic">
+                        No active disputes for this faculty member.
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="card" style="margin-bottom: 30px; border-top: 4px solid #dc3545;">
-        <h3>📢 Pending Faculty Approvals</h3>
-        <p class="text-muted" style="font-size: 0.9rem;">Approve new faculty members so they can access the system.</p>
-        
-        {% if pending_faculty %}
-            <table style="width: 100%; text-align: left; border-collapse: collapse; margin-top: 15px;">
-                <thead>
-                    <tr style="border-bottom: 2px solid var(--border);">
-                        <th style="padding: 10px;">Name / Username</th>
-                        <th>Email</th>
-                        <th>Joined</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for fac in pending_faculty %}
-                    <tr style="border-bottom: 1px solid var(--border);">
-                        <td style="padding: 10px;">
-                            <strong>
-                                {% if fac.first_name %}
-                                    {{ fac.first_name }} {{ fac.last_name }}
-                                {% else %}
-                                    {{ fac.username }}
-                                {% endif %}
-                            </strong>
-                        </td>
-                        <td>{{ fac.email }}</td>
-                        <td>{{ fac.date_joined|date:"M d, Y" }}</td>
-                        <td>
-                            <a href="{% url 'approve_user' fac.id %}" class="btn" style="padding: 5px 15px; font-size: 0.8rem; background: #28a745;">Approve</a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <div style="padding: 20px; border: 1px dashed var(--border); border-radius: 5px; text-align: center; color: var(--text-muted);">
-                No pending faculty requests at this time.
-            </div>
-        {% endif %}
-    </div>
+    <script>
+        // Language Chart (Doughnut)
+        const ctxLang = document.getElementById('langChart').getContext('2d');
+        new Chart(ctxLang, {
+            type: 'doughnut',
+            data: {
+                labels: ['Python', 'JavaScript', 'Java', 'Other'],
+                datasets: [{
+                    data: [45, 30, 15, 10],
+                    backgroundColor: ['#0ea5e9', '#818cf8', '#22c55e', '#64748b'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } }
+            }
+        });
 
-    <div class="card" style="border-top: 4px solid #ffc107;">
-        <h3>🎓 Student Mentorship Allocation</h3>
-        <p class="text-muted" style="font-size: 0.9rem;">Assign a verified Faculty member to guide each student.</p>
-        
-        {% if all_students %}
-            <div style="overflow-x: auto;">
-                <table style="width: 100%; text-align: left; border-collapse: collapse; margin-top: 15px;">
-                    <thead>
-                        <tr style="border-bottom: 2px solid var(--border);">
-                            <th style="padding: 10px;">Student Name</th>
-                            <th>Enrollment</th>
-                            <th>Current Mentor</th>
-                            <th style="width: 300px;">Assign Mentor</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for student in all_students %}
-                        <tr style="border-bottom: 1px solid var(--border);">
-                            <td style="padding: 10px; font-weight: 500;">
-                                {% if student.user.first_name %}
-                                    {{ student.user.first_name }} {{ student.user.last_name }}
-                                {% else %}
-                                    {{ student.user.username }}
-                                {% endif %}
-                            </td>
-                            <td>{{ student.enrollment_number }}</td>
-                            <td>
-                                {% if student.mentor %}
-                                    <span class="badge badge-success" style="font-size: 0.85rem;">
-                                        {% if student.mentor.first_name %}
-                                            {{ student.mentor.first_name }} {{ student.mentor.last_name }}
-                                        {% else %}
-                                            {{ student.mentor.username }}
-                                        {% endif %}
-                                    </span>
-                                {% else %}
-                                    <span class="badge badge-warning">UNASSIGNED</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <form method="post" style="display: flex; gap: 8px;">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="assign_mentor" value="true">
-                                    <input type="hidden" name="student_id" value="{{ student.id }}">
-                                    
-                                    <select name="faculty_id" class="form-control" style="flex: 1; padding: 6px; border: 1px solid var(--border); border-radius: 4px;" required>
-                                        <option value="">Select Faculty...</option>
-                                        {% for fac in verified_faculty %}
-                                            <option value="{{ fac.id }}">
-                                                {% if fac.first_name %}
-                                                    {{ fac.first_name }} {{ fac.last_name }}
-                                                {% else %}
-                                                    {{ fac.username }}
-                                                {% endif %}
-                                            </option>
-                                        {% empty %}
-                                            <option disabled>No Verified Faculty Found</option>
-                                        {% endfor %}
-                                    </select>
-                                    
-                                    <button type="submit" class="btn" style="padding: 6px 12px; font-size: 0.85rem; background-color: #007bff; border: none;">Assign</button>
-                                </form>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        {% else %}
-            <div style="padding: 20px; border: 1px dashed var(--border); border-radius: 5px; text-align: center; color: var(--text-muted);">
-                No students enrolled in your college yet.
-            </div>
-        {% endif %}
-    </div>
-
-</div>
-{% endblock %}
+        // Fields Chart (Polar Area)
+        const ctxField = document.getElementById('fieldChart').getContext('2d');
+        new Chart(ctxField, {
+            type: 'polarArea',
+            data: {
+                labels: ['Web', 'AI/ML', 'Mobile', 'Data'],
+                datasets: [{
+                    data: [40, 35, 15, 10],
+                    backgroundColor: ['#0ea5e988', '#818cf888', '#f59e0b88', '#ef444488'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { r: { grid: { color: '#334155' }, ticks: { display: false } } }
+            }
+        });
+    </script>
+</body>
+</html>
