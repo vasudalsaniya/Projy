@@ -5,6 +5,7 @@ from .models import StaffProfile, Department
 from accounts.models import User, Notification
 from students.models import StudentProfile, Project
 from django.contrib import messages
+from django.db.models import Count, Q
 
 
 # --- HOD DASHBOARD ---
@@ -45,26 +46,22 @@ def hod_dashboard(request):
 # --- FACULTY DASHBOARD ---
 @login_required
 def faculty_dashboard(request):
-    # Basic Security Check
     if request.user.role != 'FACULTY':
         return redirect('login')
 
-    # Get mentees assigned to this faculty
-    mentees = StudentProfile.objects.filter(mentor=request.user)
-
-    # Get pending projects ONLY for these mentees
-    pending_projects = Project.objects.filter(
-        student__in=mentees, 
-        is_verified=False
-    ).order_by('-id')
-
-    # Get semester update requests for mentees
-    semester_requests = StudentProfile.objects.filter(
-        mentor=request.user,
-        pending_semester__isnull=False
+    # Annotate mentees with dynamic counts
+    mentees = StudentProfile.objects.filter(mentor=request.user).annotate(
+        verified_project_count=Count('projects', filter=Q(projects__is_verified=True)),
+        pending_request_count=Count('projects', filter=Q(projects__is_verified=False))
     )
 
-    # Safely find the college
+    pending_projects = Project.objects.filter(student__in=mentees, is_verified=False).order_by('-id')
+    
+    # Calculate Total Verified Projects for all mentees
+    total_verified_projects = Project.objects.filter(student__in=mentees, is_verified=True).count()
+
+    semester_requests = StudentProfile.objects.filter(mentor=request.user, pending_semester__isnull=False)
+
     my_college = None
     try:
         my_college = request.user.staff_profile.college
@@ -74,20 +71,36 @@ def faculty_dashboard(request):
 
     pending_students = []
     if my_college:
-        pending_students = StudentProfile.objects.filter(
-            college=my_college, 
-            user__is_verified=False
-        )
+        pending_students = StudentProfile.objects.filter(college=my_college, user__is_verified=False)
 
     context = {
         'college': my_college,
+        'mentees': mentees,
         'pending_students': pending_students,
         'semester_requests': semester_requests,
         'pending_projects': pending_projects,
+        'total_verified_projects': total_verified_projects, # Pass total to template
     }
     
     return render(request, 'college/dashboard_faculty.html', context)
 
+
+# --- NEW: Faculty Settings View ---
+@login_required
+def faculty_settings_update(request):
+    if request.method == 'POST' and request.user.role == 'FACULTY':
+        # Update User fields
+        request.user.first_name = request.POST.get('first_name', request.user.first_name)
+        request.user.last_name = request.POST.get('last_name', request.user.last_name)
+        
+        # Handle Profile Picture
+        if 'profile_pic' in request.FILES:
+            request.user.profile_pic = request.FILES['profile_pic']
+            
+        request.user.save()
+        messages.success(request, "Your profile settings have been updated.")
+        
+    return redirect('faculty_dashboard')
 
 @login_required
 def approve_semester_change(request, student_id, action):

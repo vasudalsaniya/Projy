@@ -12,39 +12,29 @@
          * 1. DESIGN TOKENS (Engineering Dark Theme)
          * ========================================= */
         :root {
-            /* Cool, professional dark grays */
             --bg-color: #0d1117; 
             --surface-color: #161b22; 
             --border-color: #30363d;
-            
-            /* Professional Tech Blue */
             --accent-color: #3b82f6; 
             --accent-hover: #2563eb;
             --accent-secondary: #06b6d4;
-            
-            /* Status Colors */
             --accent-green: #238636;
             --accent-red: #da3633; 
             --accent-yellow: #facc15;
-            
             --text-main: #c9d1d9;
             --text-muted: #8b949e;
             --nav-bg: #010409;
-            
             --font-body: 'Inter', sans-serif;
             --font-mono: 'Fira Code', monospace;
-            
             --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
             --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.2);
             --radius: 6px; 
-            
             --success-bg: rgba(35, 134, 54, 0.15); --success-text: #3fb950;
             --error-bg: rgba(218, 54, 51, 0.15);   --error-text: #ff7b72;
             --info-bg: rgba(59, 130, 246, 0.15);   --info-text: #79c0ff;
             --warning-bg: rgba(210, 153, 34, 0.15);--warning-text: #e3b341;
         }
 
-        /* --- LIGHT THEME OVERRIDES --- */
         body.light-theme {
             --bg-color: #f6f8fa; 
             --surface-color: #ffffff; 
@@ -54,23 +44,17 @@
             --accent-secondary: #0891b2;
             --accent-green: #1a7f37;
             --accent-red: #cf222e;
-            
             --text-main: #24292f;
             --text-muted: #57606a;
             --nav-bg: #ffffff;
-            
             --shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
             --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.03);
-            
             --success-bg: #dafbe1; --success-text: #1a7f37;
             --error-bg: #ffebe9;   --error-text: #cf222e;
             --info-bg: #ddf4ff;    --info-text: #0969da;
             --warning-bg: #fff8c5; --warning-text: #bf8700;
         }
 
-        /* =========================================
-         * 2. BASE STYLES & BLUEPRINT GRID
-         * ========================================= */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
         body { 
@@ -86,10 +70,9 @@
         a { text-decoration: none; color: inherit; }
 
         /* =========================================
-         * 3. NAVIGATION BAR
+         * NAVIGATION BAR
          * ========================================= */
         .navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 5%; border-bottom: 1px solid var(--border-color); background: var(--nav-bg); position: sticky; top: 0; z-index: 1000; transition: background-color 0.3s, border-color 0.3s; }
-        
         .nav-logo { font-size: 1.5rem; color: var(--text-main); display: flex; gap: 8px; align-items: center; letter-spacing: -0.5px; font-weight: 500;}
         .nav-logo .accent-logo { 
             background: linear-gradient(135deg, var(--accent-color), var(--accent-secondary));
@@ -98,64 +81,35 @@
             font-weight: 800; 
         }
         .nav-actions { display: flex; align-items: center; gap: 20px; position: relative;}
-
         .icon-btn { background: transparent; border: 1px solid var(--border-color); border-radius: var(--radius); width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); cursor: pointer; transition: 0.2s; position: relative; }
         .icon-btn:hover { background: var(--surface-color); color: var(--accent-color); border-color: var(--accent-color); box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);}
-        .icon-btn.no-border { border: none; width: auto; height: auto; padding: 5px; }
-        .icon-btn.no-border:hover { background: transparent; box-shadow: none; transform: scale(1.1); }
-
-        /* Notifications Dropdown */
-        .notif-badge { position: absolute; top: -2px; right: -2px; background: var(--accent-red); color: white; font-size: 0.65rem; font-weight: bold; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; display: none; box-shadow: 0 0 8px var(--accent-red);}
-        .notif-dropdown { position: absolute; top: 45px; right: 150px; width: 340px; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--radius); box-shadow: var(--shadow); display: none; flex-direction: column; z-index: 1000; overflow: hidden;}
-        .notif-dropdown.show { display: flex; }
-        .notif-header { padding: 15px; border-bottom: 1px solid var(--border-color); font-weight: 600; font-size: 0.95rem; background: rgba(0,0,0,0.15);}
-        .notif-list { max-height: 300px; overflow-y: auto; list-style: none; }
-        .notif-item { display: block; padding: 15px; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; color: var(--text-muted); transition: background 0.2s; }
-        .notif-item:hover { background: rgba(255,255,255,0.02); }
-        .notif-item.unread { border-left: 3px solid var(--accent-color); background: var(--info-bg); }
-        .notif-time { font-size: 0.75rem; margin-top: 6px; display: block; color: var(--accent-color); font-weight: 500;}
-
-        /* Profile Pill */
         .profile-pill { display: flex; align-items: center; gap: 10px; background: var(--surface-color); border: 1px solid var(--border-color); padding: 4px 15px 4px 4px; border-radius: 30px; font-size: 0.9rem; transition: 0.2s;}
         .profile-pill:hover { border-color: var(--accent-color); box-shadow: 0 0 10px rgba(59, 130, 246, 0.15);}
         .profile-pill img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; }
         .profile-pill-name { font-weight: 600; color: var(--text-main); }
         .profile-pill-role { color: var(--text-muted); font-size: 0.8rem;}
-
         .nav-logout { color: var(--accent-red); font-size: 0.85rem; transition: 0.2s; font-weight: 600;}
         .nav-logout:hover { text-decoration: underline; text-shadow: 0 0 8px rgba(218, 54, 51, 0.5);}
 
         /* =========================================
-         * 4. MAIN LAYOUT & SIDEBAR
+         * MAIN LAYOUT & SIDEBAR
          * ========================================= */
         .layout-wrapper { max-width: 1400px; margin: 40px auto; padding: 0 20px; display: grid; grid-template-columns: 260px 1fr; gap: 40px; align-items: start; }
-
         .sidebar-card { background: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 30px 20px; display: flex; flex-direction: column; align-items: center; position: sticky; top: 100px; transition: background-color 0.3s, border-color 0.3s; box-shadow: var(--shadow-sm);}
-        
         .profile-img-container { position: relative; width: 96px; height: 96px; margin-bottom: 20px; border-radius: 50%; overflow: hidden; border: 2px solid var(--accent-color); background: #222; box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); padding: 2px;}
         .profile-img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 50%;}
-        .profile-img-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; font-size: 0.75rem; font-weight: 500; cursor: pointer; opacity: 0; transition: opacity 0.2s ease; border-radius: 50%;}
-        .profile-img-container:hover .profile-img-overlay { opacity: 1; }
-        
         .username { color: var(--text-main); font-weight: 700; font-size: 1.15rem; margin-bottom: 25px; text-align: center; letter-spacing: -0.3px;}
-        
         .info-block { width: 100%; text-align: left; margin-bottom: 30px; background: rgba(0,0,0,0.15); padding: 15px; border-radius: var(--radius); border: 1px solid var(--border-color);}
         .info-item { display: flex; justify-content: space-between; padding: 6px 0; font-size: 0.8rem; }
         .info-label { font-weight: 600; color: var(--text-muted); }
         .info-value { color: var(--text-main); font-weight: 500; text-align: right;}
-        
         .sidebar-nav { width: 100%; display: flex; flex-direction: column; gap: 8px; }
         .nav-btn { width: 100%; padding: 12px 15px; border-radius: var(--radius); border: 1px solid transparent; background: transparent; color: var(--text-muted); font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; text-align: left; display: flex; justify-content: space-between;}
         .nav-btn:hover { background: rgba(255,255,255,0.03); color: var(--text-main);}
-        .nav-btn.active { 
-            background: linear-gradient(90deg, var(--info-bg) 0%, transparent 100%);
-            border-left: 3px solid var(--accent-color); 
-            color: var(--accent-color); 
-            font-weight: 700;
-        }
+        .nav-btn.active { background: linear-gradient(90deg, var(--info-bg) 0%, transparent 100%); border-left: 3px solid var(--accent-color); color: var(--accent-color); font-weight: 700; }
 
         /* =========================================
-         * 5. DASHBOARD COMPONENTS
+         * DASHBOARD COMPONENTS
          * ========================================= */
         .page-section { display: none; width: 100%; animation: fadeIn 0.3s ease-out; }
         .page-section.active { display: block; }
@@ -170,21 +124,17 @@
         .stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background: var(--accent-color); opacity: 0.8;}
         .stat-card.urgent::before { background: var(--accent-red); }
         .stat-card.success::before { background: var(--accent-green); }
-        
         .stat-title { color: var(--text-muted); font-weight: 600; font-size: 0.75rem; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;}
         .stat-value { font-size: 2.5rem; font-weight: 800; color: var(--text-main); line-height: 1;}
         
         .main-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; align-items: start;}
         .verification-column { max-height: 800px; overflow-y: auto; padding-right: 5px; }
         .verification-column::-webkit-scrollbar { width: 6px; }
-        .verification-column::-webkit-scrollbar-track { background: transparent; }
         .verification-column::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
-        .verification-column::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
-
+        
         .data-card { background: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--radius); overflow: hidden; margin-bottom: 30px; box-shadow: var(--shadow-sm);}
         .data-header { padding: 15px 20px; border-bottom: 1px solid var(--border-color); font-size: 0.95rem; font-weight: 600; background: rgba(0,0,0,0.15); display: flex; justify-content: space-between; align-items: center; color: var(--text-main);}
         
-        /* Tables */
         table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem;}
         th, td { padding: 15px 20px; border-bottom: 1px solid var(--border-color); }
         th { color: var(--text-muted); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; background: rgba(0,0,0,0.15); position: sticky; top: 0; z-index: 10;}
@@ -194,19 +144,14 @@
         .student-name { color: var(--text-main); font-weight: 600; display: block; margin-top: 2px;}
         .req-date { color: var(--text-muted); font-size: 0.85rem;}
         
-        /* Buttons */
         .btn-sm { padding: 8px 14px; font-size: 0.8rem; border-radius: var(--radius); cursor: pointer; border: 1px solid transparent; font-weight: 600; transition: all 0.2s; text-align: center; letter-spacing: 0.2px;}
         .btn-view { background: var(--bg-color); border-color: var(--border-color); color: var(--text-main); margin-right: 5px; }
         .btn-view:hover { background: rgba(255,255,255,0.05); border-color: var(--text-muted); }
-        
         .btn-approve { background: var(--success-bg); color: var(--success-text); border-color: var(--success-bg); }
         .btn-approve:hover:not(:disabled) { background: var(--accent-green); color: #fff; box-shadow: 0 4px 10px rgba(35, 134, 54, 0.3);}
-        .btn-approve:disabled { opacity: 0.5; cursor: not-allowed; }
-        
         .btn-danger { background: var(--error-bg); color: var(--error-text); border-color: var(--error-bg); }
         .btn-danger:hover { background: var(--accent-red); color: #fff; box-shadow: 0 4px 10px rgba(218, 54, 51, 0.3);}
 
-        /* Badges */
         .badge { padding: 5px 10px; border-radius: 4px; font-size: 0.7rem; text-transform: uppercase; white-space: nowrap; font-weight: 700; letter-spacing: 0.5px;}
         .badge-project { background: var(--info-bg); color: var(--info-text); border: 1px solid rgba(59, 130, 246, 0.3); }
         .badge-cert { background: var(--warning-bg); color: var(--warning-text); border: 1px solid rgba(210, 153, 34, 0.3); }
@@ -215,67 +160,28 @@
         .badge-pending { background: var(--warning-bg); color: var(--warning-text); border: 1px solid rgba(210, 153, 34, 0.3); }
         .badge-active { background: var(--success-bg); color: var(--success-text); border: 1px solid rgba(35, 134, 54, 0.3); }
 
-        /* =========================================
-         * 6. ACTIVITY LOG (Light/Dark Support)
-         * ========================================= */
         .terminal-log { background: #050505; border: 1px solid var(--border-color); border-radius: var(--radius); overflow: hidden; box-shadow: inset 0 0 20px rgba(0,0,0,0.8);}
         .terminal-header { background: #111; padding: 10px 15px; border-bottom: 1px solid #333; display: flex; gap: 6px; align-items: center;}
         .terminal-dot { width: 10px; height: 10px; border-radius: 50%; }
         .dot-red { background: #ff5f56; } .dot-yellow { background: #ffbd2e; } .dot-green { background: #27c93f; }
         .terminal-title { color: #8b949e; font-weight: 500; font-size: 0.8rem; margin-left: 10px; font-family: var(--font-mono);}
-        
         .log-list { list-style: none; padding: 20px 15px; margin: 0; font-size: 0.85rem; max-height: 400px; overflow-y: auto;}
         .log-list li { margin-bottom: 14px; color: #a1a1aa; display: flex; gap: 10px; align-items: flex-start; line-height: 1.4;}
-        .log-list li:last-child { margin-bottom: 0; }
         .log-list li::before { content: '>'; color: var(--accent-secondary); font-weight: 700;}
         .log-time { color: #52525b; min-width: 65px; flex-shrink: 0; font-weight: 500; font-family: var(--font-mono);}
         .log-highlight { color: var(--accent-color); font-weight: 600; } 
-
-        /* --- LIGHT MODE TERMINAL OVERRIDES --- */
-        body.light-theme .terminal-log { background: #ffffff; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-color: #e2e8f0; }
-        body.light-theme .terminal-header { background: #f8fafc; border-bottom: 1px solid #e2e8f0; }
-        body.light-theme .terminal-title { color: #64748b; }
-        body.light-theme .log-list li { color: #334155; }
-        body.light-theme .log-list li::before { color: var(--accent-color); }
-        body.light-theme .log-time { color: #64748b; }
-        body.light-theme .log-highlight { color: var(--accent-color); }
 
         .form-group { margin-bottom: 22px; }
         .form-label { display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;}
         .form-input { width: 100%; max-width: 400px; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); color: var(--text-main); padding: 12px 15px; border-radius: var(--radius); font-size: 0.95rem; transition: border-color 0.2s ease, box-shadow 0.2s;}
         .form-input:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);}
-        body.light-theme .form-input { background: var(--bg-color); }
-        
-        /* Select Dropdown Styling for Dark/Light Mode */
         select.form-input { appearance: auto; cursor: pointer; background-color: var(--surface-color); color: var(--text-main); }
-        select.form-input option { background-color: var(--surface-color); color: var(--text-main); }
-        body.light-theme select.form-input { background-color: #ffffff; color: #0f172a; }
-        body.light-theme select.form-input option { background-color: #ffffff; color: #0f172a; }
-
-        /* Toast Alerts */
+        
         .messages-container { position: fixed; top: 80px; right: 20px; z-index: 2000; width: 350px; }
         .alert { padding: 16px 20px; margin-bottom: 12px; border-radius: var(--radius); border-left: 4px solid transparent; box-shadow: var(--shadow); background: var(--surface-color); font-size: 0.9rem; font-weight: 500; animation: slideIn 0.3s ease-out; }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         .alert-success { border-color: var(--accent-green); color: var(--accent-green); }
         .alert-error { border-color: var(--accent-red); color: var(--accent-red); }
-
-        /* PAC-MAN */
-        .pacman-toggle-wrapper { position: fixed; bottom: 30px; right: 30px; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 30px; padding: 8px 16px; display: flex; align-items: center; gap: 10px; z-index: 99999; box-shadow: var(--shadow); transition: 0.3s;}
-        .pacman-green-dot { width: 8px; height: 8px; background: var(--accent-yellow); border-radius: 50%; box-shadow: 0 0 8px var(--accent-yellow); }
-        .pacman-label { font-weight: 600; font-size: 0.85rem; color: var(--text-main); }
-        .switch { position: relative; display: inline-block; width: 36px; height: 20px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); transition: .3s; border-radius: 20px; }
-        .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 3px; bottom: 3px; background-color: var(--text-muted); transition: .3s; border-radius: 50%; }
-        input:checked + .slider { background: var(--info-bg); border-color: var(--accent-color);}
-        input:checked + .slider:before { transform: translateX(16px); background-color: var(--accent-color);}
-
-        @keyframes pacman-chomp {
-            0%, 49% { clip-path: polygon( 100% 0%, 0% 0%, 0% 100%, 100% 100%, 100% 75%, 80% 75%, 80% 60%, 55% 60%, 55% 40%, 80% 40%, 80% 25%, 100% 25% ); }
-            50%, 100% { clip-path: polygon( 100% 0%, 0% 0%, 0% 100%, 100% 100%, 100% 55%, 55% 55%, 55% 45%, 100% 45% ); }
-        }
-        #pacman-follower { position: fixed; width: 30px; height: 30px; background: var(--accent-yellow); pointer-events: none; z-index: 999999; display: none; animation: pacman-chomp 0.3s infinite steps(1); will-change: transform; filter: drop-shadow(0 0 5px rgba(250, 204, 21, 0.5));}
-        #pacman-follower::after { content: ''; position: absolute; top: 15%; left: 55%; width: 4px; height: 4px; background: #000; border-radius: 0; }
 
         @media (max-width: 900px) {
             .layout-wrapper { grid-template-columns: 1fr; }
@@ -296,8 +202,18 @@
         })();
     </script>
 
+    {% if messages %}
+    <div class="messages-container">
+        {% for message in messages %}
+            <div class="alert alert-{% if message.tags == 'error' %}error{% else %}success{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
     <nav class="navbar">
-        <a href="{% url 'faculty_dashboard'|default:'#' %}" class="nav-logo" onclick="switchTab('overview')">
+        <a href="{% url 'faculty_dashboard' %}" class="nav-logo" onclick="switchTab('overview')">
             <span class="accent-logo">Projy</span> Ecosystem
         </a>
         
@@ -308,25 +224,13 @@
                 </svg>
             </button>
 
-            <div style="position: relative;">
-                <button class="icon-btn no-border" id="notif-btn" aria-label="Notifications">
-                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                    </svg>
-                    <span class="notif-badge" id="notif-badge">0</span>
-                </button>
-                
-                <div class="notif-dropdown" id="notif-dropdown">
-                    <div class="notif-header">System Alerts</div>
-                    <ul class="notif-list" id="notif-list">
-                        <li class="notif-item" style="text-align: center;">Fetching data...</li>
-                    </ul>
-                </div>
-            </div>
-
             <div class="profile-pill">
-                <img src="{{ user.profile_pic.url|default:'https://via.placeholder.com/150' }}" alt="User" id="nav-preview-img">
-                <span class="profile-pill-name" id="nav-user-name">{{ user.username|default:"Dr. John Smith" }}</span>
+                {% if request.user.profile_pic %}
+                <img src="{{ request.user.profile_pic.url }}" alt="User" id="nav-preview-img">
+                {% else %}
+                <img src="https://via.placeholder.com/150" alt="User" id="nav-preview-img">
+                {% endif %}
+                <span class="profile-pill-name" id="nav-user-name">{{ request.user.get_full_name|default:request.user.username }}</span>
                 <span class="profile-pill-role">| Faculty</span>
             </div>
             
@@ -334,34 +238,31 @@
         </div>
     </nav>
 
-
     <div class="layout-wrapper">
         
         <aside class="sidebar-card">
-            
             <div class="profile-img-container">
-                <img src="{{ user.profile_pic.url|default:'https://via.placeholder.com/150' }}" alt="Faculty Profile" class="profile-img" id="sidebar-preview-img">
-                <label for="profile-pic-upload" class="profile-img-overlay">
-                    <svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z" fill="none"/><path d="M19.3 8.3c-.4-.4-1.1-.4-1.5 0l-1.3 1.3 2.6 2.6 1.3-1.3c.4-.4.4-1.1 0-1.5l-1.1-1.1zM3 17.2V20h2.8l10.6-10.6-2.8-2.8L3 17.2zM21 21H3v2h18v-2z"/></svg>
-                    Upload
-                </label>
-                <input type="file" id="profile-pic-upload" accept="image/*" style="display: none;">
+                {% if request.user.profile_pic %}
+                <img src="{{ request.user.profile_pic.url }}" alt="Faculty Profile" class="profile-img" id="sidebar-preview-img">
+                {% else %}
+                <img src="https://via.placeholder.com/150" alt="Faculty Profile" class="profile-img" id="sidebar-preview-img">
+                {% endif %}
             </div>
 
-            <div class="username" id="sidebar-user-name">{{ user.get_full_name|default:"Dr. John Smith" }}</div>
+            <div class="username" id="sidebar-user-name">{{ request.user.get_full_name|default:request.user.username }}</div>
             
             <div class="info-block">
                 <div class="info-item">
                     <span class="info-label">College:</span>
-                    <span class="info-value">{{ profile.college.name|default:"Silver Oak" }}</span>
+                    <span class="info-value">{{ college.name|default:"Unassigned" }}</span>
                 </div>
                 <div class="info-item">
                     <span class="info-label">Dept:</span>
-                    <span class="info-value" id="sidebar-dept-val">{{ profile.department.name|default:"IT" }}</span>
+                    <span class="info-value" id="sidebar-dept-val">{{ request.user.staff_profile.department.name|default:"Unassigned" }}</span>
                 </div>
                 <div class="info-item">
                     <span class="info-label">Mentees:</span>
-                    <span class="info-value">{{ mentee_count|default:"86" }}</span>
+                    <span class="info-value">{{ mentees|length|default:"0" }}</span>
                 </div>
             </div>
 
@@ -379,15 +280,15 @@
                 <div class="stats-grid">
                     <div class="stat-card urgent">
                         <div class="stat-title">Pending Reviews</div>
-                        <div class="stat-value" id="stat-pending">{{ pending_verifications_count|default:"14" }}</div>
+                        <div class="stat-value" id="stat-pending">{{ pending_projects|length|add:semester_requests|length|add:pending_students|length }}</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-title">Active Mentees</div>
-                        <div class="stat-value">{{ mentee_count|default:"86" }}</div>
+                        <div class="stat-value">{{ mentees|length|default:"0" }}</div>
                     </div>
                     <div class="stat-card success">
                         <div class="stat-title">Total Verified</div>
-                        <div class="stat-value" id="stat-verified">{{ total_verified_count|default:"342" }}</div>
+                        <div class="stat-value" id="stat-verified">{{ total_verified_projects|default:"0" }}</div>
                     </div>
                 </div>
 
@@ -402,7 +303,6 @@
                                     <select id="queue-filter" class="form-input" style="margin: 0; padding: 6px 12px; font-size: 0.85rem; width: auto; height: auto;">
                                         <option value="all">All Types</option>
                                         <option value="project">Projects</option>
-                                        <option value="certificate">Certificates</option>
                                         <option value="semester">Semesters</option>
                                         <option value="student">New Users</option>
                                     </select>
@@ -419,433 +319,74 @@
                                     </tr>
                                 </thead>
                                 <tbody id="queue-table-body">
-                                    {% for req in pending_requests %}
-                                    <tr class="queue-row" data-type="{{ req.type }}">
-                                        <td>
-                                            <span class="student-name">{{ req.student.get_full_name }}</span>
-                                            <span class="student-id">ID: {{ req.student.id }}</span>
-                                        </td>
-                                        <td class="req-details" style="font-weight: 500;">{{ req.title }}</td>
-                                        <td>
-                                            {% if req.type == 'project' %}
-                                                <span class="badge badge-project">Project</span>
-                                            {% elif req.type == 'certificate' %}
-                                                <span class="badge badge-cert">Certificate</span>
-                                            {% elif req.type == 'semester' %}
-                                                <span class="badge badge-semester">Sem Update</span>
-                                            {% elif req.type == 'student' %}
-                                                <span class="badge badge-student">New Student</span>
-                                            {% endif %}
-                                        </td>
-                                        <td class="req-date">{{ req.date_submitted|date:"M d, H:i" }}</td>
-                                        <td>
-                                            <button class="btn-sm btn-view" onclick="reviewRequest(this)">View</button> 
-                                            <button class="btn-sm btn-approve" onclick="verifyRequest(this)">Verify</button>
-                                        </td>
-                                    </tr>
-                                    {% empty %}
                                     
+                                    {% for project in pending_projects %}
                                     <tr class="queue-row" data-type="project">
-                                        <td><span class="student-name">Jainil Desai</span><span class="student-id">ID: 847291</span></td>
-                                        <td class="req-details" style="font-weight: 500;">Stayfinder Hotel Mgmt</td>
+                                        <td>
+                                            <span class="student-name">{{ project.student.user.get_full_name|default:project.student.user.username }}</span>
+                                            <span class="student-id">ID: {{ project.student.id }}</span>
+                                        </td>
+                                        <td class="req-details" style="font-weight: 500;">{{ project.title }}</td>
                                         <td><span class="badge badge-project">Project</span></td>
-                                        <td class="req-date">Today, 10:45</td>
+                                        <td class="req-date">{{ project.created_at|date:"M d, H:i"|default:"Recent" }}</td>
                                         <td>
-                                            <button class="btn-sm btn-view" onclick="reviewRequest(this)">View</button> 
-                                            <button class="btn-sm btn-approve" onclick="verifyRequest(this)">Verify</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="queue-row" data-type="certificate">
-                                        <td><span class="student-name">Alex Mercer</span><span class="student-id">ID: 293847</span></td>
-                                        <td class="req-details" style="font-weight: 500;">AWS Cloud Practitioner</td>
-                                        <td><span class="badge badge-cert">Certificate</span></td>
-                                        <td class="req-date">Yesterday</td>
-                                        <td>
-                                            <button class="btn-sm btn-view" onclick="reviewRequest(this)">View</button> 
-                                            <button class="btn-sm btn-approve" onclick="verifyRequest(this)">Verify</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="queue-row" data-type="semester">
-                                        <td><span class="student-name">Sarah Connor</span><span class="student-id">ID: 583021</span></td>
-                                        <td class="req-details" style="font-weight: 500;">Sem 5 &rarr; Sem 6</td>
-                                        <td><span class="badge badge-semester">Sem Update</span></td>
-                                        <td class="req-date">Oct 12, 14:00</td>
-                                        <td>
-                                            <button class="btn-sm btn-view" onclick="reviewRequest(this)">View</button> 
-                                            <button class="btn-sm btn-approve" onclick="verifyRequest(this)">Verify</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="queue-row" data-type="student">
-                                        <td><span class="student-name">John Doe</span><span class="student-id">ID: 987654</span></td>
-                                        <td class="req-details" style="font-weight: 500;">System Access Request</td>
-                                        <td><span class="badge badge-student">New Student</span></td>
-                                        <td class="req-date">Oct 10, 09:15</td>
-                                        <td>
-                                            <button class="btn-sm btn-view" onclick="reviewRequest(this)">View</button> 
-                                            <button class="btn-sm btn-approve" onclick="verifyRequest(this)">Verify</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="queue-row" data-type="project">
-                                        <td><span class="student-name">Emma Watson</span><span class="student-id">ID: 345129</span></td>
-                                        <td class="req-details" style="font-weight: 500;">AI Image Generator</td>
-                                        <td><span class="badge badge-project">Project</span></td>
-                                        <td class="req-date">Oct 09, 16:30</td>
-                                        <td>
-                                            <button class="btn-sm btn-view" onclick="reviewRequest(this)">View</button> 
-                                            <button class="btn-sm btn-approve" onclick="verifyRequest(this)">Verify</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="queue-row" data-type="certificate">
-                                        <td><span class="student-name">Michael Scott</span><span class="student-id">ID: 762940</span></td>
-                                        <td class="req-details" style="font-weight: 500;">Scrum Master Certified</td>
-                                        <td><span class="badge badge-cert">Certificate</span></td>
-                                        <td class="req-date">Oct 08, 11:20</td>
-                                        <td>
-                                            <button class="btn-sm btn-view" onclick="reviewRequest(this)">View</button> 
-                                            <button class="btn-sm btn-approve" onclick="verifyRequest(this)">Verify</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="queue-row" data-type="semester">
-                                        <td><span class="student-name">Priya Sharma</span><span class="student-id">ID: 554312</span></td>
-                                        <td class="req-details" style="font-weight: 500;">Sem 3 &rarr; Sem 4</td>
-                                        <td><span class="badge badge-semester">Sem Update</span></td>
-                                        <td class="req-date">Oct 07, 10:10</td>
-                                        <td>
-                                            <button class="btn-sm btn-view" onclick="reviewRequest(this)">View</button> 
-                                            <button class="btn-sm btn-approve" onclick="verifyRequest(this)">Verify</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="queue-row" data-type="project">
-                                        <td><span class="student-name">Rahul Patel</span><span class="student-id">ID: 119834</span></td>
-                                        <td class="req-details" style="font-weight: 500;">IoT Smart Mirror</td>
-                                        <td><span class="badge badge-project">Project</span></td>
-                                        <td class="req-date">Oct 06, 15:45</td>
-                                        <td>
-                                            <button class="btn-sm btn-view" onclick="reviewRequest(this)">View</button> 
-                                            <button class="btn-sm btn-approve" onclick="verifyRequest(this)">Verify</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="queue-row" data-type="project">
-                                        <td><span class="student-name">Amit Kumar</span><span class="student-id">ID: 882190</span></td>
-                                        <td class="req-details" style="font-weight: 500;">Django E-commerce API</td>
-                                        <td><span class="badge badge-project">Project</span></td>
-                                        <td class="req-date">Oct 05, 09:05</td>
-                                        <td>
-                                            <button class="btn-sm btn-view" onclick="reviewRequest(this)">View</button> 
-                                            <button class="btn-sm btn-approve" onclick="verifyRequest(this)">Verify</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="queue-row" data-type="certificate">
-                                        <td><span class="student-name">Jessica Davis</span><span class="student-id">ID: 334512</span></td>
-                                        <td class="req-details" style="font-weight: 500;">Google Data Analytics</td>
-                                        <td><span class="badge badge-cert">Certificate</span></td>
-                                        <td class="req-date">Oct 05, 14:30</td>
-                                        <td>
-                                            <button class="btn-sm btn-view" onclick="reviewRequest(this)">View</button> 
-                                            <button class="btn-sm btn-approve" onclick="verifyRequest(this)">Verify</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="queue-row" data-type="student">
-                                        <td><span class="student-name">David Wilson</span><span class="student-id">ID: 776512</span></td>
-                                        <td class="req-details" style="font-weight: 500;">System Access Request</td>
-                                        <td><span class="badge badge-student">New Student</span></td>
-                                        <td class="req-date">Oct 04, 11:15</td>
-                                        <td>
-                                            <button class="btn-sm btn-view" onclick="reviewRequest(this)">View</button> 
-                                            <button class="btn-sm btn-approve" onclick="verifyRequest(this)">Verify</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="queue-row" data-type="project">
-                                        <td><span class="student-name">Sneha Gupta</span><span class="student-id">ID: 443219</span></td>
-                                        <td class="req-details" style="font-weight: 500;">React Native Weather App</td>
-                                        <td><span class="badge badge-project">Project</span></td>
-                                        <td class="req-date">Oct 04, 16:50</td>
-                                        <td>
-                                            <button class="btn-sm btn-view" onclick="reviewRequest(this)">View</button> 
-                                            <button class="btn-sm btn-approve" onclick="verifyRequest(this)">Verify</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="queue-row" data-type="semester">
-                                        <td><span class="student-name">Rohit Singh</span><span class="student-id">ID: 998123</span></td>
-                                        <td class="req-details" style="font-weight: 500;">Sem 1 &rarr; Sem 2</td>
-                                        <td><span class="badge badge-semester">Sem Update</span></td>
-                                        <td class="req-date">Oct 03, 10:00</td>
-                                        <td>
-                                            <button class="btn-sm btn-view" onclick="reviewRequest(this)">View</button> 
-                                            <button class="btn-sm btn-approve" onclick="verifyRequest(this)">Verify</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="queue-row" data-type="project">
-                                        <td><span class="student-name">Chloe Brown</span><span class="student-id">ID: 221345</span></td>
-                                        <td class="req-details" style="font-weight: 500;">Unity Chat Application</td>
-                                        <td><span class="badge badge-project">Project</span></td>
-                                        <td class="req-date">Oct 03, 13:20</td>
-                                        <td>
-                                            <button class="btn-sm btn-view" onclick="reviewRequest(this)">View</button> 
-                                            <button class="btn-sm btn-approve" onclick="verifyRequest(this)">Verify</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="queue-row" data-type="certificate">
-                                        <td><span class="student-name">Daniel Martinez</span><span class="student-id">ID: 665432</span></td>
-                                        <td class="req-details" style="font-weight: 500;">Coursera: Intro to ML</td>
-                                        <td><span class="badge badge-cert">Certificate</span></td>
-                                        <td class="req-date">Oct 02, 09:45</td>
-                                        <td>
-                                            <button class="btn-sm btn-view" onclick="reviewRequest(this)">View</button> 
-                                            <button class="btn-sm btn-approve" onclick="verifyRequest(this)">Verify</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="queue-row" data-type="project">
-                                        <td><span class="student-name">Aisha Khan</span><span class="student-id">ID: 112233</span></td>
-                                        <td class="req-details" style="font-weight: 500;">Blockchain Voting System</td>
-                                        <td><span class="badge badge-project">Project</span></td>
-                                        <td class="req-date">Oct 01, 11:30</td>
-                                        <td>
-                                            <button class="btn-sm btn-view" onclick="reviewRequest(this)">View</button> 
-                                            <button class="btn-sm btn-approve" onclick="verifyRequest(this)">Verify</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="queue-row" data-type="student">
-                                        <td><span class="student-name">Kevin Lee</span><span class="student-id">ID: 445566</span></td>
-                                        <td class="req-details" style="font-weight: 500;">System Access Request</td>
-                                        <td><span class="badge badge-student">New Student</span></td>
-                                        <td class="req-date">Sep 30, 08:20</td>
-                                        <td>
-                                            <button class="btn-sm btn-view" onclick="reviewRequest(this)">View</button> 
-                                            <button class="btn-sm btn-approve" onclick="verifyRequest(this)">Verify</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="queue-row" data-type="semester">
-                                        <td><span class="student-name">Rachel Green</span><span class="student-id">ID: 778899</span></td>
-                                        <td class="req-details" style="font-weight: 500;">Sem 7 &rarr; Sem 8</td>
-                                        <td><span class="badge badge-semester">Sem Update</span></td>
-                                        <td class="req-date">Sep 29, 15:10</td>
-                                        <td>
-                                            <button class="btn-sm btn-view" onclick="reviewRequest(this)">View</button> 
-                                            <button class="btn-sm btn-approve" onclick="verifyRequest(this)">Verify</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="queue-row" data-type="project">
-                                        <td><span class="student-name">Vikram Singh</span><span class="student-id">ID: 334455</span></td>
-                                        <td class="req-details" style="font-weight: 500;">Flask REST API</td>
-                                        <td><span class="badge badge-project">Project</span></td>
-                                        <td class="req-date">Sep 28, 10:05</td>
-                                        <td>
-                                            <button class="btn-sm btn-view" onclick="reviewRequest(this)">View</button> 
-                                            <button class="btn-sm btn-approve" onclick="verifyRequest(this)">Verify</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="queue-row" data-type="certificate">
-                                        <td><span class="student-name">Megan Fox</span><span class="student-id">ID: 667788</span></td>
-                                        <td class="req-details" style="font-weight: 500;">Udemy: Advanced CSS</td>
-                                        <td><span class="badge badge-cert">Certificate</span></td>
-                                        <td class="req-date">Sep 27, 14:50</td>
-                                        <td>
-                                            <button class="btn-sm btn-view" onclick="reviewRequest(this)">View</button> 
-                                            <button class="btn-sm btn-approve" onclick="verifyRequest(this)">Verify</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="queue-row" data-type="project">
-                                        <td><span class="student-name">Oliver Twist</span><span class="student-id">ID: 990011</span></td>
-                                        <td class="req-details" style="font-weight: 500;">GoLang Microservice</td>
-                                        <td><span class="badge badge-project">Project</span></td>
-                                        <td class="req-date">Sep 26, 09:30</td>
-                                        <td>
-                                            <button class="btn-sm btn-view" onclick="reviewRequest(this)">View</button> 
-                                            <button class="btn-sm btn-approve" onclick="verifyRequest(this)">Verify</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="queue-row" data-type="semester">
-                                        <td><span class="student-name">Sophia Loren</span><span class="student-id">ID: 223344</span></td>
-                                        <td class="req-details" style="font-weight: 500;">Sem 3 &rarr; Sem 4</td>
-                                        <td><span class="badge badge-semester">Sem Update</span></td>
-                                        <td class="req-date">Sep 25, 11:45</td>
-                                        <td>
-                                            <button class="btn-sm btn-view" onclick="reviewRequest(this)">View</button> 
-                                            <button class="btn-sm btn-approve" onclick="verifyRequest(this)">Verify</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="queue-row" data-type="project">
-                                        <td><span class="student-name">Liam Neeson</span><span class="student-id">ID: 556677</span></td>
-                                        <td class="req-details" style="font-weight: 500;">Vue.js Dashboard</td>
-                                        <td><span class="badge badge-project">Project</span></td>
-                                        <td class="req-date">Sep 24, 16:15</td>
-                                        <td>
-                                            <button class="btn-sm btn-view" onclick="reviewRequest(this)">View</button> 
-                                            <button class="btn-sm btn-approve" onclick="verifyRequest(this)">Verify</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="queue-row" data-type="certificate">
-                                        <td><span class="student-name">Isabella Ross</span><span class="student-id">ID: 889900</span></td>
-                                        <td class="req-details" style="font-weight: 500;">Azure Solutions Architect</td>
-                                        <td><span class="badge badge-cert">Certificate</span></td>
-                                        <td class="req-date">Sep 23, 10:20</td>
-                                        <td>
-                                            <button class="btn-sm btn-view" onclick="reviewRequest(this)">View</button> 
-                                            <button class="btn-sm btn-approve" onclick="verifyRequest(this)">Verify</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="queue-row" data-type="student">
-                                        <td><span class="student-name">Mason Mount</span><span class="student-id">ID: 114477</span></td>
-                                        <td class="req-details" style="font-weight: 500;">System Access Request</td>
-                                        <td><span class="badge badge-student">New Student</span></td>
-                                        <td class="req-date">Sep 22, 08:50</td>
-                                        <td>
-                                            <button class="btn-sm btn-view" onclick="reviewRequest(this)">View</button> 
-                                            <button class="btn-sm btn-approve" onclick="verifyRequest(this)">Verify</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="queue-row" data-type="project">
-                                        <td><span class="student-name">Mia Khalifa</span><span class="student-id">ID: 225588</span></td>
-                                        <td class="req-details" style="font-weight: 500;">Ruby on Rails Backend</td>
-                                        <td><span class="badge badge-project">Project</span></td>
-                                        <td class="req-date">Sep 21, 13:40</td>
-                                        <td>
-                                            <button class="btn-sm btn-view" onclick="reviewRequest(this)">View</button> 
-                                            <button class="btn-sm btn-approve" onclick="verifyRequest(this)">Verify</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="queue-row" data-type="semester">
-                                        <td><span class="student-name">James Bond</span><span class="student-id">ID: 336699</span></td>
-                                        <td class="req-details" style="font-weight: 500;">Sem 5 &rarr; Sem 6</td>
-                                        <td><span class="badge badge-semester">Sem Update</span></td>
-                                        <td class="req-date">Sep 20, 09:10</td>
-                                        <td>
-                                            <button class="btn-sm btn-view" onclick="reviewRequest(this)">View</button> 
-                                            <button class="btn-sm btn-approve" onclick="verifyRequest(this)">Verify</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="queue-row" data-type="project">
-                                        <td><span class="student-name">Amelia Earhart</span><span class="student-id">ID: 447700</span></td>
-                                        <td class="req-details" style="font-weight: 500;">Three.js Interactive Scene</td>
-                                        <td><span class="badge badge-project">Project</span></td>
-                                        <td class="req-date">Sep 19, 15:30</td>
-                                        <td>
-                                            <button class="btn-sm btn-view" onclick="reviewRequest(this)">View</button> 
-                                            <button class="btn-sm btn-approve" onclick="verifyRequest(this)">Verify</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="queue-row" data-type="certificate">
-                                        <td><span class="student-name">Benjamin Button</span><span class="student-id">ID: 558811</span></td>
-                                        <td class="req-details" style="font-weight: 500;">CompTIA Security+</td>
-                                        <td><span class="badge badge-cert">Certificate</span></td>
-                                        <td class="req-date">Sep 18, 11:05</td>
-                                        <td>
-                                            <button class="btn-sm btn-view" onclick="reviewRequest(this)">View</button> 
-                                            <button class="btn-sm btn-approve" onclick="verifyRequest(this)">Verify</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="queue-row" data-type="project">
-                                        <td><span class="student-name">Charlotte Web</span><span class="student-id">ID: 669922</span></td>
-                                        <td class="req-details" style="font-weight: 500;">Svelte UI Kit</td>
-                                        <td><span class="badge badge-project">Project</span></td>
-                                        <td class="req-date">Sep 17, 14:20</td>
-                                        <td>
-                                            <button class="btn-sm btn-view" onclick="reviewRequest(this)">View</button> 
-                                            <button class="btn-sm btn-approve" onclick="verifyRequest(this)">Verify</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="queue-row" data-type="student">
-                                        <td><span class="student-name">Lucas Scott</span><span class="student-id">ID: 770033</span></td>
-                                        <td class="req-details" style="font-weight: 500;">System Access Request</td>
-                                        <td><span class="badge badge-student">New Student</span></td>
-                                        <td class="req-date">Sep 16, 08:35</td>
-                                        <td>
-                                            <button class="btn-sm btn-view" onclick="reviewRequest(this)">View</button> 
-                                            <button class="btn-sm btn-approve" onclick="verifyRequest(this)">Verify</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="queue-row" data-type="semester">
-                                        <td><span class="student-name">Harper Lee</span><span class="student-id">ID: 881144</span></td>
-                                        <td class="req-details" style="font-weight: 500;">Sem 1 &rarr; Sem 2</td>
-                                        <td><span class="badge badge-semester">Sem Update</span></td>
-                                        <td class="req-date">Sep 15, 10:50</td>
-                                        <td>
-                                            <button class="btn-sm btn-view" onclick="reviewRequest(this)">View</button> 
-                                            <button class="btn-sm btn-approve" onclick="verifyRequest(this)">Verify</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="queue-row" data-type="project">
-                                        <td><span class="student-name">Elijah Wood</span><span class="student-id">ID: 992255</span></td>
-                                        <td class="req-details" style="font-weight: 500;">C++ Game Engine</td>
-                                        <td><span class="badge badge-project">Project</span></td>
-                                        <td class="req-date">Sep 14, 16:40</td>
-                                        <td>
-                                            <button class="btn-sm btn-view" onclick="reviewRequest(this)">View</button> 
-                                            <button class="btn-sm btn-approve" onclick="verifyRequest(this)">Verify</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="queue-row" data-type="certificate">
-                                        <td><span class="student-name">Evelyn Salt</span><span class="student-id">ID: 103366</span></td>
-                                        <td class="req-details" style="font-weight: 500;">Google Project Mgmt</td>
-                                        <td><span class="badge badge-cert">Certificate</span></td>
-                                        <td class="req-date">Sep 13, 09:25</td>
-                                        <td>
-                                            <button class="btn-sm btn-view" onclick="reviewRequest(this)">View</button> 
-                                            <button class="btn-sm btn-approve" onclick="verifyRequest(this)">Verify</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="queue-row" data-type="project">
-                                        <td><span class="student-name">William Tell</span><span class="student-id">ID: 214477</span></td>
-                                        <td class="req-details" style="font-weight: 500;">TensorFlow Object Detection</td>
-                                        <td><span class="badge badge-project">Project</span></td>
-                                        <td class="req-date">Sep 12, 13:55</td>
-                                        <td>
-                                            <button class="btn-sm btn-view" onclick="reviewRequest(this)">View</button> 
-                                            <button class="btn-sm btn-approve" onclick="verifyRequest(this)">Verify</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="queue-row" data-type="semester">
-                                        <td><span class="student-name">Abigail Adams</span><span class="student-id">ID: 325588</span></td>
-                                        <td class="req-details" style="font-weight: 500;">Sem 7 &rarr; Sem 8</td>
-                                        <td><span class="badge badge-semester">Sem Update</span></td>
-                                        <td class="req-date">Sep 11, 11:10</td>
-                                        <td>
-                                            <button class="btn-sm btn-view" onclick="reviewRequest(this)">View</button> 
-                                            <button class="btn-sm btn-approve" onclick="verifyRequest(this)">Verify</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="queue-row" data-type="student">
-                                        <td><span class="student-name">James Franco</span><span class="student-id">ID: 436699</span></td>
-                                        <td class="req-details" style="font-weight: 500;">System Access Request</td>
-                                        <td><span class="badge badge-student">New Student</span></td>
-                                        <td class="req-date">Sep 10, 08:40</td>
-                                        <td>
-                                            <button class="btn-sm btn-view" onclick="reviewRequest(this)">View</button> 
-                                            <button class="btn-sm btn-approve" onclick="verifyRequest(this)">Verify</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="queue-row" data-type="project">
-                                        <td><span class="student-name">Emily Blunt</span><span class="student-id">ID: 547700</span></td>
-                                        <td class="req-details" style="font-weight: 500;">D3.js Data Vis Dashboard</td>
-                                        <td><span class="badge badge-project">Project</span></td>
-                                        <td class="req-date">Sep 09, 15:25</td>
-                                        <td>
-                                            <button class="btn-sm btn-view" onclick="reviewRequest(this)">View</button> 
-                                            <button class="btn-sm btn-approve" onclick="verifyRequest(this)">Verify</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="queue-row" data-type="certificate">
-                                        <td><span class="student-name">Alexander Great</span><span class="student-id">ID: 658811</span></td>
-                                        <td class="req-details" style="font-weight: 500;">Cisco CCNA</td>
-                                        <td><span class="badge badge-cert">Certificate</span></td>
-                                        <td class="req-date">Sep 08, 10:15</td>
-                                        <td>
-                                            <button class="btn-sm btn-view" onclick="reviewRequest(this)">View</button> 
-                                            <button class="btn-sm btn-approve" onclick="verifyRequest(this)">Verify</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="queue-row" data-type="project">
-                                        <td><span class="student-name">Grace Kelly</span><span class="student-id">ID: 769922</span></td>
-                                        <td class="req-details" style="font-weight: 500;">Node.js Payment Gateway</td>
-                                        <td><span class="badge badge-project">Project</span></td>
-                                        <td class="req-date">Sep 07, 14:05</td>
-                                        <td>
-                                            <button class="btn-sm btn-view" onclick="reviewRequest(this)">View</button> 
-                                            <button class="btn-sm btn-approve" onclick="verifyRequest(this)">Verify</button>
+                                            <button class="btn-sm btn-view" onclick="reviewRequest(this, '{% url 'approve_project' project.id %}', '{% url 'add_project_remark' project.id %}', 'project')">View</button> 
+                                            
+                                            <form action="{% url 'approve_project' project.id %}" method="POST" style="display:inline;">
+                                                {% csrf_token %}
+                                                <button class="btn-sm btn-approve" type="submit">Verify</button>
+                                            </form>
                                         </td>
                                     </tr>
                                     {% endfor %}
+
+                                    {% for sem_student in semester_requests %}
+                                    <tr class="queue-row" data-type="semester">
+                                        <td>
+                                            <span class="student-name">{{ sem_student.user.get_full_name|default:sem_student.user.username }}</span>
+                                            <span class="student-id">ID: {{ sem_student.id }}</span>
+                                        </td>
+                                        <td class="req-details" style="font-weight: 500;">Sem {{ sem_student.semester }} &rarr; Sem {{ sem_student.pending_semester }}</td>
+                                        <td><span class="badge badge-semester">Sem Update</span></td>
+                                        <td class="req-date">Recent</td>
+                                        <td>
+                                            <button class="btn-sm btn-view" onclick="reviewRequest(this, '{% url 'approve_semester_change' sem_student.id 'approve' %}', '{% url 'approve_semester_change' sem_student.id 'reject' %}', 'semester')">View</button> 
+                                            
+                                            <form action="{% url 'approve_semester_change' sem_student.id 'approve' %}" method="POST" style="display:inline;">
+                                                {% csrf_token %}
+                                                <button class="btn-sm btn-approve" type="submit">Verify</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+
+                                    {% for pend_student in pending_students %}
+                                    <tr class="queue-row" data-type="student">
+                                        <td>
+                                            <span class="student-name">{{ pend_student.user.get_full_name|default:pend_student.user.username }}</span>
+                                            <span class="student-id">ID: {{ pend_student.id }}</span>
+                                        </td>
+                                        <td class="req-details" style="font-weight: 500;">System Access Request</td>
+                                        <td><span class="badge badge-student">New Student</span></td>
+                                        <td class="req-date">Recent</td>
+                                        <td>
+                                            <button class="btn-sm btn-view" onclick="reviewRequest(this, '{% url 'approve_user' pend_student.user.id %}', null, 'student')">View</button> 
+                                            
+                                            <form action="{% url 'approve_user' pend_student.user.id %}" method="POST" style="display:inline;">
+                                                {% csrf_token %}
+                                                <button class="btn-sm btn-approve" type="submit">Verify</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+
+                                    {% if not pending_projects and not semester_requests and not pending_students %}
+                                    <tr>
+                                        <td colspan="5" style="text-align:center; padding: 30px; color: var(--text-muted);">
+                                            No pending verifications in your queue.
+                                        </td>
+                                    </tr>
+                                    {% endif %}
                                 </tbody>
                             </table>
                         </div>
@@ -862,12 +403,8 @@
                             </div>
                             <ul class="log-list" id="activity-feed">
                                 <li>
-                                    <span class="log-time">[11:02]</span>
-                                    <span class="log-text">User <span class="log-highlight">#121212</span> committed code to repository.</span>
-                                </li>
-                                <li>
-                                    <span class="log-time">[09:45]</span>
-                                    <span class="log-text">System executed verification on node <span class="log-highlight">'oto'</span>.</span>
+                                    <span class="log-time">[System]</span>
+                                    <span class="log-text">Dashboard securely loaded and synced with database.</span>
                                 </li>
                             </ul>
                         </div>
@@ -879,64 +416,55 @@
                 <h2 class="section-title">Student Roster</h2>
                 <div class="data-card">
                     <div class="data-header">
-                        <span>{{ profile.department.name|default:"IT" }} Cohort</span>
+                        <span>{{ request.user.staff_profile.department.name|default:"Assigned" }} Cohort</span>
                         <input type="text" id="student-search" class="form-input" placeholder="Query by ID or Name..." style="max-width: 250px; padding: 6px 12px; font-size: 0.85rem; margin:0;">
                     </div>
                     <div style="overflow-x: auto;">
                         <table>
                             <thead>
                                 <tr>
-                                    <th>UID</th>
-                                    <th>USER DATA</th>
-                                    <th>SEM</th>
-                                    <th>PROGRESS</th>
-                                    <th>STATE</th>
-                                    <th>ACTION</th>
+                                    <th>SID/UID</th>
+                                    <th>Student Name (Username)</th>
+                                    <th>Email ID</th>
+                                    <th>Sem</th>
+                                    <th>Progress</th>
+                                    <th>Requests</th>
+                                    <th>Portfolio</th>
                                 </tr>
                             </thead>
                             <tbody id="student-table-body">
                                 {% for mentee in mentees %}
                                 <tr class="student-row">
-                                    <td><span class="student-id">#{{ mentee.id }}</span></td>
+                                    <td><span class="student-id">#{{ mentee.user.id }}</span></td>
                                     <td>
-                                        <span class="student-name">{{ mentee.get_full_name|default:mentee.username }}</span>
-                                        <span style="color: var(--text-muted); font-size: 0.75rem;">{{ mentee.email }}</span>
+                                        <span class="student-name">{{ mentee.user.get_full_name|default:mentee.user.username }}</span>
                                     </td>
-                                    <td><span class="badge badge-semester">Sem {{ mentee.profile.semester|default:"-" }}</span></td>
-                                    <td style="font-size: 0.85rem; font-weight: 500;">[{{ mentee.verified_projects_count|default:"0" }}] Verified</td>
                                     <td>
-                                        {% if mentee.pending_requests_count > 0 %}
-                                            <span class="badge badge-pending">{{ mentee.pending_requests_count }} REQ</span>
+                                        <span style="color: var(--text-muted); font-size: 0.75rem;">{{ mentee.user.email }}</span>
+                                    </td>
+                                    <td><span class="badge badge-semester">Sem {{ mentee.semester|default:"-" }}</span></td>
+                                    
+                                    <td style="font-size: 0.85rem; font-weight: 500;">
+                                        <span class="badge badge-active">{{ mentee.verified_project_count|default:"0" }} Verified</span>
+                                    </td>
+                                    
+                                    <td>
+                                        {% if mentee.pending_request_count > 0 %}
+                                            <span class="badge badge-pending">{{ mentee.pending_request_count }} Pending</span>
                                         {% else %}
-                                            <span class="badge badge-active">SYNCED</span>
+                                            <span style="color: var(--text-muted); font-size:0.8rem;">Clear</span>
                                         {% endif %}
                                     </td>
+                                    
                                     <td>
-                                        <a href="{% url 'student_portfolio' mentee.username %}" target="_blank" class="btn-sm btn-view" style="display:inline-block;">Launch</a>
+                                        <a href="{% url 'live_portfolio' %}?student={{ mentee.user.username }}" target="_blank" class="btn-sm btn-view" style="display:inline-block;">View</a>
                                     </td>
                                 </tr>
                                 {% empty %}
-                                <tr class="student-row">
-                                    <td><span class="student-id">#121212</span></td>
-                                    <td>
-                                        <span class="student-name">Jainil Desai</span>
-                                        <span style="color: var(--text-muted); font-size: 0.75rem;">jainil@student.edu</span>
+                                <tr>
+                                    <td colspan="7" style="text-align:center; padding: 30px; color: var(--text-muted);">
+                                        No students assigned to you yet.
                                     </td>
-                                    <td><span class="badge badge-semester">Sem 6</span></td>
-                                    <td style="font-size: 0.85rem; font-weight: 500;">[4] Verified</td>
-                                    <td><span class="badge badge-pending">1 REQ</span></td>
-                                    <td><a href="#" class="btn-sm btn-view" style="display:inline-block;">Launch</a></td>
-                                </tr>
-                                <tr class="student-row">
-                                    <td><span class="student-id">#121213</span></td>
-                                    <td>
-                                        <span class="student-name">Sarah Connor</span>
-                                        <span style="color: var(--text-muted); font-size: 0.75rem;">s.connor@student.edu</span>
-                                    </td>
-                                    <td><span class="badge badge-semester">Sem 5</span></td>
-                                    <td style="font-size: 0.85rem; font-weight: 500;">[6] Verified</td>
-                                    <td><span class="badge badge-active">SYNCED</span></td>
-                                    <td><a href="#" class="btn-sm btn-view" style="display:inline-block;">Launch</a></td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -948,24 +476,46 @@
             <section id="settings" class="page-section">
                 <h2 class="section-title">Faculty Configuration</h2>
                 <div class="data-card" style="padding: 30px;">
-                    <h3 style="margin-bottom: 25px; color: var(--text-main); font-size: 1.1rem; font-weight: 700;">Update Profile Settings</h3>
                     
-                    <div class="form-group">
-                        <label class="form-label">Display Name</label>
-                        <input type="text" class="form-input" id="settings-name-input" value="{{ user.get_full_name|default:'Dr. John Smith' }}">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Department / Title</label>
-                        <input type="text" class="form-input" id="settings-dept-input" value="{{ profile.department.name|default:'IT' }}">
-                    </div>
-                    <div class="form-group" style="margin-bottom: 30px;">
-                        <label class="form-label">System Hooks</label>
-                        <div style="display: flex; align-items: center; gap: 10px; color: var(--text-muted); font-size: 0.9rem;">
-                            <input type="checkbox" checked id="notif-check" style="cursor: pointer;">
-                            <label for="notif-check" style="cursor: pointer;">Enable email webhooks for incoming requests</label>
+                    <form method="POST" action="{% url 'faculty_settings_update' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <h3 style="margin-bottom: 25px; color: var(--text-main); font-size: 1.1rem; font-weight: 700;">Update Profile Settings</h3>
+                        
+                        <div class="form-group" style="margin-bottom: 30px; display: flex; align-items: center; gap: 20px;">
+                            <div class="profile-img-container" style="margin: 0;">
+                                {% if request.user.profile_pic %}
+                                    <img src="{{ request.user.profile_pic.url }}" alt="Profile" class="profile-img" id="settings-preview-img">
+                                {% else %}
+                                    <img src="https://via.placeholder.com/150" alt="Profile" class="profile-img" id="settings-preview-img">
+                                {% endif %}
+                            </div>
+                            <div>
+                                <label for="profile-pic-upload" class="btn-sm btn-view" style="cursor: pointer;">Change Avatar</label>
+                                <input type="file" name="profile_pic" id="profile-pic-upload" accept="image/*" style="display: none;" onchange="previewImage(event)">
+                            </div>
                         </div>
-                    </div>
-                    <button class="btn-sm btn-approve" id="save-settings-btn" style="padding: 10px 20px; font-size: 0.9rem;">Compile & Save</button>
+
+                        <div class="form-group">
+                            <label class="form-label">First Name</label>
+                            <input type="text" name="first_name" class="form-input" value="{{ request.user.first_name }}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" name="last_name" class="form-input" value="{{ request.user.last_name }}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Department / Title</label>
+                            <input type="text" class="form-input" value="{{ request.user.staff_profile.department.name|default:'' }}" readonly style="opacity: 0.7; cursor: not-allowed;" title="Contact Admin to change Department">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 30px;">
+                            <label class="form-label">System Hooks</label>
+                            <div style="display: flex; align-items: center; gap: 10px; color: var(--text-muted); font-size: 0.9rem;">
+                                <input type="checkbox" name="email_webhooks" checked id="notif-check" style="cursor: pointer;">
+                                <label for="notif-check" style="cursor: pointer;">Enable email webhooks for incoming requests</label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-sm btn-approve" style="padding: 10px 20px; font-size: 0.9rem;">Compile & Save</button>
+                    </form>
                 </div>
             </section>
 
@@ -979,20 +529,20 @@
                     <div class="detail-left">
                         <div class="data-card" style="padding: 25px;">
                             <div style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 10px; text-transform: uppercase; font-weight: 600;">Target Payload</div>
-                            <h1 id="review-title" style="font-size: 1.8rem; margin-bottom: 15px; color: var(--text-main); font-weight: 800;">Project Name</h1>
+                            <h1 id="review-title" style="font-size: 1.8rem; margin-bottom: 15px; color: var(--text-main); font-weight: 800;">Request Title</h1>
                             
                             <div style="background: rgba(0,0,0,0.15); padding: 15px; border-radius: var(--radius); margin-bottom: 25px; border: 1px solid var(--border-color);">
                                 <div id="review-student-info" style="color: var(--accent-secondary); font-size: 0.9rem; margin-bottom: 5px; font-weight: 600;">
                                     Origin: Student Name
                                 </div>
                                 <div id="review-date-info" style="color: var(--text-muted); font-size: 0.85rem; font-weight: 500;">
-                                    Timestamp: Today
+                                    Timestamp: Date
                                 </div>
                             </div>
                             
-                            <h3 style="color: var(--text-main); font-size: 1.1rem; margin-bottom: 10px; font-weight: 700;">Execution Details</h3>
+                            <h3 style="color: var(--text-main); font-size: 1.1rem; margin-bottom: 10px; font-weight: 700;">Action Required</h3>
                             <p style="color: var(--text-muted); line-height: 1.7; font-size: 0.95rem;">
-                                Waiting for detailed telemetry from database...
+                                Please review this request and choose to approve or reject it using the controls on the right.
                             </p>
                         </div>
                     </div>
@@ -1000,9 +550,17 @@
                     <div class="detail-right">
                         <div class="data-card" style="padding: 20px;">
                             <h3 style="margin-bottom: 15px; font-size: 0.95rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Run Verification</h3>
-                            <button class="btn-sm btn-approve" onclick="verifyFromReview()" style="width: 100%; padding: 12px; margin-bottom: 15px; font-size: 0.9rem;">Approve Request</button>
-                            <textarea class="form-input" placeholder="Input denial reason or patch notes..." style="width: 100%; min-height: 80px; margin-bottom: 10px; font-size: 0.85rem; resize: vertical;"></textarea>
-                            <button class="btn-sm btn-danger" style="width: 100%; padding: 12px; font-size: 0.9rem;">Reject Request</button>
+                            
+                            <form id="review-approve-form" method="POST">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-sm btn-approve" style="width: 100%; padding: 12px; margin-bottom: 15px; font-size: 0.9rem;">Approve Request</button>
+                            </form>
+
+                            <form id="review-reject-form" method="POST" style="display: none;">
+                                {% csrf_token %}
+                                <textarea name="remarks" id="review-remarks" class="form-input" placeholder="Input denial reason or remarks (optional for semester rejection)..." style="width: 100%; min-height: 80px; margin-bottom: 10px; font-size: 0.85rem; resize: vertical;"></textarea>
+                                <button type="submit" class="btn-sm btn-danger" style="width: 100%; padding: 12px; font-size: 0.9rem;">Reject / Request Changes</button>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -1010,127 +568,78 @@
         </main>
     </div>
 
-    <div class="pacman-toggle-wrapper">
-        <span class="pacman-green-dot"></span>
-        <span class="pacman-label">Dev Mode</span>
-        <label class="switch">
-            <input type="checkbox" id="pacman-switch">
-            <span class="slider"></span>
-        </label>
-    </div>
-    <div id="pacman-follower"></div>
-
     <script>
         // ------------------------------------
-        // 1. Toast Notification System
+        // Settings Image Preview Script
         // ------------------------------------
-        function showToast(message, type = 'success') {
-            let container = document.querySelector('.messages-container');
-            if (!container) {
-                container = document.createElement('div');
-                container.className = 'messages-container';
-                document.body.appendChild(container);
+        function previewImage(event) {
+            const input = event.target;
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.getElementById('settings-preview-img');
+                    if (img) {
+                        img.src = e.target.result;
+                    }
+                }
+                reader.readAsDataURL(input.files[0]);
             }
-            const alert = document.createElement('div');
-            alert.className = `alert alert-${type}`;
-            alert.innerText = message;
-            container.appendChild(alert);
-            setTimeout(() => {
+        }
+
+        // ------------------------------------
+        // Toast Alerts (auto-clears)
+        // ------------------------------------
+        setTimeout(() => {
+            document.querySelectorAll('.alert').forEach(alert => {
                 alert.style.transition = 'opacity 0.5s ease';
                 alert.style.opacity = '0';
                 setTimeout(() => alert.remove(), 500);
-            }, 3000);
-        }
+            });
+        }, 4000);
 
         // ------------------------------------
-        // 2. DYNAMIC TERMINAL LOG SYSTEM
+        // Dynamic Review Request Logic
         // ------------------------------------
-        function addActivityLog(htmlMessage) {
-            const feed = document.getElementById('activity-feed');
-            if (!feed) return;
-
-            const now = new Date();
-            const timeString = `[${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}]`;
-            
-            const li = document.createElement('li');
-            li.innerHTML = `<span class="log-time">${timeString}</span><span class="log-text">${htmlMessage}</span>`;
-            
-            li.style.opacity = "0";
-            li.style.transform = "translateX(-10px)";
-            li.style.transition = "all 0.3s ease";
-            
-            feed.prepend(li);
-            
-            setTimeout(() => {
-                li.style.opacity = "1";
-                li.style.transform = "translateX(0)";
-            }, 10);
-
-            if (feed.children.length > 15) {
-                feed.removeChild(feed.lastChild);
-            }
-        }
-
-        // ------------------------------------
-        // 3. Queue Actions (Verify & Review)
-        // ------------------------------------
-        function updateCounters() {
-            const pendingEl = document.getElementById('stat-pending');
-            const verifiedEl = document.getElementById('stat-verified');
-            if (pendingEl) {
-                let count = parseInt(pendingEl.innerText);
-                if (count > 0) pendingEl.innerText = count - 1;
-            }
-            if (verifiedEl) {
-                let count = parseInt(verifiedEl.innerText);
-                verifiedEl.innerText = count + 1;
-            }
-        }
-
-        function verifyRequest(btn) {
+        function reviewRequest(btn, approveUrl, rejectUrl, reqType) {
             const row = btn.closest('tr');
+            const studentId = row.querySelector('.student-id').innerText;
             const studentName = row.querySelector('.student-name').innerText;
-            const requestTitle = row.querySelector('.req-details').innerText;
-            
-            const originalText = btn.innerText;
-            btn.innerText = 'Processing...';
-            btn.disabled = true;
+            const details = row.querySelector('.req-details').innerText;
+            const date = row.querySelector('.req-date').innerText;
 
-            setTimeout(() => {
-                showToast(`SUCCESS: ${studentName}'s payload accepted.`, 'success');
-                addActivityLog(`System verified node <span class="log-highlight">'${requestTitle}'</span>.`);
-
-                row.style.opacity = '0';
-                row.style.transform = 'scale(0.95)';
-                setTimeout(() => { row.remove(); updateCounters(); }, 200);
-            }, 400);
-        }
-
-        let currentRowBeingReviewed = null; 
-        function reviewRequest(btn) {
-            currentRowBeingReviewed = btn.closest('tr');
-            const studentId = currentRowBeingReviewed.querySelector('.student-id').innerText;
-            const studentName = currentRowBeingReviewed.querySelector('.student-name').innerText;
-            const details = currentRowBeingReviewed.querySelector('.req-details').innerText;
-            const date = currentRowBeingReviewed.querySelector('.req-date').innerText;
-
+            // Populate text
             document.getElementById('review-title').innerText = details;
             document.getElementById('review-student-info').innerText = `Origin: ${studentName} (${studentId})`;
             document.getElementById('review-date-info').innerText = `Timestamp: ${date}`;
             
+            // Set Form Endpoints dynamically
+            document.getElementById('review-approve-form').action = approveUrl;
+            
+            const rejectForm = document.getElementById('review-reject-form');
+            const remarksInput = document.getElementById('review-remarks');
+            
+            if (rejectUrl && rejectUrl !== 'null') {
+                rejectForm.style.display = 'block';
+                rejectForm.action = rejectUrl;
+                
+                // If it's a project, require remarks.
+                if (reqType === 'project') {
+                    remarksInput.style.display = 'block';
+                    remarksInput.required = true;
+                    remarksInput.placeholder = "Required: Input denial reason or patch notes...";
+                } else if (reqType === 'semester') {
+                    remarksInput.style.display = 'none';
+                    remarksInput.required = false;
+                }
+            } else {
+                rejectForm.style.display = 'none';
+            }
+            
             switchTab('review-project');
         }
 
-        function verifyFromReview() {
-            if (currentRowBeingReviewed) {
-                const verifyBtn = currentRowBeingReviewed.querySelector('.btn-approve');
-                verifyRequest(verifyBtn);
-                setTimeout(() => switchTab('overview'), 500);
-            }
-        }
-
         // ------------------------------------
-        // 4. Queue Filter & Tab Switching
+        // Queue Filter & Tab Switching
         // ------------------------------------
         const queueFilter = document.getElementById('queue-filter');
         if (queueFilter) {
@@ -1168,84 +677,7 @@
         }
 
         // ------------------------------------
-        // 5. Profile Settings & Image Upload
-        // ------------------------------------
-        const saveSettingsBtn = document.getElementById('save-settings-btn');
-        const nameInput = document.getElementById('settings-name-input');
-        const deptInput = document.getElementById('settings-dept-input');
-        const navUserName = document.getElementById('nav-user-name');
-        const sidebarUserName = document.getElementById('sidebar-user-name');
-        const sidebarDeptVal = document.getElementById('sidebar-dept-val');
-
-        const savedName = localStorage.getItem('facultyName');
-        const savedDept = localStorage.getItem('facultyDept');
-        
-        if (savedName) {
-            if(nameInput) nameInput.value = savedName;
-            if(navUserName) navUserName.textContent = savedName;
-            if(sidebarUserName) sidebarUserName.textContent = savedName;
-        }
-        if (savedDept) {
-            if(deptInput) deptInput.value = savedDept;
-            if(sidebarDeptVal) sidebarDeptVal.textContent = savedDept;
-        }
-
-        if (saveSettingsBtn) {
-            saveSettingsBtn.addEventListener('click', () => {
-                const newName = nameInput.value;
-                const newDept = deptInput.value;
-                
-                if(navUserName) navUserName.textContent = newName;
-                if(sidebarUserName) sidebarUserName.textContent = newName;
-                if(sidebarDeptVal) sidebarDeptVal.textContent = newDept;
-                
-                localStorage.setItem('facultyName', newName);
-                localStorage.setItem('facultyDept', newDept);
-                
-                addActivityLog(`Compiled updates to <span class="log-highlight">System Configuration</span>.`);
-
-                const originalText = saveSettingsBtn.textContent;
-                saveSettingsBtn.textContent = 'Compiled ✓';
-                saveSettingsBtn.style.background = 'var(--success-bg)';
-                saveSettingsBtn.style.color = 'var(--success-text)';
-                saveSettingsBtn.style.borderColor = 'var(--success-text)';
-                setTimeout(() => {
-                    saveSettingsBtn.textContent = originalText;
-                    saveSettingsBtn.style.background = '';
-                    saveSettingsBtn.style.color = '';
-                    saveSettingsBtn.style.borderColor = '';
-                }, 2000);
-            });
-        }
-
-        const fileInput = document.getElementById('profile-pic-upload');
-        const sidebarPreviewImg = document.getElementById('sidebar-preview-img');
-        const navPreviewImg = document.getElementById('nav-preview-img');
-
-        if (fileInput) {
-            const savedImage = localStorage.getItem('facultyProfilePic');
-            if (savedImage) {
-                if (sidebarPreviewImg) sidebarPreviewImg.src = savedImage;
-                if (navPreviewImg) navPreviewImg.src = savedImage;
-            }
-            fileInput.addEventListener('change', function(event) {
-                const file = event.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const base64Img = e.target.result;
-                        if (sidebarPreviewImg) sidebarPreviewImg.src = base64Img;
-                        if (navPreviewImg) navPreviewImg.src = base64Img;
-                        try { localStorage.setItem('facultyProfilePic', base64Img); } catch (e) {}
-                        addActivityLog(`Pushed new asset to <span class="log-highlight">profile_img</span> buffer.`);
-                    }
-                    reader.readAsDataURL(file);
-                }
-            });
-        }
-
-        // ------------------------------------
-        // 6. Theme Engine & Notifications
+        // Theme Engine
         // ------------------------------------
         const themeBtn = document.getElementById('theme-toggle-btn');
         const themeIcon = document.getElementById('theme-icon');
@@ -1266,98 +698,6 @@
                 themeIcon.innerHTML = sunSVG;
             }
         });
-
-        const notifBtn = document.getElementById('notif-btn');
-        const notifDropdown = document.getElementById('notif-dropdown');
-        const notifList = document.getElementById('notif-list');
-        const notifBadge = document.getElementById('notif-badge');
-
-        if (notifBtn) {
-            notifBtn.addEventListener('click', () => { notifDropdown.classList.toggle('show'); });
-            window.addEventListener('click', (e) => {
-                if (!notifBtn.contains(e.target) && !notifDropdown.contains(e.target)) {
-                    notifDropdown.classList.remove('show');
-                }
-            });
-            
-            async function fetchNotifications() {
-                try {
-                    const response = await fetch('/api/notifications/'); 
-                    if(!response.ok) throw new Error();
-                    const data = await response.json();
-                    notifList.innerHTML = ''; 
-                    let unreadCount = 0;
-                    data.forEach(notif => {
-                        if(notif.unread) unreadCount++;
-                        const li = document.createElement('li');
-                        li.className = `notif-item ${notif.unread ? 'unread' : ''}`;
-                        li.innerHTML = `<div style="font-weight: 600; color: var(--text-main);">${notif.message}</div><span class="notif-time">${notif.time}</span>`;
-                        notifList.appendChild(li);
-                    });
-                    if(unreadCount > 0) {
-                        notifBadge.textContent = unreadCount;
-                        notifBadge.style.display = 'flex';
-                    } else { notifBadge.style.display = 'none'; }
-                } catch (error) {
-                    const dummyData = [
-                        { id: 1, message: "Jainil Desai initiated payload 'Stayfinder'.", time: "10 mins ago", unread: true },
-                        { id: 2, message: "Alex Mercer requested auth token.", time: "1 hour ago", unread: true }
-                    ];
-                    notifList.innerHTML = ''; let unreadCount = 0;
-                    dummyData.forEach(notif => {
-                        if(notif.unread) unreadCount++;
-                        const li = document.createElement('li');
-                        li.className = `notif-item ${notif.unread ? 'unread' : ''}`;
-                        li.innerHTML = `<div style="font-size: 0.85rem; color: var(--text-main); font-weight: 500;">${notif.message}</div><span class="notif-time">${notif.time}</span>`;
-                        notifList.appendChild(li);
-                    });
-                    if(unreadCount > 0 && notifBadge) {
-                        notifBadge.textContent = unreadCount;
-                        notifBadge.style.display = 'flex';
-                    }
-                }
-            }
-            fetchNotifications();
-        }
-
-        // ------------------------------------
-        // 8. Pac-Man Logic
-        // ------------------------------------
-        const toggleSwitch = document.getElementById('pacman-switch');
-        const pacmanFollower = document.getElementById('pacman-follower');
-        let isPacmanActive = false; let mouseX = window.innerWidth / 2; let mouseY = window.innerHeight / 2;
-        let pacmanX = mouseX; let pacmanY = mouseY; let currentAngle = 0; let targetAngle = 0; let animationFrameId;
-
-        if (toggleSwitch && pacmanFollower) {
-            toggleSwitch.addEventListener('change', function(e) {
-                isPacmanActive = e.target.checked;
-                if (isPacmanActive) {
-                    pacmanFollower.style.display = 'block';
-                    pacmanX = mouseX - 25; pacmanY = mouseY - 25;
-                    cancelAnimationFrame(animationFrameId); animatePacman();
-                } else {
-                    pacmanFollower.style.display = 'none';
-                    cancelAnimationFrame(animationFrameId);
-                }
-            });
-            document.addEventListener('mousemove', function(e) {
-                if (!isPacmanActive) { mouseX = e.clientX; mouseY = e.clientY; return; }
-                const dx = e.clientX - mouseX; const dy = e.clientY - mouseY;
-                if (Math.abs(dx) > 1 || Math.abs(dy) > 1) targetAngle = Math.atan2(dy, dx) * (180 / Math.PI);
-                mouseX = e.clientX; mouseY = e.clientY;
-            });
-            function animatePacman() {
-                if (!isPacmanActive) return;
-                const targetX = mouseX - 25; const targetY = mouseY - 25; 
-                pacmanX += (targetX - pacmanX) * 0.15; pacmanY += (targetY - pacmanY) * 0.15;
-                let angleDiff = targetAngle - currentAngle;
-                angleDiff = ((angleDiff + 180) % 360 + 360) % 360 - 180;
-                currentAngle += angleDiff * 0.2;
-                pacmanFollower.style.left = pacmanX + 'px'; pacmanFollower.style.top = pacmanY + 'px';
-                pacmanFollower.style.transform = `translate(-50%, -50%) rotate(${currentAngle}deg)`;
-                animationFrameId = requestAnimationFrame(animatePacman);
-            }
-        }
     </script>
 </body>
 </html>
