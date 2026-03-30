@@ -6,6 +6,7 @@ from accounts.models import User, Notification
 from students.models import StudentProfile, Project
 from django.contrib import messages
 from django.db.models import Count, Q
+import json
 
 
 # --- HOD DASHBOARD ---
@@ -13,27 +14,33 @@ from django.db.models import Count, Q
 def hod_dashboard(request):
     if request.user.role != 'HOD' or not request.user.is_verified:
         return redirect('login')
+        
     try:
         my_college = request.user.staff_profile.college
     except StaffProfile.DoesNotExist:
         return render(request, 'college/error.html', {'message': "No College Assigned"})
     
-    # 1. Handle Mentor Allocation (POST Request)
-    if request.method == 'POST' and 'assign_mentor' in request.POST:
-        student_id = request.POST.get('student_id')
-        faculty_id = request.POST.get('faculty_id')
-
-        student = get_object_or_404(StudentProfile, id=student_id)
-        faculty = get_object_or_404(User, id=faculty_id)
-        if student.college == my_college and faculty.staff_profile.college == my_college:
-            student.mentor = faculty
-            student.save()
-            return redirect('hod_dashboard')
+    # --- NEW: Bulk Assignment Logic ---
+    if request.method == 'POST' and 'bulk_assign' in request.POST:
+        assignments_json = request.POST.get('assignments_data', '{}')
+        try:
+            assignments = json.loads(assignments_json)
+            for student_id, faculty_id in assignments.items():
+                student = StudentProfile.objects.filter(id=student_id, college=my_college).first()
+                faculty = User.objects.filter(id=faculty_id, staff_profile__college=my_college).first()
+                if student and faculty:
+                    student.mentor = faculty
+                    student.save()
+            messages.success(request, "Bulk mentor allocation saved successfully!")
+        except json.JSONDecodeError:
+            messages.error(request, "Invalid data submitted.")
+        return redirect('hod_dashboard')
             
-    # 2. Get Data for Dashboard
+    # Get Data for Dashboard
     pending_faculty = User.objects.filter(role='FACULTY', is_verified=False, staff_profile__college=my_college)
     all_students = StudentProfile.objects.filter(college=my_college).select_related('user', 'mentor')
     verified_faculty = User.objects.filter(role='FACULTY', is_verified=True, staff_profile__college=my_college)
+    
     context = {
         'college': my_college,
         'pending_faculty': pending_faculty,

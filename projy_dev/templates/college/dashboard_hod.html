@@ -1,130 +1,236 @@
-{% extends 'base.html' %}
-{% block title %}HOD Dashboard{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HOD Dashboard | Projy Ecosystem</title>
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --primary: #3b82f6;
+            --accent: #10b981;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --unassigned: #f59e0b;
+        }
 
-{% block content %}
-<div class="container" style="max-width: 1000px; margin: 30px auto;">
-    
-    <div style="background: linear-gradient(135deg, #007bff, #0056b3); color: white; padding: 30px; border-radius: 10px; margin-bottom: 30px;">
-        <h1 style="margin: 0;">HOD Dashboard</h1>
-        <p style="opacity: 0.9; margin-top: 5px;">Managing: <strong>{{ college.name }}</strong></p>
-    </div>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 20px;
+        }
 
-    <div class="card" style="margin-bottom: 30px; border-top: 4px solid #dc3545;">
-        <h3>📢 Pending Faculty Approvals</h3>
-        <p class="text-muted" style="font-size: 0.9rem;">Approve new faculty members so they can access the system.</p>
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+
+        h2 { margin-bottom: 5px; }
+        p { color: var(--text-dim); margin-bottom: 25px; }
+
+        /* Toolbar & Buttons */
+        .toolbar {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            background: #334155;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        select, button {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #475569;
+            outline: none;
+            background: #1e293b;
+            color: white;
+        }
+
+        .btn-primary { background: var(--primary); color: white; border: none; cursor: pointer; font-weight: bold;}
+        .btn-success { background: var(--accent); color: white; border: none; cursor: pointer; font-weight: bold;}
+        .btn-save { background: #8b5cf6; color: white; border: none; cursor: pointer; font-weight: bold; margin-left: auto; padding: 10px 20px;}
+        .btn-save:hover { background: #7c3aed; }
+
+        /* Table Styles */
+        table { width: 100%; border-collapse: collapse; text-align: left; margin-bottom: 30px;}
+        th { border-bottom: 2px solid #334155; padding: 12px; color: var(--text-dim); font-size: 0.9rem; }
+        td { padding: 12px; border-bottom: 1px solid #334155; }
+
+        .badge {
+            padding: 4px 10px; border-radius: 20px; font-size: 0.75rem;
+            font-weight: bold; text-transform: uppercase;
+        }
+        .assigned { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
+        .unassigned { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; }
+        .modified { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid #3b82f6; }
+
+        input[type="checkbox"] { cursor: pointer; transform: scale(1.2); }
         
-        {% if pending_faculty %}
-            <table style="width: 100%; text-align: left; border-collapse: collapse; margin-top: 15px;">
-                <thead>
-                    <tr style="border-bottom: 2px solid var(--border);">
-                        <th style="padding: 10px;">Name / Username</th>
-                        <th>Email</th>
-                        <th>Joined</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for fac in pending_faculty %}
-                    <tr style="border-bottom: 1px solid var(--border);">
-                        <td style="padding: 10px;">
-                            <strong>
-                                {% if fac.first_name %}
-                                    {{ fac.first_name }} {{ fac.last_name }}
-                                {% else %}
-                                    {{ fac.username }}
-                                {% endif %}
-                            </strong>
-                        </td>
-                        <td>{{ fac.email }}</td>
-                        <td>{{ fac.date_joined|date:"M d, Y" }}</td>
-                        <td>
-                            <a href="{% url 'approve_user' fac.id %}" class="btn" style="padding: 5px 15px; font-size: 0.8rem; background: #28a745;">Approve</a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <div style="padding: 20px; border: 1px dashed var(--border); border-radius: 5px; text-align: center; color: var(--text-muted);">
-                No pending faculty requests at this time.
-            </div>
-        {% endif %}
-    </div>
+        .alert { padding: 15px; background: rgba(16, 185, 129, 0.2); border-left: 4px solid #10b981; margin-bottom: 20px; border-radius: 4px;}
+    </style>
+</head>
+<body>
 
-    <div class="card" style="border-top: 4px solid #ffc107;">
-        <h3>🎓 Student Mentorship Allocation</h3>
-        <p class="text-muted" style="font-size: 0.9rem;">Assign a verified Faculty member to guide each student.</p>
+<div class="container">
+    <h2>🎓 Student Mentorship Allocation</h2>
+    <p>Efficiently assign mentors to large groups of students in {{ college.name }}.</p>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="toolbar">
+        <label>Bulk Actions:</label>
         
-        {% if all_students %}
-            <div style="overflow-x: auto;">
-                <table style="width: 100%; text-align: left; border-collapse: collapse; margin-top: 15px;">
-                    <thead>
-                        <tr style="border-bottom: 2px solid var(--border);">
-                            <th style="padding: 10px;">Student Name</th>
-                            <th>Enrollment</th>
-                            <th>Current Mentor</th>
-                            <th style="width: 300px;">Assign Mentor</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for student in all_students %}
-                        <tr style="border-bottom: 1px solid var(--border);">
-                            <td style="padding: 10px; font-weight: 500;">
-                                {% if student.user.first_name %}
-                                    {{ student.user.first_name }} {{ student.user.last_name }}
-                                {% else %}
-                                    {{ student.user.username }}
-                                {% endif %}
-                            </td>
-                            <td>{{ student.enrollment_number }}</td>
-                            <td>
-                                {% if student.mentor %}
-                                    <span class="badge badge-success" style="font-size: 0.85rem;">
-                                        {% if student.mentor.first_name %}
-                                            {{ student.mentor.first_name }} {{ student.mentor.last_name }}
-                                        {% else %}
-                                            {{ student.mentor.username }}
-                                        {% endif %}
-                                    </span>
-                                {% else %}
-                                    <span class="badge badge-warning">UNASSIGNED</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <form method="post" style="display: flex; gap: 8px;">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="assign_mentor" value="true">
-                                    <input type="hidden" name="student_id" value="{{ student.id }}">
-                                    
-                                    <select name="faculty_id" class="form-control" style="flex: 1; padding: 6px; border: 1px solid var(--border); border-radius: 4px;" required>
-                                        <option value="">Select Faculty...</option>
-                                        {% for fac in verified_faculty %}
-                                            <option value="{{ fac.id }}">
-                                                {% if fac.first_name %}
-                                                    {{ fac.first_name }} {{ fac.last_name }}
-                                                {% else %}
-                                                    {{ fac.username }}
-                                                {% endif %}
-                                            </option>
-                                        {% empty %}
-                                            <option disabled>No Verified Faculty Found</option>
-                                        {% endfor %}
-                                    </select>
-                                    
-                                    <button type="submit" class="btn" style="padding: 6px 12px; font-size: 0.85rem; background-color: #007bff; border: none;">Assign</button>
-                                </form>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        {% else %}
-            <div style="padding: 20px; border: 1px dashed var(--border); border-radius: 5px; text-align: center; color: var(--text-muted);">
-                No students enrolled in your college yet.
-            </div>
-        {% endif %}
+        <select id="bulkMentorSelect">
+            <option value="">-- Choose Mentor --</option>
+            {% for faculty in verified_faculty %}
+                <option value="{{ faculty.id }}" data-name="{{ faculty.get_full_name|default:faculty.username }}">
+                    {{ faculty.get_full_name|default:faculty.username }}
+                </option>
+            {% endfor %}
+        </select>
+        
+        <button class="btn-primary" onclick="applyBulk()">Assign Selected</button>
+        <button class="btn-success" onclick="autoDistribute()">Auto-Distribute All</button>
+        
+        <button class="btn-save" onclick="saveToDatabase()">💾 Save Allocations to Database</button>
     </div>
 
+    <table>
+        <thead>
+            <tr>
+                <th><input type="checkbox" id="selectAll" onclick="toggleAll(this)"></th>
+                <th>Student Name</th>
+                <th>Enrollment</th>
+                <th>Current Mentor</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="studentTable">
+            {% for student in all_students %}
+            <tr class="student-row" data-student-id="{{ student.id }}" data-faculty-id="{% if student.mentor %}{{ student.mentor.id }}{% endif %}">
+                <td><input type="checkbox" class="st-check"></td>
+                <td>{{ student.user.get_full_name|default:student.user.username }}</td>
+                <td>{{ student.enrollment_number|default:"N/A" }}</td>
+                <td>
+                    {% if student.mentor %}
+                        <span class="badge assigned">{{ student.mentor.get_full_name|default:student.mentor.username }}</span>
+                    {% else %}
+                        <span class="badge unassigned">UNASSIGNED</span>
+                    {% endif %}
+                </td>
+                <td><button class="btn-primary" onclick="assignRow(this)">Assign</button></td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="text-align: center; color: var(--text-dim);">No students found in this college.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <form id="bulkSubmitForm" method="POST" action="{% url 'hod_dashboard' %}" style="display: none;">
+        {% csrf_token %}
+        <input type="hidden" name="bulk_assign" value="1">
+        <input type="hidden" name="assignments_data" id="assignmentsData">
+    </form>
 </div>
-{% endblock %}
+
+<script>
+    // Load faculty options from the dropdown into an array for auto-distribution
+    const facultyOptions = Array.from(document.querySelectorAll('#bulkMentorSelect option'))
+                                .filter(opt => opt.value !== '')
+                                .map(opt => ({ id: opt.value, name: opt.dataset.name }));
+
+    // 1. Check/Uncheck All
+    function toggleAll(master) {
+        document.querySelectorAll('.st-check').forEach(cb => cb.checked = master.checked);
+    }
+
+    // 2. Assign to Selected Checkboxes (UI Only)
+    function applyBulk() {
+        const selectEl = document.getElementById('bulkMentorSelect');
+        const mentorId = selectEl.value;
+        const mentorName = selectEl.options[selectEl.selectedIndex].dataset.name;
+        
+        const selected = document.querySelectorAll('.st-check:checked');
+
+        if (!mentorId) return alert("Select a mentor first!");
+        if (selected.length === 0) return alert("Select at least one student!");
+
+        selected.forEach(cb => updateRow(cb.closest('tr'), mentorId, mentorName));
+        document.getElementById('selectAll').checked = false;
+    }
+
+    // 3. Auto-Distribute (UI Only)
+    function autoDistribute() {
+        if (facultyOptions.length === 0) return alert("No verified faculty available to distribute to!");
+        
+        const rows = document.querySelectorAll('#studentTable .student-row');
+        rows.forEach((row, index) => {
+            const mentor = facultyOptions[index % facultyOptions.length];
+            updateRow(row, mentor.id, mentor.name);
+        });
+    }
+
+    // 4. Individual row assignment (UI Only)
+    function assignRow(btn) {
+        const selectEl = document.getElementById('bulkMentorSelect');
+        const mentorId = selectEl.value;
+        const mentorName = selectEl.options[selectEl.selectedIndex]?.dataset?.name;
+        
+        if (!mentorId) return alert("Select a mentor in the dropdown above first!");
+        updateRow(btn.closest('tr'), mentorId, mentorName);
+    }
+
+    // Helper to update UI and store data attributes
+    function updateRow(row, mentorId, mentorName) {
+        const badge = row.querySelector('.badge');
+        badge.textContent = mentorName;
+        badge.className = 'badge modified'; // Use modified class to show unsaved changes
+        
+        // Store the new faculty ID in the row's data attribute
+        row.dataset.facultyId = mentorId;
+        row.querySelector('.st-check').checked = false;
+    }
+
+    // 5. Final Save to Database
+    function saveToDatabase() {
+        const assignments = {};
+        let hasChanges = false;
+
+        document.querySelectorAll('.student-row').forEach(row => {
+            const studentId = row.dataset.studentId;
+            const facultyId = row.dataset.facultyId;
+            
+            // Only add to payload if a faculty ID exists
+            if (facultyId && facultyId.trim() !== '') {
+                assignments[studentId] = facultyId;
+                hasChanges = true;
+            }
+        });
+
+        if (!hasChanges) {
+            return alert("No assignments have been made.");
+        }
+
+        // Put the JSON dictionary into the hidden form input and submit
+        document.getElementById('assignmentsData').value = JSON.stringify(assignments);
+        document.getElementById('bulkSubmitForm').submit();
+    }
+</script>
+
+</body>
+</html>

@@ -8,6 +8,11 @@ from django.contrib import messages
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 import datetime
+from accounts.models import User
+from django.http import HttpResponse
+from students.models import Project, BlogPost
+from django.template.loader import get_template
+from django.template.exceptions import TemplateDoesNotExist
 
 @login_required
 def student_dashboard(request):
@@ -204,7 +209,15 @@ def student_public_profile(request, student_id):
     })
     
 @login_required
-def live_portfolio(request):
+def live_portfolio(request, username=None, enrollment=None, college_name=None):
+    if username:
+        # If the URL contains a username, a Faculty/HOD is viewing it. 
+        # Fetch that specific student's user account.
+        target_user = get_object_or_404(User, username=username)
+    else:
+        # If no username is in the URL, the logged-in student is viewing their own.
+        target_user = request.user
+        
     profile = request.user.student_profile
     projects = Project.objects.filter(student=profile, is_verified=True)
     # ONLY show public blogs
@@ -370,22 +383,53 @@ def portfolio_builder(request):
 
 # Update your existing live_portfolio view:
 @login_required
-def live_portfolio(request):
-    profile = request.user.student_profile
+def live_portfolio(request, username=None, enrollment=None, college_name=None):
+    # 1. Determine whose portfolio we are trying to view
+    if username:
+        target_user = get_object_or_404(User, username=username)
+    else:
+        target_user = request.user
+        
+    # 2. Safety Check
+    if not hasattr(target_user, 'student_profile'):
+        return HttpResponse("Error: This user does not have a student profile.", status=400)
+        
+    # 3. Fetch the profile and data
+    profile = target_user.student_profile
     projects = Project.objects.filter(student=profile, is_verified=True)
-    blogs = BlogPost.objects.filter(student=profile, is_private=False)
+    public_blogs = BlogPost.objects.filter(student=profile, is_private=False)
     
-    context = {
+    # ==========================================
+    # 4. GENERIC SMART THEME ENGINE
+    # ==========================================
+    # Get the theme name from the database (e.g., 'morden', 'minimul', 'hacker', 'space', 'neon')
+    theme_choice = getattr(profile, 'portfolio_theme', 'hacker')
+    
+    # Clean the input (handle None, lowercase, remove accidental spaces)
+    if not theme_choice:
+        theme_choice = 'hacker'
+    theme_choice = str(theme_choice).strip().lower()
+
+    # Build the generic path based on a standard naming convention
+    template_name = f'students/themes/theme_{theme_choice}.html'
+
+    # 5. Safe Fallback Logic: Check if the file actually exists!
+    try:
+        # Django checks if the file is physically present in your templates folder
+        get_template(template_name)
+    except TemplateDoesNotExist:
+        # If the file is missing or misspelled, fallback to the working terminal theme
+        # Replace 'theme_hacker.html' with the exact filename of your working theme
+        try:
+            fallback_theme = 'students/themes/theme_hacker.html'
+            get_template(fallback_theme)
+            template_name = fallback_theme
+        except TemplateDoesNotExist:
+            # Absolute last resort if even the fallback is missing
+            template_name = 'students/portfolio_template.html'
+
+    return render(request, template_name, {
         'profile': profile,
         'projects': projects,
-        'blogs': blogs,
-    }
-    
-    # dynamically render the selected theme template
-    theme = profile.portfolio_theme
-    if theme == 'minimal':
-        return render(request, 'students/themes/theme_minimal.html', context)
-    elif theme == 'hacker':
-        return render(request, 'students/themes/theme_hacker.html', context)
-    else:
-        return render(request, 'students/themes/theme_modern.html', context)
+        'blogs': public_blogs,
+    })
