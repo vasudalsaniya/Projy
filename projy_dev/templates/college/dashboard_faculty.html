@@ -457,7 +457,7 @@
                                     </td>
                                     
                                     <td>
-                                        <a href="{% url 'live_portfolio' %}?student={{ mentee.user.username }}" target="_blank" class="btn-sm btn-view" style="display:inline-block;">View</a>
+                                        <a href="{% url 'live_portfolio' username=mentee.user.username enrollment=mentee.enrollment_number|default:'000000' college_name=mentee.college.name|slugify|default:'college' %}" target="_blank" class="btn-sm btn-view" style="display:inline-block;">View</a>
                                     </td>
                                 </tr>
                                 {% empty %}
