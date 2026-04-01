@@ -11,6 +11,12 @@
     "axe/forms": "off",
     "css-prefix-order": "off",
     "compat-api/html": "off",
-    "axe/name-role-value": "off"
+    "axe/name-role-value": "off",
+    "axe/language": [
+      "default",
+      {
+        "html-has-lang": "off"
+      }
+    ]
   }
 }
