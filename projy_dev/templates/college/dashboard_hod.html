@@ -416,7 +416,11 @@
     <aside class="sidebar-card glass-panel">
         <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
             <div class="profile-img-container">
-                <img src="{{ user.profile_pic.url|default:'https://via.placeholder.com/150' }}" alt="HOD Profile" class="profile-img" id="sidebar-preview-img">
+                {% if user.profile_pic %}
+                <img src="{{ user.profile_pic.url }}" alt="HOD Profile" class="profile-img" id="sidebar-preview-img">
+                {% else %}
+                <img src="https://ui-avatars.com/api/?name={{ user.get_full_name|default:user.username|urlencode }}&background=22d3ee&color=fff" alt="HOD Profile" class="profile-img" id="sidebar-preview-img">
+                {% endif %}
             </div>
 
             <div style="text-align: center; width: 100%;">
@@ -463,7 +467,7 @@
                 <div class="stat-card card-urgent">
                     <div class="stat-label">Escalated Reviews</div>
                     <div class="stat-value-row">
-                        <div class="stat-value" id="stat-pending">{{ dept_pending_verifications|default:"5" }}</div>
+                        <div class="stat-value" id="stat-pending">{{ dept_pending_verifications }}</div>
                         <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                     </div>
                 </div>
@@ -471,7 +475,7 @@
                 <div class="stat-card card-active" style="cursor: pointer;" onclick="switchTab('faculty')" title="View Faculty Directory">
                     <div class="stat-label">Active Faculty</div>
                     <div class="stat-value-row">
-                        <div class="stat-value">{{ total_faculty_count|default:"12" }}</div>
+                        <div class="stat-value">{{ total_faculty_count }}</div>
                         <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                     </div>
                 </div>
@@ -479,7 +483,7 @@
                 <div class="stat-card card-verified">
                     <div class="stat-label">Total Verifications</div>
                     <div class="stat-value-row">
-                        <div class="stat-value" id="stat-verified">{{ dept_total_verified|default:"1,842" }}</div>
+                        <div class="stat-value" id="stat-verified">{{ dept_total_verified }}</div>
                         <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     </div>
                 </div>
@@ -517,78 +521,63 @@
                                 </tr>
                             </thead>
                             <tbody id="queue-table-body">
+                                {% for fac in pending_faculty %}
                                 <tr class="queue-row" data-type="faculty">
                                     <td>
                                         <div class="td-content">
-                                            <span class="text-title text-truncate init-name">Dr. Sarah Jenkins</span>
-                                            <span class="text-sub text-truncate init-sub">FAC: #8472</span>
+                                            <span class="text-title text-truncate init-name">{{ fac.get_full_name|default:fac.username }}</span>
+                                            <span class="text-sub text-truncate init-sub">FAC: #{{ fac.id }}</span>
                                         </div>
                                     </td>
                                     <td>
                                         <div class="td-content">
-                                            <span class="text-title text-truncate req-name">Curriculum Update: Sem 5</span>
-                                            <span class="text-sub text-truncate req-sub">Req #309</span>
+                                            <span class="text-title text-truncate req-name">Faculty verification pending</span>
+                                            <span class="text-sub text-truncate req-sub">{{ fac.email|default:'No email' }}</span>
                                         </div>
                                     </td>
                                     <td><span class="aq-badge badge-cyan text-truncate" title="Faculty Req">Faculty Req</span></td>
                                     <td>
-                                        <div class="text-sub req-date-val" style="line-height: 1.4;">15<br>Jun<br>2024</div>
+                                        <div class="text-sub req-date-val" style="line-height: 1.4;">--</div>
                                     </td>
                                     <td>
                                         <div class="aq-actions">
-                                            <button type="button" class="aq-btn btn-outline" onclick="reviewRequest(this)">Review</button> 
-                                            <button type="button" class="aq-btn btn-green" onclick="verifyRequest(this)">Approve</button>
+                                            <button type="button" class="aq-btn btn-outline" onclick="reviewRequest(this)">Review</button>
+                                            <a href="{% url 'approve_user' fac.id %}" class="aq-btn btn-green" style="text-decoration:none;">Approve</a>
                                         </div>
                                     </td>
                                 </tr>
+                                {% endfor %}
+                                {% for st in pending_students %}
                                 <tr class="queue-row" data-type="student">
                                     <td>
                                         <div class="td-content">
-                                            <span class="text-title text-truncate init-name">Alex Mercer</span>
-                                            <span class="text-sub text-truncate init-sub">STU: #2938</span>
+                                            <span class="text-title text-truncate init-name">{{ st.user.get_full_name|default:st.user.username }}</span>
+                                            <span class="text-sub text-truncate init-sub">STU: #{{ st.id }}</span>
                                         </div>
                                     </td>
                                     <td>
                                         <div class="td-content">
-                                            <span class="text-title text-truncate req-name">Dispute: Rejected Project</span>
-                                            <span class="text-sub text-truncate req-sub">Req #308</span>
+                                            <span class="text-title text-truncate req-name">Student verification pending</span>
+                                            <span class="text-sub text-truncate req-sub">{{ st.enrollment_number }}</span>
                                         </div>
                                     </td>
-                                    <td><span class="aq-badge badge-red text-truncate" title="Escalation">Escalation</span></td>
+                                    <td><span class="aq-badge badge-red text-truncate" title="Student Req">Student Req</span></td>
                                     <td>
-                                        <div class="text-sub req-date-val" style="line-height: 1.4;">14<br>Jun<br>2024</div>
+                                        <div class="text-sub req-date-val" style="line-height: 1.4;">--</div>
                                     </td>
                                     <td>
                                         <div class="aq-actions">
-                                            <button type="button" class="aq-btn btn-outline" onclick="reviewRequest(this)">Review</button> 
-                                            <button type="button" class="aq-btn btn-cyan" onclick="verifyRequest(this)">Resolve</button>
+                                            <button type="button" class="aq-btn btn-outline" onclick="reviewRequest(this)">Review</button>
+                                            <button type="button" class="aq-btn btn-cyan" onclick="showToast('Student verification is handled by assigned faculty.', 'error')">Info</button>
                                         </div>
                                     </td>
                                 </tr>
-                                <tr class="queue-row" data-type="faculty">
-                                    <td>
-                                        <div class="td-content">
-                                            <span class="text-title text-truncate init-name">Prof. Alan Turing</span>
-                                            <span class="text-sub text-truncate init-sub">FAC: #1021</span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="td-content">
-                                            <span class="text-title text-truncate req-name">Streamline Permissions</span>
-                                            <span class="text-sub text-truncate req-sub">Req #312</span>
-                                        </div>
-                                    </td>
-                                    <td><span class="aq-badge badge-cyan text-truncate" title="Faculty Req">Faculty Req</span></td>
-                                    <td>
-                                        <div class="text-sub req-date-val" style="line-height: 1.4;">29<br>Jun<br>2024</div>
-                                    </td>
-                                    <td>
-                                        <div class="aq-actions">
-                                            <button type="button" class="aq-btn btn-outline" onclick="reviewRequest(this)">Review</button> 
-                                            <button type="button" class="aq-btn btn-green" onclick="verifyRequest(this)">Approve</button>
-                                        </div>
-                                    </td>
+                                {% endfor %}
+                                {% if not pending_faculty and not pending_students %}
+                                <tr>
+                                    <td colspan="5" style="text-align:center; color: var(--text-muted);">No pending verification requests.</td>
                                 </tr>
+                                {% endif %}
                             </tbody>
                         </table>
                     </div>
@@ -613,18 +602,17 @@
                         <div class="terminal-title">Live Activity Log</div>
                     </div>
                     <ul class="log-content" id="activity-feed" style="margin:0;">
-                        <li class="log-entry" style="flex-direction: column;">
-                            <div style="display: flex;">
-                                <span class="log-time">11:02</span>
-                                <div><span class="log-user">Dr. Smith</span> <span class="log-action">verified 15 projects for Sem 6.</span></div>
-                            </div>
+                        {% for log in activity_logs %}
+                        <li class="log-entry">
+                            <span class="log-time">{{ log.created_at|time:"H:i" }}</span>
+                            <div><span class="log-user">System</span> <span class="log-action">{{ log.message }}</span></div>
                         </li>
-                        <li class="log-entry" style="flex-direction: column;">
-                            <div style="display: flex;">
-                                <span class="log-time">09:45</span>
-                                <div><span class="log-user">System</span> <span class="log-action">New faculty member Prof. Davis joined.</span></div>
-                            </div>
+                        {% empty %}
+                        <li class="log-entry">
+                            <span class="log-time">--:--</span>
+                            <div><span class="log-user">System</span> <span class="log-action">No recent activity yet.</span></div>
                         </li>
+                        {% endfor %}
                     </ul>
                 </div>
             </div>
@@ -636,7 +624,7 @@
                     <h2 class="section-title">Mentor Assignment</h2>
                     <div class="section-subtitle">Assign faculty mentors to your students in bulk.</div>
                 </div>
-                <form action="#" method="POST" onsubmit="event.preventDefault(); autoDistribute();">
+                <form action="{% url 'auto_assign' %}" method="POST">
                     {% csrf_token %}
                     <button type="submit" class="btn-success-generic" style="background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); border: none; font-size: 0.95rem; padding: 12px 24px;">
                         ⚡ Auto-Assign All (Round Robin)
@@ -647,33 +635,30 @@
             <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
                 <div class="stat-card card-cyan">
                     <div class="stat-label">Total Students</div>
-                    <div class="stat-value">1,240</div>
+                    <div class="stat-value">{{ dept_mentee_count }}</div>
                 </div>
                 <div class="stat-card card-urgent">
                     <div class="stat-label">Unassigned</div>
-                    <div class="stat-value" style="color: var(--accent-urgent);">450</div>
+                    <div class="stat-value" style="color: var(--accent-urgent);">{{ unassigned_count }}</div>
                 </div>
                 <div class="stat-card card-verified">
                     <div class="stat-label">Active Mentors</div>
-                    <div class="stat-value">12</div>
+                    <div class="stat-value">{{ total_faculty_count }}</div>
                 </div>
             </div>
 
-            <form action="#" method="POST" onsubmit="event.preventDefault(); applyBulk();">
+            <form action="{% url 'manual_assign' %}" method="POST">
                 {% csrf_token %}
                 <div class="data-panel" style="margin-bottom: 30px;">
                     <div class="panel-header" style="flex-wrap: wrap; gap: 15px;">
                         <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
                             <span style="font-weight: 700; color: var(--accent-cyan);">Bulk Action:</span>
                             <span style="color: var(--text-muted); font-size: 0.9rem;">Assign selected to:</span>
-                            <select id="bulkMentorSelect" class="filter-select">
+                            <select id="bulkMentorSelect" name="selected_mentor" class="filter-select">
                                 <option value="">-- Choose Mentor --</option>
                                 {% for mentor in mentors %}
-                                <option value="{{ mentor.id }}">Prof. {{ mentor.user.first_name }} ({{ mentor.current_load }}/30)</option>
+                                <option value="{{ mentor.id }}">{{ mentor.get_full_name|default:mentor.username }}</option>
                                 {% endfor %}
-                                <option value="Dr. Sarah Jenkins">Dr. Sarah Jenkins</option>
-                                <option value="Prof. Alan Turing">Prof. Alan Turing</option>
-                                <option value="Dr. John Smith">Dr. John Smith</option>
                             </select>
                             <button type="submit" class="btn-outline-generic" style="padding: 8px 16px;">Assign Selected</button>
                         </div>
@@ -694,27 +679,25 @@
                                 </tr>
                             </thead>
                             <tbody id="studentTable">
+                                {% for st in students %}
                                 <tr class="assign-row">
-                                    <td style="padding-left: 25px;"><input type="checkbox" class="st-check student-checkbox" style="cursor: pointer; width: 16px; height: 16px; accent-color: var(--accent-cyan);"></td>
-                                    <td><span class="user-name-first">Shreya Jani</span></td>
-                                    <td><span class="user-sub">123412</span></td>
-                                    <td><span class="badge bg-red badge-mentor">UNASSIGNED</span></td>
+                                    <td style="padding-left: 25px;"><input type="checkbox" name="student_ids" value="{{ st.id }}" class="st-check student-checkbox" style="cursor: pointer; width: 16px; height: 16px; accent-color: var(--accent-cyan);"></td>
+                                    <td><span class="user-name-first">{{ st.user.get_full_name|default:st.user.username }}</span></td>
+                                    <td><span class="user-sub">{{ st.enrollment_number }}</span></td>
+                                    <td>
+                                        {% if st.mentor %}
+                                        <span class="badge bg-green badge-mentor">{{ st.mentor.get_full_name|default:st.mentor.username }}</span>
+                                        {% else %}
+                                        <span class="badge bg-red badge-mentor">UNASSIGNED</span>
+                                        {% endif %}
+                                    </td>
                                     <td><button type="button" class="btn-outline-generic" onclick="assignRow(this)">Assign</button></td>
                                 </tr>
-                                <tr class="assign-row">
-                                    <td style="padding-left: 25px;"><input type="checkbox" class="st-check student-checkbox" style="cursor: pointer; width: 16px; height: 16px; accent-color: var(--accent-cyan);"></td>
-                                    <td><span class="user-name-first">Vasudalsaniya</span></td>
-                                    <td><span class="user-sub">654321</span></td>
-                                    <td><span class="badge bg-red badge-mentor">UNASSIGNED</span></td>
-                                    <td><button type="button" class="btn-outline-generic" onclick="assignRow(this)">Assign</button></td>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" style="text-align:center; color: var(--text-muted);">No students found in your college.</td>
                                 </tr>
-                                <tr class="assign-row">
-                                    <td style="padding-left: 25px;"><input type="checkbox" class="st-check student-checkbox" style="cursor: pointer; width: 16px; height: 16px; accent-color: var(--accent-cyan);"></td>
-                                    <td><span class="user-name-first">Neel Patel</span></td>
-                                    <td><span class="user-sub">321654</span></td>
-                                    <td><span class="badge bg-red badge-mentor">UNASSIGNED</span></td>
-                                    <td><button type="button" class="btn-outline-generic" onclick="assignRow(this)">Assign</button></td>
-                                </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>
@@ -730,7 +713,7 @@
 
             <div class="data-panel">
                 <div class="panel-header">
-                    <span>Department Faculty ({{ total_faculty_count|default:"12" }})</span>
+                    <span>Department Faculty ({{ total_faculty_count }})</span>
                     <input type="text" id="faculty-search" class="form-input" placeholder="Search faculty..." style="padding: 6px 12px; max-width: 250px; margin: 0; border-radius: 20px;">
                 </div>
                 <div class="table-responsive-wrapper-default">
@@ -745,46 +728,50 @@
                             </tr>
                         </thead>
                         <tbody id="faculty-table-body">
+                            {% for fac in mentors %}
                             <tr class="faculty-row">
                                 <td>
                                     <div class="user-col">
-                                        <img src="https://ui-avatars.com/api/?name=John+Smith&background=0ea5e9&color=fff" class="table-avatar">
+                                        {% if fac.profile_pic %}
+                                        <img src="{{ fac.profile_pic.url }}" class="table-avatar">
+                                        {% else %}
+                                        <img src="https://ui-avatars.com/api/?name={{ fac.get_full_name|default:fac.username|urlencode }}&background=0ea5e9&color=fff" class="table-avatar">
+                                        {% endif %}
                                         <div class="user-info-stack-generic">
-                                            <span class="user-name-first">Dr. John Smith</span>
-                                            <span class="user-sub">FAC: #1001</span>
+                                            <span class="user-name-first">{{ fac.get_full_name|default:fac.username }}</span>
+                                            <span class="user-sub">FAC: #{{ fac.id }}</span>
                                         </div>
                                     </div>
                                 </td>
-                                <td><span class="td-sub" style="color: var(--text-muted);">Data Science & AI</span></td>
+                                <td><span class="td-sub" style="color: var(--text-muted);">{{ fac.staff_profile.department.name|default:'Faculty' }}</span></td>
                                 <td>
-                                    <button type="button" class="btn-mentees" onclick="viewFacultyStudents('Dr. John Smith')">
-                                        86 Students
+                                    <button
+                                        type="button"
+                                        class="btn-mentees"
+                                        onclick="viewFacultyStudents('{{ fac.id }}', '{{ fac.get_full_name|default:fac.username|escapejs }}')"
+                                    >
+                                        {{ fac.mentored_students.count }} Students
                                         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path></svg>
                                     </button>
                                 </td>
-                                <td><span class="aq-badge badge-red">14 Pending</span></td>
-                                <td><button type="button" class="btn-outline-generic" onclick="viewFacultyProfile(this)">View Profile</button></td>
-                            </tr>
-                            <tr class="faculty-row">
+                                <td><span class="aq-badge badge-cyan" style="color: #00e676; border-color: rgba(0, 230, 118, 0.4); background: rgba(0, 230, 118, 0.1);">Active</span></td>
                                 <td>
-                                    <div class="user-col">
-                                        <img src="https://ui-avatars.com/api/?name=Sarah+Jenkins&background=8b5cf6&color=fff" class="table-avatar">
-                                        <div class="user-info-stack-generic">
-                                            <span class="user-name-first">Prof. Sarah Jenkins</span>
-                                            <span class="user-sub">FAC: #1002</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="td-sub" style="color: var(--text-muted);">Web Technologies</span></td>
-                                <td>
-                                    <button type="button" class="btn-mentees" onclick="viewFacultyStudents('Prof. Sarah Jenkins')">
-                                        92 Students
-                                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path></svg>
+                                    <button
+                                        type="button"
+                                        class="btn-outline-generic"
+                                        data-faculty-id="{{ fac.id }}"
+                                        data-faculty-email="{{ fac.email|default:'' }}"
+                                        onclick="viewFacultyProfile(this)"
+                                    >
+                                        View Profile
                                     </button>
                                 </td>
-                                <td><span class="aq-badge badge-cyan" style="color: #00e676; border-color: rgba(0, 230, 118, 0.4); background: rgba(0, 230, 118, 0.1);">All Clear</span></td>
-                                <td><button type="button" class="btn-outline-generic" onclick="viewFacultyProfile(this)">View Profile</button></td>
                             </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" style="text-align:center; color: var(--text-muted);">No verified faculty found.</td>
+                            </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
@@ -802,13 +789,13 @@
                 </div>
                 
                 <div style="flex-grow: 1;">
-                    <h1 id="profile-detail-name" style="font-size: 2rem; font-weight: 800; color: var(--text-main); margin-bottom: 5px; letter-spacing: -1px;">Dr. Name Here</h1>
+                    <h1 id="profile-detail-name" style="font-size: 2rem; font-weight: 800; color: var(--text-main); margin-bottom: 5px; letter-spacing: -1px;">Faculty Profile</h1>
                     <p id="profile-detail-spec" style="color: var(--accent-cyan); font-weight: 600; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; margin-bottom: 15px;">Specialization Area</p>
                     
                     <div style="display: flex; flex-wrap: wrap; gap: 10px;">
                         <span class="badge bg-blue"><span id="profile-detail-dept">Computer Engineering</span></span>
-                        <span class="badge bg-blue"><span id="profile-detail-exp">12 Years Experience</span></span>
-                        <span class="badge bg-blue"><span id="profile-detail-email">faculty@college.edu</span></span>
+                        <span class="badge bg-blue"><span id="profile-detail-exp">Mentor Insights</span></span>
+                        <span class="badge bg-blue"><span id="profile-detail-email">--</span></span>
                     </div>
                 </div>
             </div>
@@ -816,15 +803,15 @@
             <div class="stats-grid">
                 <div class="stat-card card-cyan" style="text-align: center;">
                     <div class="stat-title">Total Assigned Mentees</div>
-                    <div class="stat-value" id="fac-profile-mentees" style="margin-top: 10px;">86</div>
+                    <div class="stat-value" id="fac-profile-mentees" style="margin-top: 10px;">0</div>
                 </div>
                 <div class="stat-card card-green" style="text-align: center;">
                     <div class="stat-title">Projects Verified by Mentees</div>
-                    <div class="stat-value" style="margin-top: 10px;">342</div>
+                    <div class="stat-value" id="fac-profile-projects" style="margin-top: 10px;">0</div>
                 </div>
                 <div class="stat-card card-yellow" style="text-align: center;">
                     <div class="stat-title">Certificates Verified by Mentees</div>
-                    <div class="stat-value" style="margin-top: 10px;">128</div>
+                    <div class="stat-value" id="fac-profile-certs" style="margin-top: 10px;">0</div>
                 </div>
             </div>
 
@@ -866,44 +853,46 @@
                             </tr>
                         </thead>
                         <tbody id="student-table-body">
-                            <tr class="student-row">
+                            {% for st in students %}
+                            <tr class="student-row" data-mentor-id="{{ st.mentor.id|default:'' }}">
                                 <td>
                                     <div class="user-col">
-                                        <img src="https://ui-avatars.com/api/?name=Jainil+Desai&background=10b981&color=fff" class="table-avatar">
+                                        {% if st.user.profile_pic %}
+                                        <img src="{{ st.user.profile_pic.url }}" class="table-avatar">
+                                        {% else %}
+                                        <img src="https://ui-avatars.com/api/?name={{ st.user.get_full_name|default:st.user.username|urlencode }}&background=10b981&color=fff" class="table-avatar">
+                                        {% endif %}
                                         <div class="user-info-stack-generic">
-                                            <span class="user-name-first">Jainil Desai</span>
-                                            <span class="user-sub">ID: #847291</span>
+                                            <span class="user-name-first">{{ st.user.get_full_name|default:st.user.username }}</span>
+                                            <span class="user-sub">ID: #{{ st.enrollment_number }}</span>
                                         </div>
                                     </div>
                                 </td>
-                                <td><span class="badge bg-blue">Sem 6</span></td>
-                                <td class="req-title" style="font-weight: 500;">Dr. John Smith</td>
-                                <td><span style="font-weight: 600; color: var(--text-main);">4</span> Projects</td>
+                                <td><span class="badge bg-blue">Sem {{ st.semester }}</span></td>
+                                <td class="req-title" style="font-weight: 500;">
+                                    {% if st.mentor %}
+                                        {{ st.mentor.get_full_name|default:st.mentor.username }}
+                                    {% else %}
+                                        UNASSIGNED
+                                    {% endif %}
+                                </td>
+                                <td><span style="font-weight: 600; color: var(--text-main);">{{ st.projects.count }}</span> Projects</td>
                                 <td>
                                     <div class="btn-group">
-                                        <button type="button" class="btn-outline-generic" onclick="window.open('#', '_blank')">View Portfolio</button>
+                                        <a
+                                            href="{% url 'live_portfolio' username=st.user.username enrollment=st.enrollment_number|default:'000000' college_name=st.college.name|slugify|default:'college' %}"
+                                            target="_blank"
+                                            class="btn-outline-generic"
+                                            style="text-decoration:none; display:inline-block;"
+                                        >View Portfolio</a>
                                     </div>
                                 </td>
                             </tr>
-                            <tr class="student-row">
-                                <td>
-                                    <div class="user-col">
-                                        <img src="https://ui-avatars.com/api/?name=Alex+Mercer&background=facc15&color=000" class="table-avatar">
-                                        <div class="user-info-stack-generic">
-                                            <span class="user-name-first">Alex Mercer</span>
-                                            <span class="user-sub">ID: #293847</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="badge bg-blue">Sem 4</span></td>
-                                <td class="req-title" style="font-weight: 500;">Prof. Sarah Jenkins</td>
-                                <td><span style="font-weight: 600; color: var(--text-main);">2</span> Projects</td>
-                                <td>
-                                    <div class="btn-group">
-                                        <button type="button" class="btn-outline-generic" onclick="window.open('#', '_blank')">View Portfolio</button>
-                                    </div>
-                                </td>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" style="text-align:center; color: var(--text-muted);">No students available.</td>
                             </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
@@ -921,7 +910,11 @@
                     
                     <div class="form-group" style="margin-bottom: 30px; display: flex; align-items: center; gap: 20px;">
                         <div class="profile-img-container" style="margin: 0; width: 80px; height: 80px; box-shadow: 0 0 15px var(--glow-cyan);">
-                            <img src="{{ user.profile_pic.url|default:'https://ui-avatars.com/api/?name=User&background=22d3ee&color=fff' }}" alt="Profile" class="profile-img" id="settings-preview-img">
+                            {% if user.profile_pic %}
+                            <img src="{{ user.profile_pic.url }}" alt="Profile" class="profile-img" id="settings-preview-img">
+                            {% else %}
+                            <img src="https://ui-avatars.com/api/?name={{ user.get_full_name|default:user.username|urlencode }}&background=22d3ee&color=fff" alt="Profile" class="profile-img" id="settings-preview-img">
+                            {% endif %}
                         </div>
                         <div>
                             <label for="profile-pic-upload-settings" class="btn-outline-generic" style="display: inline-block;">Change Avatar</label>
@@ -991,6 +984,10 @@
 </div>
 
 <script>
+    const mentorAnalytics = JSON.parse('{{ mentor_analytics_json|escapejs }}');
+    const verificationChartData = JSON.parse('{{ verification_chart_json|escapejs }}');
+    let selectedFacultyId = null;
+
     document.addEventListener("DOMContentLoaded", () => {
         const savedName = localStorage.getItem('hodName');
         const savedDept = localStorage.getItem('hodDept');
@@ -1088,6 +1085,7 @@
     function renderHODChart() {
         const ctxHOD = document.getElementById('hodDeptChart');
         if(!ctxHOD || ctxHOD.offsetParent === null) return;
+        if (typeof Chart === 'undefined') return;
         
         // Simple direct CSS check for text color to be safe across all mode implementations
         const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim() || '#94a3b8';
@@ -1097,10 +1095,10 @@
         hodDeptChartInstance = new Chart(ctxHOD.getContext('2d'), {
             type: 'doughnut',
             data: {
-                labels: ['Verified', 'Pending', 'Rejected'],
+                labels: verificationChartData.labels,
                 datasets: [{
-                    data: [75, 15, 10],
-                    backgroundColor: ['#00e676', '#ffcc00', '#ff3b30'],
+                    data: verificationChartData.values,
+                    backgroundColor: ['#00e676', '#ffcc00'],
                     borderWidth: 0,
                     hoverOffset: 4
                 }]
@@ -1119,9 +1117,16 @@
     function renderCharts() {
         const ctxLang = document.getElementById('langChart');
         const ctxField = document.getElementById('fieldChart');
+        if (typeof Chart === 'undefined') return;
         
         const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim() || '#94a3b8';
         const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--border-glass').trim() || 'rgba(255,255,255,0.05)';
+        const stats = mentorAnalytics[selectedFacultyId] || {
+            lang_labels: ['No Data'],
+            lang_values: [1],
+            field_labels: ['No Data'],
+            field_values: [1]
+        };
 
         if (langChartInstance) langChartInstance.destroy();
         if (fieldChartInstance) fieldChartInstance.destroy();
@@ -1130,9 +1135,9 @@
             langChartInstance = new Chart(ctxLang.getContext('2d'), {
                 type: 'doughnut',
                 data: {
-                    labels: ['Python', 'JavaScript', 'Java', 'Other'],
+                    labels: stats.lang_labels,
                     datasets: [{
-                        data: [45, 30, 15, 10],
+                        data: stats.lang_values,
                         backgroundColor: ['#ff3b30', '#ffcc00', '#a200ff', '#64748b'],
                         borderWidth: 0,
                         hoverOffset: 4
@@ -1151,9 +1156,9 @@
             fieldChartInstance = new Chart(ctxField.getContext('2d'), {
                 type: 'polarArea',
                 data: {
-                    labels: ['Web', 'AI/ML', 'Mobile', 'Data'],
+                    labels: stats.field_labels,
                     datasets: [{
-                        data: [40, 35, 15, 10],
+                        data: stats.field_values,
                         backgroundColor: ['rgba(255, 59, 48, 0.6)', 'rgba(255, 204, 0, 0.6)', 'rgba(0, 230, 118, 0.6)', 'rgba(162, 0, 255, 0.6)'],
                         borderWidth: 1,
                         borderColor: gridColor
@@ -1288,10 +1293,6 @@
 
             setTimeout(() => {
                 try {
-                    addActivityLog('System', `Approved request "${requestTitle}" from ${userName}.`);
-                } catch(e) {}
-                
-                try {
                     showToast(`Successfully approved request from ${userName}!`, 'success');
                 } catch(e) {}
                 
@@ -1342,7 +1343,6 @@
     function verifyFromReview() {
         if (currentRowBeingReviewed) {
             try {
-                addActivityLog('System', `Approved manual resolution request.`);
                 showToast(`Request successfully approved!`, 'success');
                 
                 currentRowBeingReviewed.style.transition = 'all 0.4s ease';
@@ -1400,7 +1400,17 @@
             showToast("Select a mentor in the dropdown above first!", "error");
             return;
         }
-        updateRow(btn.closest('tr'), mentor);
+        const row = btn.closest('tr');
+        const checkbox = row ? row.querySelector('.student-checkbox') : null;
+        if (checkbox) checkbox.checked = true;
+
+        const form = document.querySelector('form[action*="assign/manual"]');
+        if (form) {
+            form.submit();
+            return;
+        }
+
+        updateRow(row, mentor);
         showToast(`Student assigned to ${mentor}`);
     }
 
@@ -1422,12 +1432,23 @@
         const row = btn.closest('tr');
         const facName = row.querySelector('.user-name-first').innerText;
         const facSpec = row.querySelector('.td-sub') ? row.querySelector('.td-sub').innerText : "Specialization Area";
+        selectedFacultyId = btn.dataset.facultyId || null;
+        const stats = mentorAnalytics[selectedFacultyId] || {
+            mentees: 0,
+            verified_projects: 0,
+            verified_certificates: 0,
+            email: ''
+        };
         
         document.getElementById('profile-detail-name').innerText = facName;
         document.getElementById('profile-detail-spec').innerText = facSpec;
         
         const deptName = document.getElementById('sidebar-dept-val') ? document.getElementById('sidebar-dept-val').innerText : "Computer Engineering";
         document.getElementById('profile-detail-dept').innerText = deptName;
+        document.getElementById('profile-detail-email').innerText = stats.email || '--';
+        document.getElementById('fac-profile-mentees').innerText = stats.mentees;
+        document.getElementById('fac-profile-projects').innerText = stats.verified_projects;
+        document.getElementById('fac-profile-certs').innerText = stats.verified_certificates;
         
         const initial = facName.replace('Dr. ', '').replace('Prof. ', '').charAt(0);
         document.getElementById('profile-detail-img').src = `https://ui-avatars.com/api/?name=${initial}&background=a200ff&color=fff&size=128`;
@@ -1435,17 +1456,24 @@
         switchTab('faculty-profile');
     }
 
-    function viewFacultyStudents(facultyName) {
+    function viewFacultyStudents(facultyId, facultyName) {
         document.getElementById('student-roster-title').innerText = `Mentees assigned to: ${facultyName}`;
         
         const backBtn = document.getElementById('back-to-faculty-btn');
         if(backBtn) backBtn.style.display = 'inline-block';
 
         const searchInput = document.getElementById('student-search');
-        if(searchInput) {
-            searchInput.value = facultyName;
+        if (searchInput) {
+            searchInput.value = '';
             searchInput.dispatchEvent(new Event('input'));
         }
+
+        const facIdStr = String(facultyId);
+        const rows = document.querySelectorAll('#student-table-body .student-row');
+        rows.forEach(row => {
+            const mid = row.dataset.mentorId;
+            row.style.display = (mid && mid === facIdStr) ? '' : 'none';
+        });
         
         switchTab('students');
     }

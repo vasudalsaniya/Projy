@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from .models import StaffProfile, Department
 from accounts.models import User, Notification
-from students.models import StudentProfile, Project
+from students.models import StudentProfile, Project, ProjectLanguage, Certificate
 from django.contrib import messages
 from django.db.models import Count, Q
 import json
@@ -19,35 +19,137 @@ def hod_dashboard(request):
         my_college = request.user.staff_profile.college
     except StaffProfile.DoesNotExist:
         return render(request, 'college/error.html', {'message': "No College Assigned"})
-    
-    # --- NEW: Bulk Assignment Logic ---
-    if request.method == 'POST' and 'bulk_assign' in request.POST:
-        assignments_json = request.POST.get('assignments_data', '{}')
-        try:
-            assignments = json.loads(assignments_json)
-            for student_id, faculty_id in assignments.items():
-                student = StudentProfile.objects.filter(id=student_id, college=my_college).first()
-                faculty = User.objects.filter(id=faculty_id, staff_profile__college=my_college).first()
-                if student and faculty:
-                    student.mentor = faculty
-                    student.save()
-            messages.success(request, "Bulk mentor allocation saved successfully!")
-        except json.JSONDecodeError:
-            messages.error(request, "Invalid data submitted.")
-        return redirect('hod_dashboard')
             
-    # Get Data for Dashboard
+    # Fetch Real Data for the Dashboard Context
     pending_faculty = User.objects.filter(role='FACULTY', is_verified=False, staff_profile__college=my_college)
-    all_students = StudentProfile.objects.filter(college=my_college).select_related('user', 'mentor')
     verified_faculty = User.objects.filter(role='FACULTY', is_verified=True, staff_profile__college=my_college)
+    all_students = StudentProfile.objects.filter(college=my_college).select_related('user', 'mentor')
+    pending_students = all_students.filter(user__is_verified=False)
     
+    unassigned_students_count = all_students.filter(mentor__isnull=True).count()
+
+    total_verified_projects = Project.objects.filter(student__college=my_college, is_verified=True).count()
+
+    # HOD-facing verifications: currently this dashboard approves faculty records.
+    total_hod_verifications = verified_faculty.count()
+
+    # Overview chart data
+    verification_chart = {
+        'labels': ['Verified Faculty', 'Pending Faculty'],
+        'values': [total_hod_verifications, pending_faculty.count()],
+    }
+
+    # Faculty profile stats + charts (mentor-wise)
+    mentor_analytics = {}
+    for mentor in verified_faculty:
+        mentees_qs = all_students.filter(mentor=mentor).select_related('user')
+        mentees_count = mentees_qs.count()
+        verified_projects_count = Project.objects.filter(student__in=mentees_qs, is_verified=True).count()
+        verified_certificates_count = Certificate.objects.filter(student__in=mentees_qs).count()
+
+        lang_counts = (
+            ProjectLanguage.objects
+            .filter(project__student__in=mentees_qs)
+            .values('language_name')
+            .annotate(total=Count('id'))
+            .order_by('-total')[:5]
+        )
+        lang_labels = [item['language_name'] for item in lang_counts] or ['No Data']
+        lang_values = [item['total'] for item in lang_counts] or [1]
+
+        semester_counts = (
+            mentees_qs.values('semester')
+            .annotate(total=Count('id'))
+            .order_by('semester')
+        )
+        field_labels = [f"Sem {item['semester']}" for item in semester_counts] or ['No Data']
+        field_values = [item['total'] for item in semester_counts] or [1]
+
+        mentor_analytics[str(mentor.id)] = {
+            'mentees': mentees_count,
+            'verified_projects': verified_projects_count,
+            'verified_certificates': verified_certificates_count,
+            'lang_labels': lang_labels,
+            'lang_values': lang_values,
+            'field_labels': field_labels,
+            'field_values': field_values,
+            'email': mentor.email or '',
+        }
+
+    activity_logs = Notification.objects.filter(user=request.user).order_by('-created_at')[:10]
+
     context = {
+        'profile': request.user.staff_profile,
         'college': my_college,
+        'mentors': verified_faculty,
+        'students': all_students,
+        'pending_students': pending_students,
+        'total_faculty_count': verified_faculty.count(),
+        'dept_mentee_count': all_students.count(),
+        'unassigned_count': unassigned_students_count,
         'pending_faculty': pending_faculty,
-        'all_students': all_students,
-        'verified_faculty': verified_faculty
+        'dept_pending_verifications': pending_faculty.count(),
+        'dept_total_verified': total_hod_verifications,
+        'verification_chart': verification_chart,
+        'verification_chart_json': json.dumps(verification_chart),
+        'mentor_analytics_json': json.dumps(mentor_analytics),
+        'activity_logs': activity_logs,
+        'total_verified_projects': total_verified_projects,
     }
     return render(request, 'college/dashboard_hod.html', context)
+
+
+@login_required
+def manual_assign(request):
+    if request.method == 'POST' and request.user.role == 'HOD':
+        mentor_id = request.POST.get('selected_mentor')
+        student_ids = request.POST.getlist('student_ids') # Gets all checked checkboxes
+        
+        if mentor_id and student_ids:
+            mentor = get_object_or_404(User, id=mentor_id, role='FACULTY')
+            my_college = request.user.staff_profile.college
+            updated_count = StudentProfile.objects.filter(
+                id__in=student_ids,
+                college=my_college
+            ).update(mentor=mentor)
+            messages.success(request, f"Successfully assigned {len(student_ids)} students to Prof. {mentor.last_name}.")
+            Notification.objects.create(
+                user=request.user,
+                message=f"You assigned {updated_count} student(s) to {mentor.get_full_name() or mentor.username}.",
+                link="/college/dashboard/hod/"
+            )
+        else:
+            messages.error(request, "Please select a mentor and at least one student.")
+            
+    return redirect('hod_dashboard')
+
+
+@login_required
+def auto_assign(request):
+    if request.method == 'POST' and request.user.role == 'HOD':
+        my_college = request.user.staff_profile.college
+        mentors = list(User.objects.filter(role='FACULTY', is_verified=True, staff_profile__college=my_college))
+        unassigned_students = StudentProfile.objects.filter(college=my_college, mentor__isnull=True)
+        
+        if not mentors:
+            messages.error(request, "No active mentors available for assignment.")
+            return redirect('hod_dashboard')
+            
+        count = 0
+        for i, student in enumerate(unassigned_students):
+            # Round Robin logic
+            mentor = mentors[i % len(mentors)]
+            student.mentor = mentor
+            student.save()
+            count += 1
+            
+        messages.success(request, f"Auto-assigned {count} students using Round Robin!")
+        Notification.objects.create(
+            user=request.user,
+            message=f"You auto-assigned {count} unassigned student(s).",
+            link="/college/dashboard/hod/"
+        )
+    return redirect('hod_dashboard')
 
 
 # --- FACULTY DASHBOARD ---
@@ -141,6 +243,11 @@ def approve_user(request, user_id):
         if current_user.staff_profile.college == target_user.staff_profile.college:
             target_user.is_verified = True
             target_user.save()
+            Notification.objects.create(
+                user=current_user,
+                message=f"You verified faculty {target_user.get_full_name() or target_user.username}.",
+                link="/college/dashboard/hod/"
+            )
             return redirect('hod_dashboard')
 
     # Logic 2: Faculty approving Student
