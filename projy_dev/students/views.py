@@ -5,7 +5,6 @@ from accounts.models import Notification
 from .forms import ProjectForm, ProjectLanguageForm, StudentProfileEditForm
 from .utils import analyze_zip_and_create_languages
 from django.contrib import messages
-from django.shortcuts import get_object_or_404
 from django.utils import timezone
 import datetime
 from accounts.models import User
@@ -161,13 +160,25 @@ def delete_project(request, project_id):
 def project_detail(request, project_id):
     project = get_object_or_404(Project, id=project_id)
 
+    # 1. Calculate the current total percentage of all skills
+    current_total = sum(lang.percentage for lang in project.languages.all())
+
     # Logic to add languages to this specific project
     if request.method == 'POST':
         lang_form = ProjectLanguageForm(request.POST)
         if lang_form.is_valid():
             language = lang_form.save(commit=False)
-            language.project = project
-            language.save()
+            
+            # 2. BACKEND SECURITY CHECK: Ensure new skill doesn't exceed 100% total
+            if current_total + language.percentage <= 100:
+                language.project = project
+                language.save()
+                messages.success(request, f"Skill '{language.language_name}' added successfully!")
+            else:
+                # If they try to bypass the frontend limits, block it and show an error
+                remaining = 100 - current_total
+                messages.error(request, f"Action blocked: Adding {language.percentage}% exceeds the 100% limit. You only have {remaining}% remaining.")
+                
             return redirect('project_detail', project_id=project.id)
     else:
         lang_form = ProjectLanguageForm()
@@ -176,7 +187,7 @@ def project_detail(request, project_id):
         'project': project, 
         'lang_form': lang_form
     })
-
+    
 @login_required
 def student_public_profile(request, student_id):   
     # Fetch the student profile

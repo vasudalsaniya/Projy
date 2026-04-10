@@ -1,19 +1,35 @@
 {% extends 'base.html' %}
 {% block title %}Pending Approval{% endblock %}
+
 {% block content %}
-<div class="card text-center" style="max-width: 500px; margin: 3rem auto; padding: 40px;">
-    <h1 style="color: #dc3545;">Account Pending</h1>
-    <p>Your account has been created, but it is waiting for approval.</p>
+<style>
+    .auth-container { max-width: 550px; margin: 80px auto; padding: 0 20px; }
+    .glass-card { background: var(--surface-glass); border: 1px solid var(--border-glass); border-radius: 12px; padding: 50px 40px; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: 0 8px 32px rgba(0,0,0,0.3); text-align: center; }
     
-    <div style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; margin: 20px 0;">
-        <strong>Who verifies me?</strong>
-        <ul style="text-align: left;">
-            <li>If you are a <strong>Student</strong>: Wait for a Faculty member.</li>
-            <li>If you are a <strong>Faculty</strong>: Wait for an HOD.</li>
-            <li>If you are an <strong>HOD/Recruiter</strong>: Wait for the Admin.</li>
-        </ul>
+    .warning-box { background: rgba(255, 77, 79, 0.1); border: 1px solid rgba(255, 77, 79, 0.3); padding: 25px; border-radius: 8px; margin: 30px 0; text-align: left; }
+    .warning-box strong { color: #ff4d4f; font-size: 1.1rem; display: block; margin-bottom: 10px; }
+    .warning-box ul { color: var(--text-main); font-size: 0.9rem; padding-left: 20px; line-height: 1.8; margin: 0; }
+    .warning-box li strong { display: inline; color: var(--text-main); font-size: 0.9rem; }
+
+    .btn-outline { display: inline-block; background: transparent; border: 1px solid var(--text-muted); color: var(--text-muted); padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; transition: all 0.3s ease; }
+    .btn-outline:hover { background: rgba(255,255,255,0.05); color: var(--text-main); border-color: var(--text-main); }
+</style>
+
+<div class="auth-container">
+    <div class="glass-card">
+        <h1 style="color: #ff4d4f; margin-top: 0; font-size: 2.2rem; letter-spacing: -0.5px;">Account Pending</h1>
+        <p style="color: var(--text-muted); font-size: 1rem;">Your account has been successfully created, but it is waiting for administrative approval.</p>
+        
+        <div class="warning-box">
+            <strong>Who verifies me?</strong>
+            <ul>
+                <li>If you are a <strong style="color: var(--neon-cyan);">Student</strong>: Wait for a Faculty member.</li>
+                <li>If you are a <strong style="color: var(--neon-purple);">Faculty</strong>: Wait for an HOD.</li>
+                <li>If you are an <strong style="color: #faad14;">HOD/Recruiter</strong>: Wait for the Admin.</li>
+            </ul>
+        </div>
+        
+        <a href="{% url 'login' %}" class="btn-outline">Back to Login</a>
     </div>
-    
-    <a href="{% url 'login' %}" class="btn">Back to Login</a>
 </div>
 {% endblock %}

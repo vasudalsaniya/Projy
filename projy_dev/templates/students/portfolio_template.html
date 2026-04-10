@@ -1,101 +1,89 @@
 {% extends 'base.html' %}
-{% block title %}{{ profile.user.first_name }}'s Portfolio{% endblock %}
+{% block title %}{{ profile.user.username }}'s Portfolio{% endblock %}
 
 {% block content %}
 <style>
-    /* CSS to fix the overlapping images */
-    .project-card {
-        background-color: var(--surface);
-        border-radius: var(--radius);
-        overflow: hidden;
-        border: 1px solid var(--border);
-        display: flex;
-        flex-direction: column;
-        box-shadow: var(--shadow-sm);
-        transition: transform 0.2s ease;
-    }
-    .project-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); }
+    .portfolio-container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+
+    .glass-card { background: var(--surface-glass); border: 1px solid var(--border-glass); border-radius: 12px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.3); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
     
-    .project-img {
-        width: 100%;
-        height: 200px;
-        object-fit: cover; /* Forces image to stay within the box perfectly */
-        border-bottom: 1px solid var(--border);
-    }
+    .profile-header { text-align: center; padding: 50px 20px; border-bottom: 2px solid var(--neon-cyan); }
     
-    .project-body {
-        padding: 20px;
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-    }
+    .project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px; margin-top: 30px; }
     
-    .multi-progress-bar {
-        display: flex;
-        height: 8px;
-        background-color: var(--border);
-        border-radius: 4px;
-        overflow: hidden;
-        margin: 15px 0;
-    }
+    .project-card { display: flex; flex-direction: column; transition: transform 0.3s ease, border-color 0.3s ease; }
+    .project-card:hover { transform: translateY(-5px); border-color: var(--neon-cyan); }
     
+    .project-img { width: 100%; height: 200px; object-fit: cover; border-bottom: 1px solid var(--border-glass); }
+    
+    .project-body { padding: 25px; flex-grow: 1; display: flex; flex-direction: column; }
+    
+    .multi-progress-bar { display: flex; height: 8px; background-color: var(--input-bg); border-radius: 4px; overflow: hidden; margin: 15px 0 25px 0; border: 1px solid var(--border-glass); }
     .progress-segment { height: 100%; }
     
-    .btn-view {
-        margin-top: auto;
-        display: block;
-        text-align: center;
-        padding: 10px;
-        background: var(--surface);
-        border: 1px solid var(--primary);
-        color: var(--primary);
-        border-radius: 6px;
-        font-weight: 600;
-    }
-    .btn-view:hover { background: var(--background); }
+    .btn-outline { margin-top: auto; display: block; text-align: center; padding: 10px; background: transparent; border: 1px solid var(--neon-cyan); color: var(--neon-cyan); border-radius: 8px; font-weight: 600; text-decoration: none; transition: 0.2s; }
+    .btn-outline:hover { background: rgba(0, 240, 255, 0.1); box-shadow: 0 0 15px rgba(0, 240, 255, 0.2); }
 </style>
 
-<div class="container">
-    <div class="card" style="text-align: center; padding: 50px; border-bottom: 5px solid var(--primary); background-color: var(--surface);">
+<div class="portfolio-container">
+    <div class="glass-card profile-header">
         {% if profile.user.profile_pic %}
-            <img src="{{ profile.user.profile_pic.url }}" style="width:150px; height:150px; border-radius:50%; object-fit:cover; border: 5px solid var(--background);">
+            <img src="{{ profile.user.profile_pic.url }}" style="width:160px; height:160px; border-radius:50%; object-fit:cover; border: 4px solid var(--neon-cyan); box-shadow: 0 0 20px rgba(0, 240, 255, 0.4); margin-bottom: 15px;">
+        {% else %}
+            <div style="width: 160px; height: 160px; border-radius: 50%; background: var(--surface-heavy); border: 4px solid var(--neon-cyan); margin: 0 auto 15px auto; display: flex; align-items: center; justify-content: center; font-size: 4rem; font-weight: bold; color: var(--neon-cyan);">
+                {{ profile.user.first_name|slice:":1" }}
+            </div>
         {% endif %}
-        <h1 style="font-size: 3rem; margin: 10px 0; color: var(--text-main);">{{ profile.user.get_full_name }}</h1>
-        <p style="font-size: 1.2rem; color: var(--text-muted);">{{ profile.education_details }} | Semester {{ profile.semester }}</p>
-        <div style="display: flex; justify-content: center; gap: 15px; margin-top: 20px;">
-            <a href="{{ profile.github_url }}" class="btn btn-sm" target="_blank">GitHub</a>
-            <a href="{{ profile.linkedin_url }}" class="btn btn-sm" style="background:#0077b5;" target="_blank">LinkedIn</a>
+        
+        <h1 style="font-size: 3rem; margin: 10px 0; color: var(--text-main); letter-spacing: -1px;">{{ profile.user.get_full_name }}</h1>
+        <p style="font-size: 1.1rem; color: var(--neon-cyan); font-weight: 600; margin-bottom: 5px;">{{ profile.job_title|default:"Software Developer" }}</p>
+        <p style="font-size: 1rem; color: var(--text-muted);">{{ profile.education_details }} | Semester {{ profile.semester }}</p>
+        
+        <div style="display: flex; justify-content: center; gap: 15px; margin-top: 25px;">
+            {% if profile.github_url %}
+                <a href="{{ profile.github_url }}" class="btn-outline" style="padding: 8px 20px;" target="_blank">GitHub</a>
+            {% endif %}
+            {% if profile.linkedin_url %}
+                <a href="{{ profile.linkedin_url }}" class="btn-outline" style="padding: 8px 20px; border-color: #0077b5; color: #0077b5;" target="_blank">LinkedIn</a>
+            {% endif %}
         </div>
     </div>
 
-    <div class="card" style="margin-top: 30px; background-color: var(--surface); color: var(--text-main);">
-        <h3 style="margin-top: 0;">About Me</h3>
-        <p style="color: var(--text-muted); line-height: 1.6;">{{ profile.bio }}</p>
+    <div class="glass-card" style="margin-top: 30px; padding: 40px;">
+        <h3 style="margin-top: 0; color: var(--text-main); font-size: 1.5rem; margin-bottom: 15px;">About Me</h3>
+        <p style="color: var(--text-muted); line-height: 1.8; font-size: 1rem;">{{ profile.bio|default:"No bio provided yet." }}</p>
     </div>
 
-    <h2 style="margin-top: 40px; color: var(--text-main);">Featured Projects</h2>
+    <h2 style="margin-top: 50px; color: var(--text-main); font-size: 2rem; border-left: 4px solid var(--neon-purple); padding-left: 15px;">Featured Projects</h2>
     
-    <div class="grid-3">
+    <div class="project-grid">
         {% for project in projects %}
-            <div class="project-card">
+            <div class="glass-card project-card">
                 {% if project.cover_image %}
                     <img src="{{ project.cover_image.url }}" class="project-img">
                 {% else %}
-                    <div class="project-img" style="display: flex; align-items: center; justify-content: center; background: var(--background); color: var(--text-muted);">No Cover</div>
+                    <div class="project-img" style="display: flex; align-items: center; justify-content: center; background: var(--surface-heavy); color: var(--text-muted); font-size: 1.2rem;">No Cover</div>
                 {% endif %}
                 
                 <div class="project-body">
-                    <h3 style="margin: 0 0 10px 0; color: var(--text-main);">{{ project.title }}</h3>
+                    <h3 style="margin: 0 0 10px 0; color: var(--text-main); font-size: 1.3rem;">{{ project.title }}</h3>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.5;">{{ project.description|truncatewords:15 }}</p>
+                    
                     <div class="multi-progress-bar">
                         {% for lang in project.languages.all %}
-                            <div class="progress-segment" style="width: {{ lang.percentage }}%; background-color: {{ lang.get_color }};"></div>
+                            <div class="progress-segment" style="width: {{ lang.percentage }}%; background-color: {{ lang.get_color }};" title="{{ lang.language_name }}"></div>
+                        {% empty %}
+                            <div style="width: 100%; background: var(--surface-heavy);"></div>
                         {% endfor %}
                     </div>
-                    <a href="{% url 'project_detail' project.id %}" class="btn-view">View Case Study</a>
+                    
+                    <a href="{% url 'project_detail' project.id %}" class="btn-outline">View Case Study</a>
                 </div>
             </div>
         {% empty %}
-            <p style="color: var(--text-muted);">No public projects available.</p>
+            <div style="grid-column: 1 / -1; padding: 50px; text-align: center; border: 1px dashed var(--border-glass); border-radius: 12px;">
+                <p style="color: var(--text-muted); font-size: 1.1rem;">No public projects available.</p>
+            </div>
         {% endfor %}
     </div>
 </div>

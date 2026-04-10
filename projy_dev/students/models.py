@@ -1,4 +1,3 @@
-# Create your models here.
 from django.db import models
 from django.conf import settings
 from college.models import College, Department
@@ -77,7 +76,6 @@ class ProjectLanguage(models.Model):
     def __str__(self):
         return f"{self.language_name} ({self.percentage}%)"
 
-    # --- ADD THIS METHOD ---
     def get_color(self):
         """Returns the GitHub-like color for the language."""
         colors = {
@@ -125,7 +123,7 @@ class ProjectLanguage(models.Model):
 @receiver(post_delete, sender=Project)
 def delete_project_files_on_delete(sender, instance, **kwargs):
     """
-    When a Project is deleted from the DB, delete its files from the PC.
+    When a Project is deleted from the DB, safely delete its files from the PC.
     """
     files_to_delete = [
         instance.cover_image,
@@ -134,17 +132,20 @@ def delete_project_files_on_delete(sender, instance, **kwargs):
     ]
 
     for file_field in files_to_delete:
-        if file_field and os.path.isfile(file_field.path):
+        if file_field and hasattr(file_field, 'path') and os.path.isfile(file_field.path):
             try:
+                # Force close file to free Windows locks before deleting
+                file_field.close()
                 os.remove(file_field.path)
                 print(f"Deleted file: {file_field.path}")
             except Exception as e:
-                print(f"Error deleting file: {e}")
+                print(f"Skipped deleting file (likely locked): {e}")
+
 
 @receiver(pre_save, sender=Project)
 def delete_old_files_on_update(sender, instance, **kwargs):
     """
-    When a Project is edited (e.g. new zip uploaded), delete the old zip.
+    When a Project is edited (e.g. new zip uploaded), safely delete the old zip.
     """
     if not instance.pk:
         return False
@@ -155,10 +156,18 @@ def delete_old_files_on_update(sender, instance, **kwargs):
         return False
 
     def check_and_delete(old_file, new_file):
+        # Only attempt to delete if the file has actually changed
         if old_file and old_file != new_file:
-            if os.path.isfile(old_file.path):
-                os.remove(old_file.path)
-                print(f"Replaced/Deleted old file: {old_file.path}")
+            if hasattr(old_file, 'path') and os.path.isfile(old_file.path):
+                try:
+                    # Explicitly close the file handle so Windows allows deletion
+                    old_file.close()
+                    os.remove(old_file.path)
+                    print(f"Replaced/Deleted old file: {old_file.path}")
+                except PermissionError:
+                    print(f"PermissionError: Windows blocked deletion of {old_file.path} because it is currently open.")
+                except Exception as e:
+                    print(f"Error deleting old file: {e}")
 
     check_and_delete(old_project.cover_image, instance.cover_image)
     check_and_delete(old_project.source_code_zip, instance.source_code_zip)
@@ -200,9 +209,8 @@ class TodoItem(models.Model):
     task = models.CharField(max_length=255)
     is_completed = models.BooleanField(default=False)
     
-    # NEW: Due Date Field
+    # Due Date Field
     due_date = models.DateField(null=True, blank=True)
-    
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

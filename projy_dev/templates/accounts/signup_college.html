@@ -1,52 +1,98 @@
 {% extends 'base.html' %}
 
-{% block title %}College Registration{% endblock %}
+{% block title %}College Registration | Projy{% endblock %}
 
 {% block content %}
-<div class="card" style="max-width: 500px; margin: 2rem auto;">
-    <h2 class="text-center" style="color: var(--primary);">Join Your Campus</h2>
-    <p class="text-center text-muted">For Students, Faculty, and HODs</p>
+<style>
+    .auth-container { max-width: 600px; margin: 40px auto 80px auto; padding: 0 20px; }
+    .glass-card { background: var(--surface-glass); border: 1px solid var(--border-glass); border-radius: 12px; padding: 40px; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
     
-    <hr>
+    .auth-title { text-align: center; color: var(--neon-cyan); font-size: 2rem; font-weight: 800; margin-bottom: 5px; letter-spacing: -0.5px; }
+    
+    /* Style Django inputs dynamically */
+    .glass-card label { display: block; color: var(--text-main); font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; margin-top: 20px; }
+    
+    .glass-card input[type="text"],
+    .glass-card input[type="email"],
+    .glass-card input[type="password"],
+    .glass-card select { width: 100%; background: var(--input-bg); border: 1px solid var(--border-glass); color: var(--text-main); padding: 12px 16px; border-radius: 8px; font-size: 0.95rem; outline: none; transition: all 0.3s ease; font-family: inherit; }
+    
+    .glass-card input:focus, .glass-card select:focus { border-color: var(--neon-cyan); box-shadow: 0 0 12px rgba(0, 240, 255, 0.2); }
 
-    <form method="post">
-        {% csrf_token %}
+    /* Fix dropdown text color in dark mode */
+    .glass-card select option { background: var(--surface-heavy); color: var(--text-main); }
+
+    .btn-submit { width: 100%; background: linear-gradient(135deg, var(--neon-cyan) 0%, var(--neon-purple) 100%); color: white; border: none; padding: 14px; border-radius: 8px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; margin-top: 30px; box-shadow: 0 4px 15px rgba(176, 38, 255, 0.3); }
+    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(176, 38, 255, 0.5); }
+    
+    .errorlist { color: #ff4d4f; font-size: 0.8rem; margin-top: 5px; list-style: none; padding-left: 0; }
+</style>
+
+<div class="auth-container">
+    <div class="glass-card">
+        <h2 class="auth-title">Join Your Campus</h2>
+        <p style="text-align: center; color: var(--text-muted); margin-top: 0; margin-bottom: 25px; font-size: 0.9rem;">For Students, Faculty, and HODs</p>
         
-        <label>Username:</label>
-        {{ form.username }}
-        
-        <label>Email:</label>
-        {{ form.email }}
+        <hr style="border: 0; border-top: 1px solid var(--border-glass); margin-bottom: 10px;">
 
-        <label>Phone Number:</label>
-        {{ form.phone_number }}
+        <form method="post">
+            {% csrf_token %}
+            
+            <label>Username:</label>
+            {{ form.username }}
+            {{ form.username.errors }}
+            
+            <label>Email:</label>
+            {{ form.email }}
+            {{ form.email.errors }}
 
-        <label>Select Your College:</label>
-        {{ form.college }}
-        
-        <label>Select Department:</label>
-        {{ form.department }}
+            <label>Phone Number:</label>
+            {{ form.phone_number }}
+            {{ form.phone_number.errors }}
 
-        <label>I am a:</label>
-        {{ form.role_choice }}
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <label>Select Your College:</label>
+                    {{ form.college }}
+                    {{ form.college.errors }}
+                </div>
+                <div>
+                    <label>Select Department:</label>
+                    {{ form.department }}
+                    {{ form.department.errors }}
+                </div>
+            </div>
 
-        <div id="enrollment-container" style="display: none;">
-            <label>Enrollment Number:</label>
-            {{ form.enrollment_number }}
-            <small class="text-muted">Required for verification.</small>
+            <label>I am a:</label>
+            {{ form.role_choice }}
+            {{ form.role_choice.errors }}
+
+            <div id="enrollment-container" style="display: none; background: rgba(0, 240, 255, 0.05); padding: 15px; border-radius: 8px; border: 1px dashed var(--neon-cyan); margin-top: 20px;">
+                <label style="margin-top: 0; color: var(--neon-cyan);">Enrollment Number:</label>
+                {{ form.enrollment_number }}
+                {{ form.enrollment_number.errors }}
+                <small style="color: var(--text-muted); display: block; margin-top: 5px; font-size: 0.75rem;">Required for Student verification.</small>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <label>Password:</label>
+                    {{ form.password }}
+                    {{ form.password.errors }}
+                </div>
+                <div>
+                    <label>Confirm Password:</label>
+                    {{ form.confirm_password }}
+                    {{ form.confirm_password.errors }}
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit">Create Account</button>
+        </form>
+
+        <div style="text-align: center; margin-top: 25px; font-size: 0.9rem; color: var(--text-muted);">
+            Already have an account? <a href="{% url 'login' %}" style="color: var(--neon-cyan); text-decoration: none; font-weight: 600;">Login here</a>
         </div>
-
-        <label>Password:</label>
-        {{ form.password }}
-
-        <label>Confirm Password:</label>
-        {{ form.confirm_password }}
-
-        <button type="submit" class="btn" style="width: 100%; margin-top: 20px;">Create Account</button>
-    </form>
-
-    <div class="text-center" style="margin-top: 15px;">
-        <small>Already have an account? <a href="{% url 'login' %}">Login here</a></small>
     </div>
 </div>
 
@@ -66,33 +112,37 @@
                 enrollmentContainer.style.display = 'none';
             }
         }
-        toggleEnrollmentField();
-        roleDropdown.addEventListener('change', toggleEnrollmentField);
+        if(roleDropdown) {
+            toggleEnrollmentField();
+            roleDropdown.addEventListener('change', toggleEnrollmentField);
+        }
 
         // --- 2. DYNAMIC DEPARTMENT LOGIC ---
         const collegeDropdown = document.getElementById('id_college');
         const departmentDropdown = document.getElementById('id_department');
 
-        collegeDropdown.addEventListener('change', function() {
-            const collegeId = this.value;
-            const url = "{% url 'ajax_load_departments' %}";  // Django URL
+        if(collegeDropdown && departmentDropdown) {
+            collegeDropdown.addEventListener('change', function() {
+                const collegeId = this.value;
+                const url = "{% url 'ajax_load_departments' %}";  // Django URL
 
-            // Fetch departments for this college
-            fetch(`${url}?college=${collegeId}`)
-                .then(response => response.json())
-                .then(data => {
-                    // Clear existing options
-                    departmentDropdown.innerHTML = '<option value="">Select Department</option>';
-                    // Add new options
-                    data.forEach(dept => {
-                        const option = document.createElement('option');
-                        option.value = dept.id;
-                        option.textContent = dept.name;
-                        departmentDropdown.appendChild(option);
-                    });
-                })
-                .catch(error => console.error('Error:', error));
-        });
+                // Fetch departments for this college
+                fetch(`${url}?college=${collegeId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Clear existing options
+                        departmentDropdown.innerHTML = '<option value="">Select Department</option>';
+                        // Add new options
+                        data.forEach(dept => {
+                            const option = document.createElement('option');
+                            option.value = dept.id;
+                            option.textContent = dept.name;
+                            departmentDropdown.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.error('Error:', error));
+            });
+        }
     });
 </script>
 {% endblock %}

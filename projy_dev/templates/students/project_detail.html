@@ -3,21 +3,31 @@
 {% block title %}{{ project.title }}{% endblock %}
 
 {% block content %}
-
 <style>
-    /* Custom Layout for Project Detail Page */
     .project-detail-container {
         display: grid;
-        grid-template-columns: 1fr; /* Mobile: Stacked */
+        grid-template-columns: 1fr; 
         gap: 30px;
         align-items: start;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 20px 40px 20px;
     }
 
     @media (min-width: 992px) {
         .project-detail-container {
-            /* Rigid constraints ensure the right column never gets squished */
-            grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr); 
+            grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr); 
         }
+    }
+
+    .glass-card {
+        background: var(--surface-glass);
+        border: 1px solid var(--border-glass);
+        border-radius: 12px;
+        padding: 30px;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.3);
     }
 
     .right-column {
@@ -32,130 +42,219 @@
     .action-buttons {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 10px;
+        gap: 12px;
         margin-bottom: 15px;
     }
     
-    /* FIX FOR LATEX OVERFLOW */
     .description-content {
         line-height: 1.8;
-        color: var(--text-main);
-        
-        /* These 3 lines guarantee text wraps and never breaks the grid */
+        color: var(--text-muted);
+        font-size: 0.95rem;
         overflow-wrap: break-word; 
         word-wrap: break-word;
         white-space: pre-wrap;
     }
+
+    .badge {
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .badge-success { border: 1px solid var(--neon-green); color: var(--neon-green); background: rgba(0, 230, 118, 0.1); }
+    .badge-warning { border: 1px solid #faad14; color: #faad14; background: rgba(250, 173, 20, 0.1); }
+    .badge-public { border: 1px solid var(--neon-cyan); color: var(--neon-cyan); background: rgba(0, 240, 255, 0.1); }
+    .badge-private { border: 1px solid var(--text-muted); color: var(--text-muted); background: rgba(255, 255, 255, 0.05); }
+
+    .btn-gradient {
+        background: linear-gradient(135deg, var(--neon-cyan) 0%, var(--neon-purple) 100%);
+        color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: 600; cursor: pointer; text-decoration: none; text-align: center; transition: all 0.3s ease;
+    }
+    .btn-gradient:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(176, 38, 255, 0.4); }
+    
+    .btn-outline {
+        background: transparent; border: 1px solid var(--neon-cyan); color: var(--neon-cyan); padding: 10px 15px; border-radius: 8px; font-weight: 600; cursor: pointer; text-decoration: none; text-align: center; transition: all 0.3s ease;
+    }
+    .btn-outline:hover { background: rgba(0, 240, 255, 0.1); box-shadow: 0 0 15px rgba(0, 240, 255, 0.2); }
+    
+    .btn-disabled {
+        background: var(--input-bg); border: 1px solid var(--border-glass); color: var(--text-muted); cursor: not-allowed; padding: 10px 15px; border-radius: 8px; font-weight: 600; text-align: center;
+    }
+
+    .form-input { width: 100%; background: var(--input-bg); border: 1px solid var(--border-glass); color: var(--text-main); padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; outline: none; transition: 0.3s; margin-bottom: 10px; }
+    .form-input:focus { border-color: var(--neon-cyan); box-shadow: 0 0 12px rgba(0, 240, 255, 0.2); }
 </style>
 
 <div class="project-detail-container">
     
-    <div class="card" style="background-color: var(--surface);">
+    <div class="glass-card">
         {% if project.cover_image %}
-            <img src="{{ project.cover_image.url }}" style="width:100%; border-radius: 8px; margin-bottom: 20px; object-fit: cover; max-height: 450px;">
+            <img src="{{ project.cover_image.url }}" style="width:100%; border-radius: 8px; margin-bottom: 25px; object-fit: cover; max-height: 450px; border: 1px solid var(--border-glass);">
         {% endif %}
         
-        <h1 style="margin-top: 0; font-size: 2rem; color: var(--text-main);">{{ project.title }}</h1>
+        <h1 style="margin-top: 0; font-size: 2rem; color: var(--text-main); letter-spacing: -0.5px;">{{ project.title }}</h1>
         
-        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+        <div style="display: flex; gap: 10px; margin-bottom: 25px;">
             {% if project.is_verified %}
-                <span class="badge badge-success" style="padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.75rem;">Verified Project</span>
+                <span class="badge badge-success">Verified Project</span>
             {% else %}
-                <span class="badge badge-warning" style="padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.75rem; background: var(--warning-bg); color: var(--warning-text); border: 1px solid var(--warning-border);">Pending Verification</span>
+                <span class="badge badge-warning">Pending Verification</span>
             {% endif %}
             
             {% if project.is_public %}
-                <span class="badge" style="background:#e0f2fe; color:#0284c7; border:1px solid #bae6fd; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.75rem;">Public</span>
+                <span class="badge badge-public">Public</span>
             {% else %}
-                <span class="badge" style="background:var(--background); color:var(--text-muted); border:1px solid var(--border); padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.75rem;">Private</span>
+                <span class="badge badge-private">Private</span>
             {% endif %}
         </div>
 
-        <hr style="border: 0; border-top: 1px solid var(--border); margin: 20px 0;">
+        <hr style="border: 0; border-top: 1px solid var(--border-glass); margin: 20px 0;">
         
         <div class="description-content">
             {{ project.description }}
         </div>
         
-        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px dashed var(--border); font-size: 0.9rem; color: var(--text-muted);">
-            <strong>Student:</strong> {{ project.student.user.first_name }} {{ project.student.user.last_name }} ({{ project.student.enrollment_number }})
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px dashed var(--border-glass); font-size: 0.85rem; color: var(--text-muted);">
+            <strong style="color: var(--text-main);">Student:</strong> {{ project.student.user.first_name }} {{ project.student.user.last_name }} ({{ project.student.enrollment_number }})
         </div>
     </div>
 
     <div class="right-column">
         
-        <div class="card" style="background-color: var(--surface);">
-            <h3 style="margin-top: 0; color: var(--text-main);">Actions</h3>
+        <div class="glass-card">
+            <h3 style="margin-top: 0; color: var(--text-main); margin-bottom: 20px;">Actions</h3>
             
             <div class="action-buttons">
                 {% if project.video_demo %}
-                    <a href="{{ project.video_demo.url }}" class="btn" style="background-color: #dc3545; width: 100%; text-align: center; padding: 10px;" target="_blank">
+                    <a href="{{ project.video_demo.url }}" class="btn-gradient" style="background: linear-gradient(135deg, #ff4d4f 0%, #c92a2a 100%); box-shadow: 0 4px 15px rgba(255, 77, 79, 0.3);" target="_blank">
                         ▶ Demo
                     </a>
                 {% else %}
-                    <button class="btn" style="background-color: var(--border); color: var(--text-muted); cursor: not-allowed; width: 100%; padding: 10px;" disabled>
-                        No Demo
-                    </button>
+                    <button class="btn-disabled" disabled>No Demo</button>
                 {% endif %}
 
                 {% if project.github_repo_link %}
-                    <a href="{{ project.github_repo_link }}" class="btn" style="background-color: #24292e; width: 100%; text-align: center; padding: 10px;" target="_blank">
+                    <a href="{{ project.github_repo_link }}" class="btn-outline" target="_blank">
                         GitHub
                     </a>
                 {% else %}
-                    <button class="btn" style="background-color: var(--border); color: var(--text-muted); cursor: not-allowed; width: 100%; padding: 10px;" disabled>
-                        No Code
-                    </button>
+                    <button class="btn-disabled" disabled>No Code</button>
                 {% endif %}
             </div>
 
-            {% if request.user.is_superuser %}
-                <a href="{% url 'admin_control_panel' %}" class="btn" style="background: var(--border); color: var(--text-main); width: 100%;">Back to Admin</a>
-            {% elif request.user.role == 'HOD' %}
-                <a href="{% url 'hod_dashboard' %}" class="btn" style="background: var(--border); color: var(--text-main); width: 100%;">Back to HOD</a>
-            {% elif request.user.role == 'FACULTY' %}
-                <a href="{% url 'faculty_dashboard' %}" class="btn" style="background: var(--border); color: var(--text-main); width: 100%;">Back to Faculty</a>
-            {% elif request.user.role == 'RECRUITER' %}
-                <a href="{% url 'recruiter_dashboard' %}" class="btn" style="background: var(--border); color: var(--text-main); width: 100%;">Back to Recruiter</a>
-            {% else %}
-                <a href="{% url 'student_dashboard' %}" class="btn" style="background: var(--border); color: var(--text-main); width: 100%;">Back to Dashboard</a>
-            {% endif %}
+            <div style="margin-top: 10px;">
+                {% if request.user.is_superuser %}
+                    <a href="{% url 'admin_control_panel' %}" class="btn-outline" style="width: 100%; border-color: var(--text-muted); color: var(--text-muted);">Back to Admin</a>
+                {% elif request.user.role == 'HOD' %}
+                    <a href="{% url 'hod_dashboard' %}" class="btn-outline" style="width: 100%; border-color: var(--text-muted); color: var(--text-muted);">Back to HOD</a>
+                {% elif request.user.role == 'FACULTY' %}
+                    <a href="{% url 'faculty_dashboard' %}" class="btn-outline" style="width: 100%; border-color: var(--text-muted); color: var(--text-muted);">Back to Faculty</a>
+                {% elif request.user.role == 'RECRUITER' %}
+                    <a href="{% url 'recruiter_dashboard' %}" class="btn-outline" style="width: 100%; border-color: var(--text-muted); color: var(--text-muted);">Back to Recruiter</a>
+                {% else %}
+                    <a href="{% url 'student_dashboard' %}" class="btn-outline" style="width: 100%; border-color: var(--text-muted); color: var(--text-muted);">Back to Dashboard</a>
+                {% endif %}
+            </div>
         </div>
 
-        <div class="card" style="background-color: var(--surface);">
-            <h3 style="margin-top: 0; color: var(--text-main);">Tech Stack</h3>
+        <div class="glass-card">
+            <h3 style="margin-top: 0; color: var(--text-main); margin-bottom: 20px;">Tech Stack</h3>
             
             {% if project.languages.all %}
-                <div style="display: flex; height: 12px; background-color: var(--border); border-radius: 6px; overflow: hidden; margin-bottom: 20px;">
+                <div style="display: flex; height: 12px; background-color: var(--input-bg); border-radius: 6px; overflow: hidden; margin-bottom: 25px; border: 1px solid var(--border-glass);">
                     {% for lang in project.languages.all %}
                         <div style="width: {{ lang.percentage }}%; background-color: {{ lang.get_color }};" title="{{ lang.language_name }}: {{ lang.percentage }}%"></div>
                     {% endfor %}
                 </div>
 
-                <div style="display: flex; flex-direction: column; gap: 10px;">
+                <div style="display: flex; flex-direction: column; gap: 12px;">
                     {% for lang in project.languages.all %}
-                        <div style="display: flex; justify-content: space-between; align-items: center; color: var(--text-main);">
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <span style="width: 10px; height: 10px; border-radius: 50%; background-color: {{ lang.get_color }};"></span>
-                                <span style="font-weight: 500;">{{ lang.language_name }}</span>
+                        <div style="display: flex; justify-content: space-between; align-items: center; color: var(--text-main); font-size: 0.9rem;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="width: 12px; height: 12px; border-radius: 50%; background-color: {{ lang.get_color }}; box-shadow: 0 0 8px {{ lang.get_color }};"></span>
+                                <span style="font-weight: 600;">{{ lang.language_name }}</span>
                             </div>
-                            <span style="font-size: 0.9rem; color: var(--text-muted);">{{ lang.percentage }}%</span>
+                            <span style="color: var(--text-muted);">{{ lang.percentage }}%</span>
                         </div>
                     {% endfor %}
                 </div>
             {% else %}
-                <p class="text-muted">No language analysis available.</p>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">No language analysis available.</p>
             {% endif %}
 
             {% if request.user == project.student.user %}
-                <div style="margin-top: 25px; padding-top: 20px; border-top: 1px dashed var(--border);">
-                    <h4 style="margin-top: 0; font-size: 1rem; color: var(--text-main);">Add Skill Manually</h4>
-                    <form method="post">
+                <div id="add-skill-wrapper" style="margin-top: 30px; padding-top: 25px; border-top: 1px dashed var(--border-glass);">
+                    <h4 style="margin-top: 0; font-size: 0.95rem; color: var(--neon-cyan); margin-bottom: 15px;">Add Skill Manually</h4>
+                    
+                    <form method="post" id="add-skill-form">
                         {% csrf_token %}
+                        <style>
+                            #add-skill-form p { margin-bottom: 10px; }
+                            #add-skill-form label { display: block; color: var(--text-muted); font-size: 0.8rem; margin-bottom: 5px; }
+                            #add-skill-form input { width: 100%; background: var(--input-bg); border: 1px solid var(--border-glass); color: var(--text-main); padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; outline: none; }
+                            #add-skill-form input:focus { border-color: var(--neon-cyan); }
+                            #add-skill-form .helptext { display: none; } /* Hide default django help text to use our custom one */
+                        </style>
                         {{ lang_form.as_p }}
-                        <button type="submit" class="btn btn-sm" style="width: 100%; margin-top: 5px;">Add</button>
+                        
+                        <p id="dynamic-help-text" style="font-size: 0.75rem; color: var(--neon-cyan); margin-bottom: 15px; margin-top: -5px;"></p>
+                        
+                        <button type="submit" id="submit-skill-btn" class="btn-gradient" style="width: 100%; margin-top: 5px; padding: 8px;">Add Skill</button>
                     </form>
+
+                    <div id="stack-full-msg" style="display: none; background: rgba(0, 230, 118, 0.1); border-left: 4px solid var(--neon-green); padding: 15px; border-radius: 6px;">
+                        <p style="color: var(--neon-green); margin: 0; font-weight: 600; font-size: 0.9rem;">✅ Tech stack is full (100%).</p>
+                    </div>
                 </div>
+
+                <script>
+                    document.addEventListener("DOMContentLoaded", function() {
+                        // 1. Calculate the current total percentage from Django data
+                        let totalPercentage = 0;
+                        {% for lang in project.languages.all %}
+                            totalPercentage += {{ lang.percentage }};
+                        {% endfor %}
+
+                        const form = document.getElementById('add-skill-form');
+                        const fullMsg = document.getElementById('stack-full-msg');
+                        const percentInput = document.getElementById('id_percentage'); // Django's default ID for the percentage field
+                        const helpText = document.getElementById('dynamic-help-text');
+
+                        if (totalPercentage >= 100) {
+                            // Hide the form, show the success message
+                            if (form) form.style.display = 'none';
+                            if (fullMsg) fullMsg.style.display = 'block';
+                        } else {
+                            // Calculate remaining space
+                            let remaining = 100 - totalPercentage;
+                            
+                            if (percentInput) {
+                                // Enforce HTML5 validation limits
+                                percentInput.max = remaining;
+                                percentInput.min = 1;
+                                percentInput.placeholder = `Max available: ${remaining}%`;
+                                helpText.innerText = `You have ${remaining}% remaining to allocate.`;
+                            }
+
+                            // Add a Javascript listener to prevent form submission if they bypass HTML5
+                            if (form) {
+                                form.addEventListener('submit', function(e) {
+                                    if (percentInput && parseInt(percentInput.value) > remaining) {
+                                        e.preventDefault();
+                                        // Using your global toast function from base.html
+                                        if (typeof showGlobalToast === "function") {
+                                            showGlobalToast(`Cannot exceed 100%! You only have ${remaining}% left.`, 'error');
+                                        } else {
+                                            alert(`Cannot exceed 100%! You only have ${remaining}% left.`);
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    });
+                </script>
             {% endif %}
         </div>
 
