@@ -1,208 +1,887 @@
-{% extends 'base.html' %}
+﻿{% extends 'base.html' %}
 {% block title %}Master Control Panel | Projy{% endblock %}
 
-{% block content %}
+{% block extra_css %}
 <style>
-    .admin-container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+    /* ── PAGE LAYOUT ── */
+    .acp-wrapper {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
 
-    .glass-card { background: var(--surface-glass); border: 1px solid var(--border-glass); border-radius: 12px; padding: 30px; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+    /* ── PAGE HEADER ── */
+    .acp-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    .acp-header-title {
+        font-size: 1.75rem;
+        font-weight: 800;
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin: 0;
+        line-height: 1.2;
+    }
+    .acp-header-sub {
+        color: var(--text-muted);
+        font-size: 0.875rem;
+        margin-top: 4px;
+    }
+    .classic-admin-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 18px;
+        border-radius: 8px;
+        border: 1px solid var(--border-glass);
+        background: var(--surface-glass);
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-decoration: none;
+        backdrop-filter: blur(10px);
+        transition: all 0.2s ease;
+        white-space: nowrap;
+        align-self: center;
+    }
+    .classic-admin-btn:hover {
+        border-color: var(--neon-cyan);
+        color: var(--neon-cyan);
+        box-shadow: 0 0 12px rgba(0, 240, 255, 0.15);
+    }
 
+    /* ── GLASS CARD BASE ── */
+    .g-card {
+        background: var(--surface-glass);
+        border: 1px solid var(--border-glass);
+        border-radius: 16px;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        padding: 24px;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .g-card:hover {
+        border-color: rgba(255,255,255,0.14);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    }
+    .g-card-title {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: var(--text-muted);
+        margin-bottom: 18px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .g-card-title::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: var(--border-glass);
+    }
+
+    /* ── STAT CARDS GRID ── */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+        gap: 16px;
+    }
     .stat-card {
-        text-align: center;
-        padding: 30px;
-        transition: transform 0.3s ease;
+        background: var(--surface-glass);
+        border: 1px solid var(--border-glass);
+        border-radius: 14px;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        padding: 20px 22px;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
     }
-    .stat-card:hover { transform: translateY(-5px); }
-    .stat-card h2 { font-size: 3rem; margin: 0 0 10px 0; font-weight: 800; letter-spacing: -1px; }
-    .stat-card p { margin: 0; color: var(--text-muted); font-size: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
-
-    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px; margin-bottom: 40px; }
-
-    /* Action Buttons */
-    .action-btn-outline {
-        background: transparent; padding: 12px 20px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: inline-block; text-align: center; text-decoration: none;
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+        border-radius: 14px 14px 0 0;
     }
-    .btn-cyan { border: 1px solid var(--neon-cyan); color: var(--neon-cyan); }
-    .btn-cyan:hover { background: rgba(0, 240, 255, 0.1); box-shadow: 0 0 15px rgba(0, 240, 255, 0.2); color: var(--text-main); }
-    
-    .btn-purple { border: 1px solid var(--neon-purple); color: var(--neon-purple); }
-    .btn-purple:hover { background: rgba(176, 38, 255, 0.1); box-shadow: 0 0 15px rgba(176, 38, 255, 0.2); color: var(--text-main); }
+    .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+    }
+    .stat-card.cyan::before   { background: var(--neon-cyan); }
+    .stat-card.green::before  { background: var(--neon-green); }
+    .stat-card.purple::before { background: var(--neon-purple); }
+    .stat-card.gold::before   { background: #faad14; }
+    .stat-card.pink::before   { background: #ff6b9d; }
 
-    .btn-green { border: 1px solid var(--neon-green); color: var(--neon-green); }
-    .btn-green:hover { background: rgba(0, 230, 118, 0.1); box-shadow: 0 0 15px rgba(0, 230, 118, 0.2); color: var(--text-main); }
+    .stat-card:hover.cyan   { border-color: rgba(0,240,255,0.25); box-shadow: 0 12px 30px rgba(0,240,255,0.08); }
+    .stat-card:hover.green  { border-color: rgba(0,230,118,0.25); box-shadow: 0 12px 30px rgba(0,230,118,0.08); }
+    .stat-card:hover.purple { border-color: rgba(176,38,255,0.25); box-shadow: 0 12px 30px rgba(176,38,255,0.08); }
+    .stat-card:hover.gold   { border-color: rgba(250,173,20,0.25); box-shadow: 0 12px 30px rgba(250,173,20,0.08); }
+    .stat-card:hover.pink   { border-color: rgba(255,107,157,0.25); box-shadow: 0 12px 30px rgba(255,107,157,0.08); }
 
-    .btn-white { border: 1px solid var(--text-muted); color: var(--text-muted); }
-    .btn-white:hover { background: rgba(255, 255, 255, 0.05); color: var(--text-main); border-color: var(--text-main); }
+    .stat-icon {
+        width: 36px; height: 36px;
+        border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        margin-bottom: 14px;
+        font-size: 1.1rem;
+    }
+    .stat-icon.cyan   { background: rgba(0,240,255,0.12); }
+    .stat-icon.green  { background: rgba(0,230,118,0.12); }
+    .stat-icon.purple { background: rgba(176,38,255,0.12); }
+    .stat-icon.gold   { background: rgba(250,173,20,0.12); }
+    .stat-icon.pink   { background: rgba(255,107,157,0.12); }
 
-    .btn-solid-green { background: rgba(0, 230, 118, 0.2); color: var(--neon-green); border: 1px solid var(--neon-green); padding: 8px 16px; border-radius: 6px; cursor: pointer; transition: 0.2s; font-weight: 600; }
-    .btn-solid-green:hover { background: var(--neon-green); color: #000; }
-    
-    .btn-solid-red { background: rgba(255, 77, 79, 0.2); color: #ff4d4f; border: 1px solid #ff4d4f; padding: 8px 16px; border-radius: 6px; cursor: pointer; transition: 0.2s; font-weight: 600; }
-    .btn-solid-red:hover { background: #ff4d4f; color: #fff; }
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 800;
+        line-height: 1;
+        margin-bottom: 4px;
+    }
+    .stat-value.cyan   { color: var(--neon-cyan); }
+    .stat-value.green  { color: var(--neon-green); }
+    .stat-value.purple { color: var(--neon-purple); }
+    .stat-value.gold   { color: #faad14; }
+    .stat-value.pink   { color: #ff6b9d; }
 
-    /* Pending Box */
-    .pending-box { background: rgba(250, 173, 20, 0.05); border: 1px dashed #faad14; padding: 25px; border-radius: 12px; margin-bottom: 40px; }
-    .pending-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-    .pending-table td { padding: 15px 10px; border-bottom: 1px solid rgba(250, 173, 20, 0.2); color: var(--text-main); }
+    .stat-label {
+        font-size: 0.78rem;
+        font-weight: 500;
+        color: var(--text-muted);
+    }
+
+    /* ── TWO-COLUMN SECTION ── */
+    .two-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+    @media (max-width: 768px) { .two-col { grid-template-columns: 1fr; } }
+
+    /* ── PENDING APPROVALS ── */
+    .pending-table { width: 100%; border-collapse: collapse; }
+    .pending-table td { padding: 12px 8px; border-bottom: 1px solid var(--border-glass); vertical-align: middle; }
     .pending-table tr:last-child td { border-bottom: none; }
 
-    /* MODAL OVERLAY & CONTENT */
-    .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); backdrop-filter: blur(8px); overflow-y: auto; padding: 20px; }
-    .modal-content { background: var(--surface-heavy); border: 1px solid var(--border-glass); border-radius: 12px; margin: 40px auto; padding: 35px; box-shadow: 0 15px 50px rgba(0,0,0,0.6); position: relative; max-width: 500px; }
-    .close-btn { position: absolute; right: 20px; top: 20px; color: var(--text-muted); font-size: 28px; cursor: pointer; transition: color 0.2s; line-height: 1; }
-    .close-btn:hover { color: var(--neon-cyan); }
-    
-    /* Django Form Targeting inside Modals */
-    .modal-content p { margin-bottom: 15px; }
-    .modal-content label { display: block; color: var(--text-main); font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; }
-    .modal-content input, .modal-content select, .modal-content textarea { width: 100%; background: var(--input-bg); border: 1px solid var(--border-glass); color: var(--text-main); padding: 12px 16px; border-radius: 8px; font-size: 0.9rem; font-family: inherit; outline: none; transition: 0.3s; }
-    .modal-content input:focus, .modal-content select:focus { border-color: var(--neon-cyan); box-shadow: 0 0 12px rgba(0, 240, 255, 0.2); }
-    .modal-content select option { background: var(--surface-heavy); color: var(--text-main); }
-    .helptext { display: block; color: var(--text-muted); font-size: 0.75rem; margin-top: 6px; }
+    .user-row-info { display: flex; align-items: center; gap: 10px; }
+    .user-avatar {
+        width: 34px; height: 34px;
+        border-radius: 50%;
+        background: var(--surface-heavy);
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 700; font-size: 0.85rem;
+        color: var(--neon-cyan);
+        border: 1px solid var(--border-glass);
+        flex-shrink: 0;
+    }
+    .user-name { font-weight: 600; font-size: 0.875rem; color: var(--text-main); }
+    .user-email { font-size: 0.75rem; color: var(--text-muted); }
+    .role-badge {
+        display: inline-block;
+        padding: 2px 10px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+    .role-badge.hod        { background: rgba(0,240,255,0.12); color: var(--neon-cyan); border: 1px solid rgba(0,240,255,0.2); }
+    .role-badge.recruiter  { background: rgba(250,173,20,0.12); color: #faad14; border: 1px solid rgba(250,173,20,0.2); }
 
-    .btn-submit { width: 100%; background: linear-gradient(135deg, var(--neon-cyan) 0%, var(--neon-purple) 100%); color: white; border: none; padding: 14px; border-radius: 8px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; margin-top: 15px; box-shadow: 0 4px 15px rgba(176, 38, 255, 0.3); }
-    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(176, 38, 255, 0.5); }
+    .action-btns { display: flex; gap: 8px; justify-content: flex-end; }
+    .btn-approve, .btn-reject {
+        padding: 5px 14px;
+        border: none; border-radius: 7px;
+        font-size: 0.75rem; font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        letter-spacing: 0.3px;
+    }
+    .btn-approve { background: rgba(0,230,118,0.15); color: var(--neon-green); border: 1px solid rgba(0,230,118,0.25); }
+    .btn-approve:hover { background: rgba(0,230,118,0.3); box-shadow: 0 0 10px rgba(0,230,118,0.2); }
+    .btn-reject  { background: rgba(255,77,79,0.12); color: #ff4d4f; border: 1px solid rgba(255,77,79,0.2); }
+    .btn-reject:hover  { background: rgba(255,77,79,0.25); box-shadow: 0 0 10px rgba(255,77,79,0.2); }
+
+    .empty-state {
+        text-align: center;
+        padding: 30px 20px;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+    }
+    .empty-state .check-icon {
+        width: 42px; height: 42px;
+        border-radius: 50%;
+        background: rgba(0,230,118,0.1);
+        border: 1px solid rgba(0,230,118,0.2);
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 12px;
+        font-size: 1.2rem;
+    }
+
+    /* ── QUICK ACTIONS ── */
+    .quick-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 12px;
+    }
+    .quick-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 13px 16px;
+        border-radius: 12px;
+        border: 1px solid var(--border-glass);
+        background: var(--surface-heavy);
+        color: var(--text-main);
+        font-size: 0.82rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+    }
+    .quick-btn:hover { transform: translateY(-2px); }
+    .quick-btn.cyan   { border-color: rgba(0,240,255,0.3);   color: var(--neon-cyan);  }
+    .quick-btn.green  { border-color: rgba(0,230,118,0.3);   color: var(--neon-green); }
+    .quick-btn.purple { border-color: rgba(176,38,255,0.3);  color: var(--neon-purple); }
+    .quick-btn.gold   { border-color: rgba(250,173,20,0.3);  color: #faad14; }
+    .quick-btn.cyan:hover   { background: rgba(0,240,255,0.08);  box-shadow: 0 0 14px rgba(0,240,255,0.12); }
+    .quick-btn.green:hover  { background: rgba(0,230,118,0.08);  box-shadow: 0 0 14px rgba(0,230,118,0.12); }
+    .quick-btn.purple:hover { background: rgba(176,38,255,0.08); box-shadow: 0 0 14px rgba(176,38,255,0.12); }
+    .quick-btn.gold:hover   { background: rgba(250,173,20,0.08); box-shadow: 0 0 14px rgba(250,173,20,0.12); }
+
+    /* ── RECENT USERS LIST ── */
+    .recent-user-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border-glass);
+    }
+    .recent-user-row:last-child { border-bottom: none; }
+    .recent-user-info { display: flex; align-items: center; gap: 10px; }
+    .recent-user-avatar {
+        width: 32px; height: 32px;
+        border-radius: 50%;
+        background: var(--surface-heavy);
+        border: 1px solid var(--border-glass);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.8rem; font-weight: 700; color: var(--neon-purple);
+    }
+    .recent-user-name { font-size: 0.85rem; font-weight: 600; color: var(--text-main); }
+    .recent-user-time { font-size: 0.72rem; color: var(--text-muted); }
+    .recent-user-role {
+        font-size: 0.7rem; font-weight: 700; padding: 2px 10px; border-radius: 20px;
+    }
+    .rr-student  { background: rgba(0,240,255,0.1);  color: var(--neon-cyan);   border: 1px solid rgba(0,240,255,0.2); }
+    .rr-faculty  { background: rgba(0,230,118,0.1);  color: var(--neon-green);  border: 1px solid rgba(0,230,118,0.2); }
+    .rr-hod      { background: rgba(176,38,255,0.1); color: var(--neon-purple); border: 1px solid rgba(176,38,255,0.2); }
+    .rr-recruiter{ background: rgba(250,173,20,0.1); color: #faad14;            border: 1px solid rgba(250,173,20,0.2); }
+    .rr-admin    { background: rgba(255,77,79,0.1);  color: #ff4d4f;            border: 1px solid rgba(255,77,79,0.2); }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+        display: none;
+        position: fixed; inset: 0; z-index: 9000;
+        background: rgba(0,0,0,0.65);
+        backdrop-filter: blur(4px);
+        align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+        background: var(--surface-heavy);
+        border: 1px solid var(--border-glass);
+        border-radius: 18px;
+        padding: 28px;
+        width: 90%; max-width: 440px;
+        position: relative;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        animation: modalIn 0.22s ease;
+    }
+    @keyframes modalIn {
+        from { opacity: 0; transform: scale(0.95) translateY(10px); }
+        to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .modal-close {
+        position: absolute; top: 16px; right: 18px;
+        background: none; border: none;
+        color: var(--text-muted); font-size: 1.4rem;
+        cursor: pointer; line-height: 1;
+        transition: color 0.2s;
+    }
+    .modal-close:hover { color: var(--text-main); }
+    .modal-title {
+        font-size: 1rem; font-weight: 700;
+        color: var(--text-main); margin-bottom: 20px;
+        display: flex; align-items: center; gap: 8px;
+    }
+    .modal-body input,
+    .modal-body select,
+    .modal-body textarea {
+        width: 100%;
+        background: rgba(0,0,0,0.35);
+        border: 1px solid var(--border-glass);
+        border-radius: 9px;
+        padding: 10px 14px;
+        color: var(--text-main);
+        font-size: 0.85rem;
+        font-family: inherit;
+        transition: border-color 0.2s ease;
+        margin-top: 6px;
+    }
+    .modal-body input:focus,
+    .modal-body select:focus,
+    .modal-body textarea:focus {
+        outline: none;
+        border-color: var(--neon-cyan);
+        box-shadow: 0 0 0 3px rgba(0,240,255,0.08);
+    }
+    .modal-body select option { background: #0a0f1e; color: var(--text-main); }
+    .modal-body label { font-size: 0.78rem; font-weight: 600; color: var(--text-muted); display: block; margin-top: 14px; }
+    .modal-body label:first-child { margin-top: 0; }
+    .modal-body .helptext { font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; display: block; }
+    .modal-submit {
+        width: 100%; margin-top: 20px;
+        padding: 11px;
+        border: none; border-radius: 10px;
+        background: var(--gradient-primary);
+        color: #fff; font-size: 0.875rem; font-weight: 700;
+        cursor: pointer; letter-spacing: 0.3px;
+        transition: opacity 0.2s ease, transform 0.15s ease;
+    }
+    .modal-submit:hover { opacity: 0.9; transform: translateY(-1px); }
+    body.light-mode .modal-body input,
+    body.light-mode .modal-body select,
+    body.light-mode .modal-body textarea { background: #f1f5f9; color: #0f172a; border-color: #cbd5e1; }
+
+    /* ── MANAGE DATA SECTION ── */
+    .manage-tabs {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+    }
+    .manage-tab {
+        padding: 6px 16px;
+        border-radius: 20px;
+        border: 1px solid var(--border-glass);
+        background: transparent;
+        color: var(--text-muted);
+        font-size: 0.78rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .manage-tab.active,
+    .manage-tab:hover { background: var(--surface-heavy); color: var(--text-main); border-color: rgba(255,255,255,0.15); }
+    .manage-tab.active { color: var(--neon-cyan); border-color: var(--neon-cyan); }
+
+    .manage-panel { display: none; }
+    .manage-panel.active { display: block; }
+
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table th {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--text-muted);
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--border-glass);
+        text-align: left;
+    }
+    .data-table td {
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--border-glass);
+        font-size: 0.82rem;
+        color: var(--text-main);
+        vertical-align: middle;
+    }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .btn-delete {
+        padding: 4px 12px;
+        border: 1px solid rgba(255,77,79,0.3);
+        border-radius: 6px;
+        background: rgba(255,77,79,0.08);
+        color: #ff4d4f;
+        font-size: 0.72rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .btn-delete:hover { background: rgba(255,77,79,0.2); box-shadow: 0 0 8px rgba(255,77,79,0.2); }
+    .data-muted { color: var(--text-muted); }
+    .verified-dot {
+        display: inline-block;
+        width: 8px; height: 8px;
+        border-radius: 50%;
+        margin-right: 5px;
+    }
+    .dot-green { background: var(--neon-green); box-shadow: 0 0 6px rgba(0,230,118,0.5); }
+    .dot-orange { background: #faad14; box-shadow: 0 0 6px rgba(250,173,20,0.5); }
 </style>
+{% endblock %}
 
-<div class="admin-container">
-    
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; flex-wrap: wrap; gap: 20px;">
+{% block content %}
+<div class="acp-wrapper">
+
+    <!-- ── HEADER ── -->
+    <div class="acp-header">
         <div>
-            <h1 style="margin: 0; color: var(--text-main); font-size: 2.2rem; letter-spacing: -0.5px;">Admin Control Center</h1>
-            <p style="color: var(--text-muted); margin-top: 5px;">System Overview & Central Management</p>
+            <h1 class="acp-header-title">Admin Control Center</h1>
+            <p class="acp-header-sub">System overview, approvals &amp; quick management</p>
         </div>
-        <a href="/admin/" class="action-btn-outline btn-white">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-right: 6px; vertical-align: middle;"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-            Classic Django Admin
+        <a href="/admin/" class="classic-admin-btn">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            Classic Admin
         </a>
     </div>
 
-    {% if pending_hods_list or pending_recruiters_list %}
-    <div class="pending-box">
-        <h3 style="margin-top: 0; color: #faad14; display: flex; align-items: center; gap: 10px;">
-            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-            Pending Approvals Required
-        </h3>
-        <table class="pending-table">
-            {% for user in pending_hods_list %}
+    <!-- ── STAT CARDS ── -->
+    <div class="stats-grid">
+        <div class="stat-card cyan">
+            <div class="stat-icon cyan">👨‍🎓</div>
+            <div class="stat-value cyan">{{ total_students }}</div>
+            <div class="stat-label">Total Students</div>
+        </div>
+        <div class="stat-card green">
+            <div class="stat-icon green">🗂️</div>
+            <div class="stat-value green">{{ total_projects }}</div>
+            <div class="stat-label">Total Projects</div>
+        </div>
+        <div class="stat-card purple">
+            <div class="stat-icon purple">👨‍🏫</div>
+            <div class="stat-value purple">{{ total_faculty }}</div>
+            <div class="stat-label">Faculty Members</div>
+        </div>
+        <div class="stat-card gold">
+            <div class="stat-icon gold">🏫</div>
+            <div class="stat-value gold">{{ college_count }}</div>
+            <div class="stat-label">Colleges</div>
+        </div>
+        <div class="stat-card pink">
+            <div class="stat-icon pink">🏢</div>
+            <div class="stat-value pink">{{ company_count }}</div>
+            <div class="stat-label">Companies</div>
+        </div>
+    </div>
+
+    <!-- ── PENDING + RECENT ── -->
+    <div class="two-col">
+
+        <!-- PENDING APPROVALS -->
+        <div class="g-card">
+            <div class="g-card-title">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Pending Approvals
+                {% if pending_hods_list or pending_recruiters_list %}
+                    <span style="background: rgba(255,77,79,0.15); color: #ff4d4f; border: 1px solid rgba(255,77,79,0.2); border-radius: 20px; padding: 1px 8px; font-size: 0.68rem; font-weight: 800; margin-left: 6px;">
+                        {{ pending_hods_list|length|add:pending_recruiters_list|length }}
+                    </span>
+                {% endif %}
+            </div>
+
+            {% if pending_hods_list or pending_recruiters_list %}
+            <table class="pending-table">
+                {% for u in pending_hods_list %}
                 <tr>
-                    <td><strong style="color: var(--neon-cyan);">{{ user.username }}</strong> <span style="color: var(--text-muted); font-size: 0.85rem; margin-left: 10px;">(HOD Request)</span></td>
-                    <td style="text-align: right;">
-                        <form method="post" style="display: inline;">
+                    <td>
+                        <div class="user-row-info">
+                            <div class="user-avatar">{{ u.username|slice:":1"|upper }}</div>
+                            <div>
+                                <div class="user-name">{{ u.username }}</div>
+                                <div class="user-email">{{ u.email }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="text-align:center;"><span class="role-badge hod">HOD</span></td>
+                    <td>
+                        <div class="action-btns">
+                            <form method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="user_id" value="{{ u.id }}">
+                                <button class="btn-approve" type="submit" name="action" value="approve">✓ Verify</button>
+                            </form>
+                            <form method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="user_id" value="{{ u.id }}">
+                                <button class="btn-reject" type="submit" name="action" value="reject">✕</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% for u in pending_recruiters_list %}
+                <tr>
+                    <td>
+                        <div class="user-row-info">
+                            <div class="user-avatar" style="color: #faad14;">{{ u.username|slice:":1"|upper }}</div>
+                            <div>
+                                <div class="user-name">{{ u.username }}</div>
+                                <div class="user-email">{{ u.email }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="text-align:center;"><span class="role-badge recruiter">RECRUITER</span></td>
+                    <td>
+                        <div class="action-btns">
+                            <form method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="user_id" value="{{ u.id }}">
+                                <button class="btn-approve" type="submit" name="action" value="approve">✓ Verify</button>
+                            </form>
+                            <form method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="user_id" value="{{ u.id }}">
+                                <button class="btn-reject" type="submit" name="action" value="reject">✕</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <div class="check-icon">✓</div>
+                All caught up — no pending approvals.
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- RECENT USERS -->
+        <div class="g-card">
+            <div class="g-card-title">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                Recent Sign-ups
+            </div>
+            {% for u in recent_users %}
+            <div class="recent-user-row">
+                <div class="recent-user-info">
+                    <div class="recent-user-avatar">{{ u.username|slice:":1"|upper }}</div>
+                    <div>
+                        <div class="recent-user-name">{{ u.username }}</div>
+                        <div class="recent-user-time">{{ u.email }}</div>
+                    </div>
+                </div>
+                <span class="recent-user-role
+                    {% if u.role == 'STUDENT' %}rr-student
+                    {% elif u.role == 'FACULTY' %}rr-faculty
+                    {% elif u.role == 'HOD' %}rr-hod
+                    {% elif u.role == 'RECRUITER' %}rr-recruiter
+                    {% else %}rr-admin{% endif %}">
+                    {{ u.role }}
+                </span>
+            </div>
+            {% empty %}
+            <div class="empty-state">No users registered yet.</div>
+            {% endfor %}
+        </div>
+
+    </div>
+
+    <!-- ── QUICK ACTIONS ── -->
+    <div class="g-card">
+        <div class="g-card-title">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            Quick Actions
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.82rem; margin-bottom: 16px; margin-top: -8px;">Create records instantly without leaving the dashboard.</p>
+        <div class="quick-grid">
+            <button class="quick-btn cyan" onclick="openModal('modal-college')">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+                + Add College
+            </button>
+            <button class="quick-btn green" onclick="openModal('modal-dept')">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                + Add Dept
+            </button>
+            <button class="quick-btn purple" onclick="openModal('modal-company')">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                + Add Company
+            </button>
+            <button class="quick-btn gold" onclick="openModal('modal-user')">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+                + Add User
+            </button>
+        </div>
+    </div>
+
+    <!-- ── MANAGE DATA ── -->
+    <div class="g-card">
+        <div class="g-card-title">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 12h16M4 17h16"/></svg>
+            Manage Data
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.82rem; margin-top: -8px; margin-bottom: 16px;">View and delete colleges, departments, companies, and users.</p>
+
+        <div class="manage-tabs">
+            <button class="manage-tab active" onclick="showTab('tab-colleges', this)">Colleges ({{ all_colleges|length }})</button>
+            <button class="manage-tab" onclick="showTab('tab-depts', this)">Departments ({{ all_departments|length }})</button>
+            <button class="manage-tab" onclick="showTab('tab-companies', this)">Companies ({{ all_companies|length }})</button>
+            <button class="manage-tab" onclick="showTab('tab-users', this)">Users ({{ all_users|length }})</button>
+        </div>
+
+        <!-- Colleges -->
+        <div id="tab-colleges" class="manage-panel active">
+            {% if all_colleges %}
+            <table class="data-table">
+                <thead><tr><th>Name</th><th>Website</th><th>Address</th><th></th></tr></thead>
+                <tbody>
+                {% for college in all_colleges %}
+                <tr>
+                    <td style="font-weight: 600;">{{ college.name }}</td>
+                    <td class="data-muted">{{ college.website|default:"—" }}</td>
+                    <td class="data-muted">{{ college.address|truncatechars:40|default:"—" }}</td>
+                    <td style="text-align:right;">
+                        <form method="post" onsubmit="return confirm('Delete college {{ college.name|escapejs }}?');">
                             {% csrf_token %}
-                            <input type="hidden" name="user_id" value="{{ user.id }}">
-                            <button type="submit" name="action" value="approve" class="btn-solid-green">Verify</button>
-                            <button type="submit" name="action" value="reject" class="btn-solid-red" style="margin-left: 10px;">Delete</button>
+                            <input type="hidden" name="delete_college" value="true">
+                            <input type="hidden" name="college_id" value="{{ college.id }}">
+                            <button type="submit" class="btn-delete">Delete</button>
                         </form>
                     </td>
                 </tr>
-            {% endfor %}
-            {% for user in pending_recruiters_list %}
+                {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">No colleges added yet.</div>
+            {% endif %}
+        </div>
+
+        <!-- Departments -->
+        <div id="tab-depts" class="manage-panel">
+            {% if all_departments %}
+            <table class="data-table">
+                <thead><tr><th>Department</th><th>College</th><th></th></tr></thead>
+                <tbody>
+                {% for dept in all_departments %}
                 <tr>
-                    <td><strong style="color: var(--neon-purple);">{{ user.username }}</strong> <span style="color: var(--text-muted); font-size: 0.85rem; margin-left: 10px;">(Recruiter Request)</span></td>
-                    <td style="text-align: right;">
-                        <form method="post" style="display: inline;">
+                    <td style="font-weight: 600;">{{ dept.name }}</td>
+                    <td class="data-muted">{{ dept.college.name }}</td>
+                    <td style="text-align:right;">
+                        <form method="post" onsubmit="return confirm('Delete department {{ dept.name|escapejs }}?');">
                             {% csrf_token %}
-                            <input type="hidden" name="user_id" value="{{ user.id }}">
-                            <button type="submit" name="action" value="approve" class="btn-solid-green">Verify</button>
-                            <button type="submit" name="action" value="reject" class="btn-solid-red" style="margin-left: 10px;">Delete</button>
+                            <input type="hidden" name="delete_dept" value="true">
+                            <input type="hidden" name="dept_id" value="{{ dept.id }}">
+                            <button type="submit" class="btn-delete">Delete</button>
                         </form>
                     </td>
                 </tr>
-            {% endfor %}
-        </table>
-    </div>
-    {% endif %}
-
-    <div class="grid-3">
-        <div class="glass-card stat-card" style="border-top: 4px solid var(--neon-cyan);">
-            <h2 style="color: var(--neon-cyan);">{{ total_students }}</h2>
-            <p>Students</p>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">No departments added yet.</div>
+            {% endif %}
         </div>
-        <div class="glass-card stat-card" style="border-top: 4px solid var(--neon-green);">
-            <h2 style="color: var(--neon-green);">{{ total_projects }}</h2>
-            <p>Projects</p>
+
+        <!-- Companies -->
+        <div id="tab-companies" class="manage-panel">
+            {% if all_companies %}
+            <table class="data-table">
+                <thead><tr><th>Name</th><th>Location</th><th>Website</th><th></th></tr></thead>
+                <tbody>
+                {% for company in all_companies %}
+                <tr>
+                    <td style="font-weight: 600;">{{ company.name }}</td>
+                    <td class="data-muted">{{ company.location|default:"—" }}</td>
+                    <td class="data-muted">{{ company.website|default:"—" }}</td>
+                    <td style="text-align:right;">
+                        <form method="post" onsubmit="return confirm('Delete company {{ company.name|escapejs }}?');">
+                            {% csrf_token %}
+                            <input type="hidden" name="delete_company" value="true">
+                            <input type="hidden" name="company_id" value="{{ company.id }}">
+                            <button type="submit" class="btn-delete">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">No companies added yet.</div>
+            {% endif %}
         </div>
-        <div class="glass-card stat-card" style="border-top: 4px solid var(--neon-purple);">
-            <h2 style="color: var(--neon-purple);">{{ total_faculty }}</h2>
-            <p>Faculty</p>
+
+        <!-- Users -->
+        <div id="tab-users" class="manage-panel">
+            {% if all_users %}
+            <table class="data-table">
+                <thead><tr><th>Username</th><th>Email</th><th>Role</th><th>Status</th><th></th></tr></thead>
+                <tbody>
+                {% for u in all_users %}
+                <tr>
+                    <td style="font-weight: 600;">{{ u.username }}</td>
+                    <td class="data-muted">{{ u.email }}</td>
+                    <td>
+                        <span class="recent-user-role
+                            {% if u.role == 'STUDENT' %}rr-student
+                            {% elif u.role == 'FACULTY' %}rr-faculty
+                            {% elif u.role == 'HOD' %}rr-hod
+                            {% elif u.role == 'RECRUITER' %}rr-recruiter
+                            {% else %}rr-admin{% endif %}">
+                            {{ u.role }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if u.is_verified %}
+                            <span class="verified-dot dot-green"></span><span style="font-size:0.75rem; color: var(--neon-green);">Verified</span>
+                        {% else %}
+                            <span class="verified-dot dot-orange"></span><span style="font-size:0.75rem; color: #faad14;">Pending</span>
+                        {% endif %}
+                    </td>
+                    <td style="text-align:right;">
+                        <form method="post" onsubmit="return confirm('Delete user {{ u.username|escapejs }}?');">
+                            {% csrf_token %}
+                            <input type="hidden" name="delete_user" value="true">
+                            <input type="hidden" name="user_id" value="{{ u.id }}">
+                            <button type="submit" class="btn-delete">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">No users found.</div>
+            {% endif %}
         </div>
     </div>
 
-    <div class="glass-card">
-        <h3 style="margin-top: 0; color: var(--text-main); font-size: 1.5rem;">⚡ Quick Actions</h3>
-        <p style="color: var(--text-muted); margin-bottom: 25px;">Add data globally without leaving the dashboard.</p>
-        
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
-            <button onclick="openModal('modal-college')" class="action-btn-outline btn-cyan">+ Add College</button>
-            <button onclick="openModal('modal-dept')" class="action-btn-outline btn-white">+ Add Department</button>
-            <button onclick="openModal('modal-company')" class="action-btn-outline btn-purple">+ Add Company</button>
-            <button onclick="openModal('modal-user')" class="action-btn-outline btn-green">+ Add User</button>
+</div>
+
+<!-- ── MODALS ── -->
+
+<!-- Add College -->
+<div id="modal-college" class="modal-overlay">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeModal('modal-college')">&times;</button>
+        <div class="modal-title">
+            <span style="color: var(--neon-cyan);">🏫</span> Add New College
+        </div>
+        <div class="modal-body">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="add_college" value="true">
+                {% for field in college_form %}
+                    <label>{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}<span class="helptext">{{ field.help_text }}</span>{% endif %}
+                {% endfor %}
+                <button type="submit" class="modal-submit">Save College</button>
+            </form>
         </div>
     </div>
-
 </div>
 
-<div id="modal-college" class="modal">
-    <div class="modal-content">
-        <span class="close-btn" onclick="closeModal('modal-college')">&times;</span>
-        <h2 style="color: var(--neon-cyan); margin-top: 0; margin-bottom: 20px;">Add New College</h2>
-        <form method="post">
-            {% csrf_token %}
-            <input type="hidden" name="add_college" value="true">
-            {{ college_form.as_p }}
-            <button type="submit" class="btn-submit">Save College</button>
-        </form>
+<!-- Add Department -->
+<div id="modal-dept" class="modal-overlay">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeModal('modal-dept')">&times;</button>
+        <div class="modal-title">
+            <span style="color: var(--neon-green);">📚</span> Add Department
+        </div>
+        <div class="modal-body">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="add_dept" value="true">
+                {% for field in dept_form %}
+                    <label>{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}<span class="helptext">{{ field.help_text }}</span>{% endif %}
+                {% endfor %}
+                <button type="submit" class="modal-submit">Save Department</button>
+            </form>
+        </div>
     </div>
 </div>
 
-<div id="modal-dept" class="modal">
-    <div class="modal-content">
-        <span class="close-btn" onclick="closeModal('modal-dept')">&times;</span>
-        <h2 style="color: var(--text-main); margin-top: 0; margin-bottom: 20px;">Add Department</h2>
-        <form method="post">
-            {% csrf_token %}
-            <input type="hidden" name="add_dept" value="true">
-            {{ dept_form.as_p }}
-            <button type="submit" class="btn-submit">Save Department</button>
-        </form>
+<!-- Add Company -->
+<div id="modal-company" class="modal-overlay">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeModal('modal-company')">&times;</button>
+        <div class="modal-title">
+            <span style="color: var(--neon-purple);">🏢</span> Add Company
+        </div>
+        <div class="modal-body">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="add_company" value="true">
+                {% for field in company_form %}
+                    <label>{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}<span class="helptext">{{ field.help_text }}</span>{% endif %}
+                {% endfor %}
+                <button type="submit" class="modal-submit">Save Company</button>
+            </form>
+        </div>
     </div>
 </div>
 
-<div id="modal-company" class="modal">
-    <div class="modal-content">
-        <span class="close-btn" onclick="closeModal('modal-company')">&times;</span>
-        <h2 style="color: var(--neon-purple); margin-top: 0; margin-bottom: 20px;">Add Company</h2>
-        <form method="post">
-            {% csrf_token %}
-            <input type="hidden" name="add_company" value="true">
-            {{ company_form.as_p }}
-            <button type="submit" class="btn-submit">Save Company</button>
-        </form>
+<!-- Add User -->
+<div id="modal-user" class="modal-overlay">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeModal('modal-user')">&times;</button>
+        <div class="modal-title">
+            <span style="color: #faad14;">👤</span> Create User
+        </div>
+        <div class="modal-body">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="add_user" value="true">
+                {% for field in user_form %}
+                    <label>{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}<span class="helptext">{{ field.help_text }}</span>{% endif %}
+                {% endfor %}
+                <button type="submit" class="modal-submit">Create User</button>
+            </form>
+        </div>
     </div>
 </div>
 
-<div id="modal-user" class="modal">
-    <div class="modal-content">
-        <span class="close-btn" onclick="closeModal('modal-user')">&times;</span>
-        <h2 style="color: var(--neon-green); margin-top: 0; margin-bottom: 20px;">Add Global User</h2>
-        <form method="post">
-            {% csrf_token %}
-            <input type="hidden" name="add_user" value="true">
-            {{ user_form.as_p }}
-            <button type="submit" class="btn-submit">Create User</button>
-        </form>
-    </div>
-</div>
+{% endblock %}
 
+{% block scripts %}
 <script>
-    function openModal(id) { document.getElementById(id).style.display = "block"; }
-    function closeModal(id) { document.getElementById(id).style.display = "none"; }
-    window.onclick = function(event) {
-        if (event.target.classList.contains('modal')) {
-            event.target.style.display = "none";
+    function openModal(id) {
+        document.getElementById(id).classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('open');
+        document.body.style.overflow = '';
+    }
+    // Close on overlay click
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', function(e) {
+            if (e.target === this) closeModal(this.id);
+        });
+    });
+    // Close on Escape key
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.modal-overlay.open').forEach(m => closeModal(m.id));
         }
+    });
+
+    function showTab(panelId, btn) {
+        document.querySelectorAll('.manage-panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.manage-tab').forEach(t => t.classList.remove('active'));
+        document.getElementById(panelId).classList.add('active');
+        btn.classList.add('active');
     }
 </script>
-
 {% endblock %}

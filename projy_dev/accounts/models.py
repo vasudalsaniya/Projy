@@ -12,20 +12,12 @@ class User(AbstractUser):
         STUDENT = "STUDENT", "Student"
         RECRUITER = "RECRUITER", "Recruiter"
 
-    # Default role if none is specified
-    base_role = Role.ADMIN 
-    
-    role = models.CharField(max_length=50, choices=Role.choices)
-    
-    # Common fields
-    profile_pic = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
-    phone_number = models.CharField(max_length=15, blank=True, null=True)
+    base_role = Role.ADMIN
 
-    # Verification status
-    is_verified = models.BooleanField(default=False)
-    
-    # profile pic upload
+    role = models.CharField(max_length=50, choices=Role.choices, db_index=True)
     profile_pic = models.ImageField(upload_to='profile_pics/', default='default.jpg', blank=True, null=True)
+    phone_number = models.CharField(max_length=15, blank=True, null=True)
+    is_verified = models.BooleanField(default=False, db_index=True)
 
     def save(self, *args, **kwargs):
         if not self.pk: 
@@ -39,12 +31,15 @@ class User(AbstractUser):
 class Notification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
     message = models.CharField(max_length=255)
-    link = models.CharField(max_length=255, blank=True, null=True) # Where to go when clicked
-    is_read = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
+    link = models.CharField(max_length=255, blank=True, null=True)
+    is_read = models.BooleanField(default=False, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
 
     class Meta:
         ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['user', '-created_at']),
+        ]
 
     def __str__(self):
         return f"Notification for {self.user.username}"

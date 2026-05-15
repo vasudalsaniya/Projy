@@ -10,6 +10,9 @@ urlpatterns = [
     path('approve-semester/<int:student_id>/<str:action>/', views.approve_semester_change, name='approve_semester_change'),
     path('project/remark/<int:project_id>/', views.add_project_remark, name='add_project_remark'),
     path('dashboard/faculty/settings/', views.faculty_settings_update, name='faculty_settings_update'),
+    path('dashboard/hod/settings/', views.hod_settings_update, name='hod_settings_update'),
+    path('dashboard/hod/placements/add/', views.hod_add_placement, name='hod_add_placement'),
+    path('dashboard/hod/placements/delete/<int:placement_id>/', views.hod_delete_placement, name='hod_delete_placement'),
     
     # NEW: Mentor Assignment URLs
     path('dashboard/hod/assign/manual/', views.manual_assign, name='manual_assign'),

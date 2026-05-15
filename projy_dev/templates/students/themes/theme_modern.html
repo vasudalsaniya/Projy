@@ -328,6 +328,14 @@
           </li>
           {% endif %}
         </ul>
+        {% if profile.resume or profile.public_portfolio_url %}
+        <div style="margin-top: 18px; display: grid; gap: 10px;">
+          {% if profile.resume %}
+          <a href="{{ profile.resume.url }}" target="_blank" class="button button--primary">Download Resume</a>
+          {% endif %}
+          <a href="{% url 'generate_resume' %}" class="button button--secondary">Generate Resume</a>
+        </div>
+        {% endif %}
       </div>
     </aside>
 
@@ -351,6 +359,11 @@
 
       <article class="resume" data-page="resume">
         <header><h2 class="h2 article-title">Resume</h2></header>
+        {% if career_statement %}
+        <section class="about-text" style="margin-bottom: 24px; padding: 20px; border-left: 4px solid rgba(0, 255, 255, 0.5); background: rgba(0, 255, 255, 0.05);">
+          <p>{{ career_statement }}</p>
+        </section>
+        {% endif %}
         
         <section class="timeline">
           <div class="title-wrapper">

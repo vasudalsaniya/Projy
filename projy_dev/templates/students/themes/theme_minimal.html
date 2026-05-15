@@ -206,6 +206,12 @@
   <section id="about" class="py-24" data-reveal>
     <div class="max-w-6xl mx-auto px-6">
       <h2 class="text-3xl md:text-4xl font-extrabold mb-6">About Me</h2>
+      {% if career_statement %}
+      <div class="rounded-3xl border border-gray-200 dark:border-white/10 bg-white/80 dark:bg-slate-900/80 p-8 shadow-soft mb-8">
+        <h3 class="text-2xl font-semibold mb-4">AI Career Summary</h3>
+        <p class="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">{{ career_statement }}</p>
+      </div>
+      {% endif %}
       <p class="text-gray-700 dark:text-gray-300 max-w-3xl leading-relaxed whitespace-pre-wrap">{{ profile.bio|default:"Hello! I'm an enthusiastic student and developer." }}</p>
 
       <div class="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-4" id="skills-grid">
@@ -338,7 +344,7 @@
 
     // Typewriter effect
     const titleEl = document.getElementById('typedTitle');
-    const text = "Hi, I'm {{ user.username }}";
+    const text = "Hi, I'm {{ user.first_name | default:user.username}}";
     let i = 0;
     let isDeleting = false;
     let typeSpeed = 100;

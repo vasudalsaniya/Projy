@@ -3,114 +3,148 @@
 
 {% block content %}
 <style>
-    .builder-container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
+    .builder-container { max-width: 1080px; margin: 50px auto; padding: 0 20px; }
+    .builder-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 18px; margin-bottom: 32px; }
+    .builder-title { margin: 0; color: var(--text-main); font-size: clamp(2rem, 2.6vw, 2.9rem); letter-spacing: -0.04em; }
+    .builder-subtitle { margin: 12px 0 0; color: var(--text-muted); max-width: 760px; line-height: 1.75; }
 
-    .glass-card { background: var(--surface-glass); border: 1px solid var(--border-glass); border-radius: 12px; padding: 40px; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+    .glass-card { background: var(--surface-glass); border: 1px solid var(--border-glass); border-radius: 24px; padding: 42px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 24px 70px rgba(0,0,0,0.18); }
+    .glass-card-inner { display: grid; gap: 30px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .form-grid-full { grid-column: 1 / -1; }
 
-    .form-group { margin-bottom: 20px; }
-    .form-group label { display: block; color: var(--text-main); font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; }
-    .form-control { width: 100%; background: var(--input-bg); border: 1px solid var(--border-glass); color: var(--text-main); padding: 12px 16px; border-radius: 8px; font-size: 0.9rem; font-family: inherit; outline: none; transition: 0.3s; }
-    .form-control:focus { border-color: var(--neon-cyan); box-shadow: 0 0 12px rgba(0, 240, 255, 0.2); }
+    .form-group { display: flex; flex-direction: column; gap: 10px; }
+    .form-group label { color: var(--text-main); font-size: 0.95rem; font-weight: 700; }
+    .form-control { width: 100%; background: var(--input-bg); border: 1px solid var(--border-glass); color: var(--text-main); padding: 14px 16px; border-radius: 14px; font-size: 0.95rem; font-family: inherit; outline: none; transition: border-color 0.25s ease, box-shadow 0.25s ease; }
+    .form-control:focus { border-color: var(--neon-cyan); box-shadow: 0 0 18px rgba(0, 240, 255, 0.14); }
+    .form-control[type='date'] { color: var(--text-main); }
+    textarea.form-control { min-height: 160px; resize: vertical; }
 
-    /* Theme Selector Styles */
-    .theme-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-top: 20px; }
-    
-    .theme-card {
-        border: 2px solid var(--border-glass); border-radius: 12px; padding: 15px; text-align: center;
-        cursor: pointer; transition: all 0.3s ease; background: var(--input-bg);
-    }
-    .theme-card:hover { border-color: var(--neon-purple); transform: translateY(-3px); }
-    .theme-card.selected { border-color: var(--neon-cyan); background: rgba(0, 240, 255, 0.05); box-shadow: 0 0 15px rgba(0, 240, 255, 0.2); }
-    
-    .theme-preview { height: 120px; border-radius: 8px; margin-bottom: 15px; border: 1px solid var(--border-glass); }
+    .action-panel { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; justify-content: flex-end; }
+    .action-btn-outline, .action-btn { font-size: 0.95rem; }
+
+    .ai-suggestions { background: rgba(139,92,246,0.08); border: 1px solid rgba(139,92,246,0.25); padding: 22px; border-radius: 18px; }
+    .ai-suggestions strong { display: block; margin-bottom: 10px; color: var(--text-main); }
+    .ai-suggestions p { margin: 0; color: var(--text-muted); line-height: 1.75; }
+
+    .section-heading { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin: 0; }
+    .section-heading h2 { margin: 0; font-size: 1.1rem; color: var(--text-main); }
+    .section-heading p { margin: 0; color: var(--text-muted); font-size: 0.95rem; }
+
+    .theme-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-top: 18px; }
+    .theme-card { border: 2px solid var(--border-glass); border-radius: 18px; padding: 18px; text-align: center; cursor: pointer; transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; background: var(--input-bg); }
+    .theme-card:hover { border-color: var(--neon-purple); transform: translateY(-2px); }
+    .theme-card.selected { border-color: var(--neon-cyan); background: rgba(0, 240, 255, 0.08); box-shadow: 0 18px 35px rgba(0, 240, 255, 0.12); }
+    .theme-preview { height: 120px; border-radius: 16px; margin-bottom: 16px; border: 1px solid var(--border-glass); }
     .preview-modern { background: linear-gradient(135deg, #1e293b 0%, #4f46e5 100%); }
-    .preview-minimal { background: #f8fafc; border: 1px solid #ccc; }
-    .preview-hacker { background: #000; border: 1px solid #0f0; }
-
+    .preview-minimal { background: #f8fafc; border: 1px solid #cbd5e1; }
+    .preview-hacker { background: #070909; border: 1px solid #00ff88; }
+    .theme-card strong { display: block; margin-top: 10px; color: var(--text-main); font-size: 1rem; }
     .theme-radio { display: none; }
 
-    .action-btn { background: linear-gradient(135deg, var(--neon-cyan) 0%, var(--neon-purple) 100%); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(176, 38, 255, 0.3); text-decoration: none; display: inline-block; }
-    .action-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(176, 38, 255, 0.5); }
-    
-    .action-btn-outline { background: transparent; border: 1px solid var(--neon-cyan); color: var(--neon-cyan); padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
-    .action-btn-outline:hover { background: rgba(0, 240, 255, 0.1); box-shadow: 0 0 15px rgba(0, 240, 255, 0.2); }
+    .action-btn { min-width: 220px; }
+
+    @media (max-width: 860px) {
+        .form-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+        .builder-header { flex-direction: column; align-items: stretch; }
+        .action-panel { justify-content: stretch; }
+    }
 </style>
 
 <div class="builder-container">
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; margin-bottom: 30px;">
-        <h1 style="margin: 0; color: var(--text-main); font-size: 2rem; letter-spacing: -0.5px;">Portfolio Builder</h1>
-        <a href="{% url 'live_portfolio' %}" target="_blank" class="action-btn-outline">
-            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-            View Live Site
-        </a>
+    <div class="builder-header">
+        <div>
+            <h1 class="builder-title">Portfolio Builder</h1>
+            <p class="builder-subtitle">Design your student portfolio with easy form entry, choose a polished theme, and generate AI-powered copy for a stronger showcase.</p>
+        </div>
+        <div class="action-panel">
+            <a href="{% url 'live_portfolio' %}" target="_blank" class="action-btn-outline">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                View Live Site
+            </a>
+            <a href="?generate_ai=1" class="action-btn-outline" style="border-color: #8b5cf6; color: #8b5cf6;">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 14.5h-2v-2h2v2zm0-4h-2V7h2v5.5z"></path></svg>
+                AI Suggest Content
+            </a>
+        </div>
     </div>
-    
+
     <div class="glass-card">
         <form method="post">
             {% csrf_token %}
-            
-            <h3 style="margin-top: 0; color: var(--neon-cyan); font-size: 1.2rem; margin-bottom: 5px;">1. Your Content</h3>
-            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 25px;">Fill in the details you want recruiters to see on your public portfolio.</p>
-            
-            <div class="form-group">
-                <label>Professional Bio</label>
-                <textarea name="bio" class="form-control" rows="5" placeholder="I am a passionate developer focused on...">{{ profile.bio|default:"" }}</textarea>
-            </div>
-            
-            <div class="form-group">
-                <label>Education Details</label>
-                <input type="text" name="education_details" class="form-control" value="{{ profile.education_details|default:"" }}" placeholder="e.g. B.Tech in Computer Science">
-            </div>
-
-            <div class="form-group">
-                <label>Top Skills (Comma Separated)</label>
-                <input type="text" name="skills_csv" class="form-control" value="{{ profile.skills_csv|default:"" }}" placeholder="Python, Django, React, SQL">
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                <div class="form-group">
-                    <label>Job Title / Headline</label>
-                    <input type="text" name="job_title" class="form-control" value="{{ profile.job_title|default:'' }}" placeholder="Software Developer">
+            <div class="glass-card-inner">
+                {% if suggestions %}
+                <div class="ai-suggestions">
+                    <strong>AI Content Suggestions</strong>
+                    <p>{{ suggestions.career_statement }}</p>
                 </div>
-                <div class="form-group">
-                    <label>Birthday</label>
-                    <input type="date" name="birthday" class="form-control" value="{{ profile.birthday|date:'Y-m-d' }}" style="color: var(--text-muted);">
+                {% endif %}
+
+                <div class="form-grid">
+                    <div class="form-group form-grid-full">
+                        <label>Professional Bio</label>
+                        <textarea name="bio" class="form-control" rows="5" placeholder="I am a passionate developer focused on...">{{ suggestions.bio|default:profile.bio|default:'' }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Education Details</label>
+                        <input type="text" name="education_details" class="form-control" value="{{ suggestions.education_details|default:profile.education_details|default:'' }}" placeholder="e.g. B.Tech in Computer Science">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Top Skills (Comma Separated)</label>
+                        <input type="text" name="skills_csv" class="form-control" value="{{ suggestions.skills_csv|default:profile.skills_csv|default:'' }}" placeholder="Python, Django, React, SQL">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Job Title / Headline</label>
+                        <input type="text" name="job_title" class="form-control" value="{{ suggestions.job_title|default:profile.job_title|default:'' }}" placeholder="Software Developer">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Birthday</label>
+                        <input type="date" name="birthday" class="form-control" value="{{ suggestions.birthday|default:profile.birthday|date:'Y-m-d' }}">
+                    </div>
+
+                    <div class="form-group form-grid-full">
+                        <label>Location</label>
+                        <input type="text" name="location" class="form-control" value="{{ suggestions.location|default:profile.location|default:'' }}" placeholder="Gandhinagar, Gujarat, India">
+                    </div>
                 </div>
+
+                <div>
+                    <div class="section-heading" style="margin-bottom: 16px;">
+                        <div>
+                            <h2>Choose a Theme</h2>
+                            <p>Select the aesthetic for your live portfolio.</p>
+                        </div>
+                    </div>
+
+                    <div class="theme-grid">
+                        <label class="theme-card {% if profile.portfolio_theme == 'modern' %}selected{% endif %}" onclick="selectTheme(this)">
+                            <input type="radio" name="portfolio_theme" value="modern" class="theme-radio" {% if profile.portfolio_theme == 'modern' %}checked{% endif %}>
+                            <div class="theme-preview preview-modern"></div>
+                            <strong>Modern Business</strong>
+                        </label>
+
+                        <label class="theme-card {% if profile.portfolio_theme == 'minimal' %}selected{% endif %}" onclick="selectTheme(this)">
+                            <input type="radio" name="portfolio_theme" value="minimal" class="theme-radio" {% if profile.portfolio_theme == 'minimal' %}checked{% endif %}>
+                            <div class="theme-preview preview-minimal"></div>
+                            <strong>Clean Minimalist</strong>
+                        </label>
+
+                        <label class="theme-card {% if profile.portfolio_theme == 'hacker' %}selected{% endif %}" onclick="selectTheme(this)">
+                            <input type="radio" name="portfolio_theme" value="hacker" class="theme-radio" {% if profile.portfolio_theme == 'hacker' %}checked{% endif %}>
+                            <div class="theme-preview preview-hacker"></div>
+                            <strong style="color: #00ff88; font-family: monospace; letter-spacing: 1px;">>_ Terminal</strong>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="action-btn" style="width: 100%; margin-top: 40px; padding: 16px 20px;">Save & Generate Portfolio</button>
             </div>
-
-            <div class="form-group">
-                <label>Location</label>
-                <input type="text" name="location" class="form-control" value="{{ profile.location|default:'' }}" placeholder="Gandhinagar, Gujarat, India">
-            </div>
-
-            <hr style="border: 0; border-top: 1px dashed var(--border-glass); margin: 40px 0;">
-
-            <h3 style="margin-top: 0; color: var(--neon-cyan); font-size: 1.2rem; margin-bottom: 5px;">2. Choose a Theme</h3>
-            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 10px;">Select the aesthetic for your live portfolio.</p>
-
-            <div class="theme-grid">
-                
-                <label class="theme-card {% if profile.portfolio_theme == 'modern' %}selected{% endif %}" onclick="selectTheme(this)">
-                    <input type="radio" name="portfolio_theme" value="modern" class="theme-radio" {% if profile.portfolio_theme == 'modern' %}checked{% endif %}>
-                    <div class="theme-preview preview-modern"></div>
-                    <strong style="color: var(--text-main);">Modern Business</strong>
-                </label>
-
-                <label class="theme-card {% if profile.portfolio_theme == 'minimal' %}selected{% endif %}" onclick="selectTheme(this)">
-                    <input type="radio" name="portfolio_theme" value="minimal" class="theme-radio" {% if profile.portfolio_theme == 'minimal' %}checked{% endif %}>
-                    <div class="theme-preview preview-minimal"></div>
-                    <strong style="color: var(--text-main);">Clean Minimalist</strong>
-                </label>
-
-                <label class="theme-card {% if profile.portfolio_theme == 'hacker' %}selected{% endif %}" onclick="selectTheme(this)">
-                    <input type="radio" name="portfolio_theme" value="hacker" class="theme-radio" {% if profile.portfolio_theme == 'hacker' %}checked{% endif %}>
-                    <div class="theme-preview preview-hacker"></div>
-                    <strong style="color: #00ff88; font-family: monospace; letter-spacing: 1px;">>_ Terminal</strong>
-                </label>
-
-            </div>
-
-            <button type="submit" class="action-btn" style="width: 100%; margin-top: 40px; font-size: 1.1rem; padding: 15px;">Save & Generate Portfolio</button>
         </form>
     </div>
 </div>

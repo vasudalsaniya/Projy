@@ -16,108 +16,44 @@
     }
 
     /* =========================================
-     * 1. TOKENS & LIGHT/DARK THEME VARIABLES
+     * 1. HOD PAGE-SPECIFIC TOKENS
+     * (base.html handles core colors/themes)
      * ========================================= */
-    
-    /* DEFAULT DARK MODE */
     :root {
-        --bg-base: #050b14; 
-        --surface-glass: rgba(15, 23, 42, 0.5); 
         --surface-glass-heavy: rgba(0, 0, 0, 0.25);
-        --surface-hover: rgba(30, 41, 59, 0.8);
-        --border-glass: rgba(255, 255, 255, 0.08);
-        --profile-border: #0b1120;
-        
-        --gradient-primary: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
-        --gradient-sidebar: #0b1120; 
-        --bg-image: radial-gradient(circle at 15% 50%, rgba(34, 211, 238, 0.06), transparent 35%),
-                    radial-gradient(circle at 85% 30%, rgba(162, 0, 255, 0.06), transparent 35%),
-                    radial-gradient(rgba(255,255,255,0.02) 1px, transparent 1px);
-        
-        --text-main: #f8fafc;
-        --text-muted: #94a3b8;
-
+        --surface-hover: var(--surface-heavy);
+        --gradient-sidebar: rgba(10, 15, 30, 0.9);
+        --profile-border: rgba(0, 0, 0, 0.5);
         --btn-outline-border: rgba(255,255,255,0.2);
         --btn-outline-text: #fff;
-        --input-bg: rgba(0,0,0,0.3);
         --table-hover: rgba(255, 255, 255, 0.02);
-
-        /* Vibrant Neon Glows */
+        --accent-cyan: var(--neon-cyan);
+        --accent-verified: var(--neon-green);
+        --accent-urgent: #ff3b30;
+        --accent-active: #ffcc00;
+        --accent-primary: #6366f1;
         --glow-urgent: rgba(255, 59, 48, 0.4);
         --border-urgent: rgba(255, 59, 48, 0.7);
-        --accent-urgent: #ff3b30;
-
         --glow-active: rgba(255, 204, 0, 0.4);
         --border-active: rgba(255, 204, 0, 0.7);
-        --accent-active: #ffcc00;
-
         --glow-verified: rgba(0, 230, 118, 0.4);
         --border-verified: rgba(0, 230, 118, 0.7);
-        --accent-verified: #00e676;
-
-        --glow-cyan: rgba(34, 211, 238, 0.5);
-        --accent-cyan: #22d3ee;
-        --accent-primary: #6366f1;
-        
+        --glow-cyan: rgba(0, 240, 255, 0.4);
         --font-body: 'Inter', sans-serif;
         --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
     }
 
-    /* GLOBAL LIGHT MODE OVERRIDES */
-    :root[data-theme="light"],
-    [data-bs-theme="light"],
-    html.light-mode,
-    html.light,
-    body.light-mode,
-    body.light,
-    .light-mode {
-        --bg-base: #f8fafc !important; 
-        --surface-glass: #ffffff !important; 
-        --surface-glass-heavy: #f1f5f9 !important;
-        --surface-hover: #e2e8f0 !important;
-        --border-glass: rgba(0, 0, 0, 0.1) !important;
-        --profile-border: #e2e8f0 !important;
-        
-        --gradient-sidebar: #ffffff !important; 
-        --bg-image: none !important;
-        
-        --text-main: #0f172a !important;
-        --text-muted: #475569 !important;
-
-        --btn-outline-border: rgba(0,0,0,0.2) !important;
-        --btn-outline-text: #0f172a !important;
-        --input-bg: #ffffff !important;
-        --table-hover: rgba(0, 0, 0, 0.03) !important;
+    body.light-mode {
+        --surface-glass-heavy: #f1f5f9;
+        --surface-hover: #e2e8f0;
+        --gradient-sidebar: #ffffff;
+        --profile-border: #e2e8f0;
+        --btn-outline-border: rgba(0,0,0,0.2);
+        --btn-outline-text: #0f172a;
+        --table-hover: rgba(0, 0, 0, 0.03);
     }
 
-    /* Ambient Background Lighting */
-    body {
-        background-color: var(--bg-base) !important;
-        background-image: var(--bg-image) !important;
-        background-size: 100% 100%, 100% 100%, 24px 24px;
-        background-attachment: fixed;
-        color: var(--text-main) !important;
-        font-family: var(--font-body);
-        padding-bottom: 50px;
-        overflow-x: hidden;
-        width: 100%;
-        line-height: 1.5;
-        transition: background-color 0.3s ease, color 0.3s ease;
-    }
-
-    /* FIX FOR BASE.HTML NAVBAR IN LIGHT MODE */
-    :root[data-theme="light"] header, body.light-mode header, .light-mode .navbar {
-        background-color: #ffffff !important;
-        color: #0f172a !important;
-        border-bottom: 1px solid rgba(0,0,0,0.1) !important;
-    }
-    :root[data-theme="light"] header *, body.light-mode header *, .light-mode .navbar * {
-        color: #0f172a !important;
-    }
-    :root[data-theme="light"] header input, body.light-mode header input {
-        background-color: #f1f5f9 !important;
-        border: 1px solid rgba(0,0,0,0.1) !important;
-    }
+    body { padding-bottom: 50px; overflow-x: hidden; }
 
     /* =========================================
      * 2. MAIN LAYOUT & PANELS
@@ -424,7 +360,7 @@
             </div>
 
             <div style="text-align: center; width: 100%;">
-                <div class="username" id="sidebar-user-name">{{ user.get_full_name|default:"Prof. Alan Turing" }}</div>
+                <div class="username" id="sidebar-user-name">{{ user.get_full_name|default:user.username }}</div>
                 <div class="user-role">Head of Department</div>
             </div>
         </div>
@@ -432,19 +368,19 @@
         <div class="info-list">
             <div class="info-row">
                 <span class="info-label">College</span>
-                <span class="info-value">{{ profile.college.name|default:"Silver Oak Univ" }}</span>
+                <span class="info-value">{{ profile.college.name|default:"—" }}</span>
             </div>
             <div class="info-row">
                 <span class="info-label">Department</span>
-                <span class="info-value" id="sidebar-dept-val">{{ profile.department.name|default:"Computer Eng." }}</span>
+                <span class="info-value" id="sidebar-dept-val">{{ profile.department.name|default:"—" }}</span>
             </div>
             <div class="info-row">
                 <span class="info-label">Faculty Assigned</span>
-                <span class="info-value">{{ total_faculty_count|default:"12" }}</span>
+                <span class="info-value">{{ total_faculty_count }}</span>
             </div>
             <div class="info-row">
                 <span class="info-label">Total Students</span>
-                <span class="info-value">{{ dept_mentee_count|default:"450" }}</span>
+                <span class="info-value">{{ dept_mentee_count }}</span>
             </div>
         </div>
 
@@ -452,6 +388,7 @@
             <button type="button" class="nav-btn active" id="btn-overview" onclick="switchTab('overview')">Dept. Overview</button>
             <button type="button" class="nav-btn" id="btn-faculty" onclick="switchTab('faculty')">Faculty Directory</button>
             <button type="button" class="nav-btn" id="btn-assign" onclick="switchTab('assign')">Assign Mentors</button>
+            <button type="button" class="nav-btn" id="btn-placement" onclick="switchTab('placement')">Placement Drives</button>
             <button type="button" class="nav-btn" id="btn-settings" onclick="switchTab('settings')">Settings</button>
         </nav>
     </aside>
@@ -495,9 +432,8 @@
                         <span class="panel-title">Department Action Queue</span>
                         <div style="display: flex; gap: 10px; align-items: center;">
                             <select id="queue-filter" class="filter-select">
-                                <option value="all">All Escalations</option>
+                                <option value="all">All Requests</option>
                                 <option value="faculty">Faculty Approvals</option>
-                                <option value="student">Student Disputes</option>
                             </select>
                         </div>
                     </div>
@@ -522,7 +458,7 @@
                             </thead>
                             <tbody id="queue-table-body">
                                 {% for fac in pending_faculty %}
-                                <tr class="queue-row" data-type="faculty">
+                                <tr class="queue-row" data-type="faculty" data-action-url="{% url 'approve_user' fac.id %}">
                                     <td>
                                         <div class="td-content">
                                             <span class="text-title text-truncate init-name">{{ fac.get_full_name|default:fac.username }}</span>
@@ -547,33 +483,7 @@
                                     </td>
                                 </tr>
                                 {% endfor %}
-                                {% for st in pending_students %}
-                                <tr class="queue-row" data-type="student">
-                                    <td>
-                                        <div class="td-content">
-                                            <span class="text-title text-truncate init-name">{{ st.user.get_full_name|default:st.user.username }}</span>
-                                            <span class="text-sub text-truncate init-sub">STU: #{{ st.id }}</span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="td-content">
-                                            <span class="text-title text-truncate req-name">Student verification pending</span>
-                                            <span class="text-sub text-truncate req-sub">{{ st.enrollment_number }}</span>
-                                        </div>
-                                    </td>
-                                    <td><span class="aq-badge badge-red text-truncate" title="Student Req">Student Req</span></td>
-                                    <td>
-                                        <div class="text-sub req-date-val" style="line-height: 1.4;">--</div>
-                                    </td>
-                                    <td>
-                                        <div class="aq-actions">
-                                            <button type="button" class="aq-btn btn-outline" onclick="reviewRequest(this)">Review</button>
-                                            <button type="button" class="aq-btn btn-cyan" onclick="showToast('Student verification is handled by assigned faculty.', 'error')">Info</button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                                {% if not pending_faculty and not pending_students %}
+                                {% if not pending_faculty %}
                                 <tr>
                                     <td colspan="5" style="text-align:center; color: var(--text-muted);">No pending verification requests.</td>
                                 </tr>
@@ -632,7 +542,7 @@
                 </form>
             </div>
 
-            <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+            <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
                 <div class="stat-card card-cyan">
                     <div class="stat-label">Total Students</div>
                     <div class="stat-value">{{ dept_mentee_count }}</div>
@@ -644,6 +554,13 @@
                 <div class="stat-card card-verified">
                     <div class="stat-label">Active Mentors</div>
                     <div class="stat-value">{{ total_faculty_count }}</div>
+                </div>
+                <div class="stat-card card-blue" style="display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <div class="stat-label">Placement Drives</div>
+                        <div class="stat-value">{{ placements|length }}</div>
+                    </div>
+                    <a href="#placement" class="btn-outline-generic" style="margin-top: 12px; align-self: flex-start;">Manage</a>
                 </div>
             </div>
 
@@ -703,6 +620,72 @@
                     </div>
                 </div>
             </form>
+        </section>
+
+        <section id="placement" class="page-section">
+            <div class="section-header" style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 15px;">
+                <div>
+                    <h2 class="section-title">Placement Drives</h2>
+                    <div class="section-subtitle">Manage your department placement opportunities in one place.</div>
+                </div>
+                <a href="#placement" class="action-btn" style="padding: 10px 18px;">Refresh Drives</a>
+            </div>
+
+            <div class="data-panel" style="margin-bottom: 30px;">
+                <div class="panel-header">
+                    <span class="panel-title">Active Placement Drives</span>
+                </div>
+                <div class="table-responsive-wrapper-default">
+                    <table class="table-default">
+                        <thead>
+                            <tr>
+                                <th>Company</th>
+                                <th>Position / Notes</th>
+                                <th>Semester</th>
+                                <th>Registrations</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for placement in placements %}
+                            <tr>
+                                <td>{{ placement.company_name }}</td>
+                                <td>{{ placement.position|default:'Open Role' }}<br><small>{{ placement.description|truncatewords:14 }}</small></td>
+                                <td>Sem {{ placement.semester }}</td>
+                                <td>{{ placement.registration_count }}</td>
+                                <td>
+                                    <form method="post" action="{% url 'hod_delete_placement' placement.id %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn-outline-generic" style="padding: 8px 14px;">Remove</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" style="text-align:center; color: var(--text-muted);">No placement opportunities are available yet.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="data-panel">
+                <div class="panel-header">
+                    <span class="panel-title">Add New Placement Drive</span>
+                </div>
+                <form method="post" action="{% url 'hod_add_placement' %}" style="padding: 24px; display: grid; gap: 16px;">
+                    {% csrf_token %}
+                    <input type="text" name="company_name" placeholder="Company name" class="form-input" required>
+                    <input type="text" name="position" placeholder="Position / role" class="form-input">
+                    <textarea name="description" rows="4" placeholder="What students should know about this placement..." class="form-input"></textarea>
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px;">
+                        <input type="number" name="semester" placeholder="Semester" class="form-input" min="1" max="8" value="1" required>
+                        <input type="date" name="application_deadline" class="form-input">
+                    </div>
+                    <button type="submit" class="btn-success-generic" style="padding: 12px 18px;">Publish Placement</button>
+                </form>
+            </div>
         </section>
 
         <section id="faculty" class="page-section">
@@ -880,7 +863,7 @@
                                 <td>
                                     <div class="btn-group">
                                         <a
-                                            href="{% url 'live_portfolio' username=st.user.username enrollment=st.enrollment_number|default:'000000' college_name=st.college.name|slugify|default:'college' %}"
+                                            href="{% url 'live_portfolio_shared' username=st.user.username enrollment=st.enrollment_number|default:'000000' college_name=st.college.name|slugify|default:'college' %}"
                                             target="_blank"
                                             class="btn-outline-generic"
                                             style="text-decoration:none; display:inline-block;"
@@ -907,37 +890,38 @@
 
             <div class="data-panel" style="padding: 40px;">
                 <div style="max-width: 600px;">
-                    
-                    <div class="form-group" style="margin-bottom: 30px; display: flex; align-items: center; gap: 20px;">
-                        <div class="profile-img-container" style="margin: 0; width: 80px; height: 80px; box-shadow: 0 0 15px var(--glow-cyan);">
-                            {% if user.profile_pic %}
-                            <img src="{{ user.profile_pic.url }}" alt="Profile" class="profile-img" id="settings-preview-img">
-                            {% else %}
-                            <img src="https://ui-avatars.com/api/?name={{ user.get_full_name|default:user.username|urlencode }}&background=22d3ee&color=fff" alt="Profile" class="profile-img" id="settings-preview-img">
-                            {% endif %}
-                        </div>
-                        <div>
-                            <label for="profile-pic-upload-settings" class="btn-outline-generic" style="display: inline-block;">Change Avatar</label>
-                            <input type="file" id="profile-pic-upload-settings" accept="image/*" style="display: none;" onchange="previewImage(event)">
-                        </div>
-                    </div>
+                    <form method="post" action="{% url 'hod_settings_update' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
 
-                    <div class="form-group">
-                        <label class="form-label">HOD Display Name</label>
-                        <input type="text" class="form-input" id="settings-name-input" value="{{ user.get_full_name|default:'Prof. Alan Turing' }}">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Department Name</label>
-                        <input type="text" class="form-input" id="settings-dept-input" value="{{ profile.department.name|default:'Computer Engineering' }}">
-                    </div>
-                    <div class="form-group" style="margin-bottom: 40px;">
-                        <label class="form-label">Escalation Notifications</label>
-                        <div style="display: flex; align-items: center; gap: 12px; color: var(--text-main); font-size: 0.95rem;">
-                            <input type="checkbox" checked id="notif-check" style="cursor: pointer; width: 18px; height: 18px; accent-color: var(--accent-cyan);">
-                            <label for="notif-check" style="cursor: pointer;">Email me when a student disputes a faculty rejection</label>
+                        <div class="form-group" style="margin-bottom: 30px; display: flex; align-items: center; gap: 20px;">
+                            <div class="profile-img-container" style="margin: 0; width: 80px; height: 80px; box-shadow: 0 0 15px var(--glow-cyan);">
+                                {% if user.profile_pic %}
+                                <img src="{{ user.profile_pic.url }}" alt="Profile" class="profile-img" id="settings-preview-img">
+                                {% else %}
+                                <img src="https://ui-avatars.com/api/?name={{ user.get_full_name|default:user.username|urlencode }}&background=22d3ee&color=fff" alt="Profile" class="profile-img" id="settings-preview-img">
+                                {% endif %}
+                            </div>
+                            <div>
+                                <label for="profile-pic-upload-settings" class="btn-outline-generic" style="display: inline-block; cursor: pointer;">Change Avatar</label>
+                                <input type="file" name="profile_pic" id="profile-pic-upload-settings" accept="image/*" style="display: none;" onchange="previewImage(event)">
+                            </div>
                         </div>
-                    </div>
-                    <button type="button" class="btn-success-generic" id="save-settings-btn" style="font-size: 1rem; padding: 12px 24px;">Save HOD Configuration</button>
+
+                        <div class="form-group">
+                            <label class="form-label">First Name</label>
+                            <input type="text" name="first_name" class="form-input" value="{{ user.first_name }}" placeholder="Enter first name">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" name="last_name" class="form-input" value="{{ user.last_name }}" placeholder="Enter last name">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Department / Title</label>
+                            <input type="text" class="form-input" value="{{ profile.department.name|default:'' }}" readonly style="opacity: 0.5; cursor: not-allowed;" title="Contact Admin to change Department">
+                        </div>
+
+                        <button type="submit" class="btn-success-generic" style="font-size: 1rem; padding: 12px 24px; border: none; cursor: pointer;">Save HOD Configuration</button>
+                    </form>
                 </div>
             </div>
         </section>
@@ -989,48 +973,6 @@
     let selectedFacultyId = null;
 
     document.addEventListener("DOMContentLoaded", () => {
-        const savedName = localStorage.getItem('hodName');
-        const savedDept = localStorage.getItem('hodDept');
-        const savedPic = localStorage.getItem('hodProfilePic');
-
-        document.querySelectorAll('img').forEach(img => {
-            img.onerror = function() {
-                this.onerror = null; 
-                this.src = "https://ui-avatars.com/api/?name={{ request.user.first_name|default:'User' }}&background=22d3ee&color=fff";
-            };
-            if(img.complete && img.naturalHeight === 0) {
-                img.src = "https://ui-avatars.com/api/?name={{ request.user.first_name|default:'User' }}&background=22d3ee&color=fff";
-            }
-        });
-
-        if (savedName) {
-            const sidebarName = document.getElementById('sidebar-user-name');
-            const settingsNameInput = document.getElementById('settings-name-input');
-            if (sidebarName) sidebarName.textContent = savedName;
-            if (settingsNameInput) settingsNameInput.value = savedName;
-        }
-
-        if (savedDept) {
-            const sidebarDept = document.getElementById('sidebar-dept-val');
-            const settingsDeptInput = document.getElementById('settings-dept-input');
-            if (sidebarDept) sidebarDept.textContent = savedDept;
-            if (settingsDeptInput) settingsDeptInput.value = savedDept;
-        }
-
-        if (savedPic) {
-            const sidebarPic = document.getElementById('sidebar-preview-img');
-            const settingsPic = document.getElementById('settings-preview-img');
-            if (sidebarPic) sidebarPic.src = savedPic;
-            if (settingsPic) settingsPic.src = savedPic;
-            
-            const navPics = document.querySelectorAll('header img, nav img, .navbar img, img[alt*="Profile"]');
-            navPics.forEach(pic => {
-                if (pic.id !== 'sidebar-preview-img' && pic.id !== 'settings-preview-img') {
-                    pic.src = savedPic;
-                }
-            });
-        }
-
         // Initialize Charts with delay to ensure DOM is ready
         setTimeout(() => {
             renderHODChart();
@@ -1064,9 +1006,7 @@
                 const sidebarImg = document.getElementById('sidebar-preview-img');
                 if (img) img.src = e.target.result;
                 if (sidebarImg) sidebarImg.src = e.target.result;
-                
-                localStorage.setItem('hodProfilePic', e.target.result);
-                
+
                 const topNavPics = document.querySelectorAll('header img, nav img, .navbar img, img[alt*="Profile"]');
                 topNavPics.forEach(pic => {
                     if (pic.id !== 'sidebar-preview-img' && pic.id !== 'settings-preview-img') {
@@ -1131,14 +1071,25 @@
         if (langChartInstance) langChartInstance.destroy();
         if (fieldChartInstance) fieldChartInstance.destroy();
 
+        const LANG_COLORS = {
+            'Python':'#3572A5','JavaScript':'#f1e05a','HTML':'#e34c26','CSS':'#563d7c',
+            'SCSS':'#c6538c','Sass':'#a53b70','TypeScript':'#2b7489','PHP':'#4F5D95',
+            'Vue':'#41b883','Java':'#b07219','C++':'#f34b7d','C':'#555555','C#':'#178600',
+            'Go':'#00ADD8','Rust':'#dea584','Shell':'#89e051','PowerShell':'#012456',
+            'Swift':'#F05138','Kotlin':'#A97BFF','Dart':'#00B4AB','Objective-C':'#438eff',
+            'Ruby':'#701516','R':'#198CE7','SQL':'#e38c00','Lua':'#000080',
+        };
+        const FALLBACK_COLORS = ['#00f0ff','#b026ff','#00e676','#faad14','#ff6b9d','#64748b'];
+
         if(ctxLang && ctxLang.offsetParent !== null) {
+            const langColors = stats.lang_labels.map((l, i) => LANG_COLORS[l] || FALLBACK_COLORS[i % FALLBACK_COLORS.length]);
             langChartInstance = new Chart(ctxLang.getContext('2d'), {
                 type: 'doughnut',
                 data: {
                     labels: stats.lang_labels,
                     datasets: [{
                         data: stats.lang_values,
-                        backgroundColor: ['#ff3b30', '#ffcc00', '#a200ff', '#64748b'],
+                        backgroundColor: langColors,
                         borderWidth: 0,
                         hoverOffset: 4
                     }]
@@ -1310,10 +1261,12 @@
         }
     }
 
-    let currentRowBeingReviewed = null; 
+    let currentRowBeingReviewed = null;
+    let currentReviewActionUrl = null;
     function reviewRequest(btn) {
         try {
             currentRowBeingReviewed = btn.closest('tr');
+            currentReviewActionUrl = currentRowBeingReviewed?.dataset?.actionUrl || null;
             let userId = "";
             let userName = "User";
             let details = "Request";
@@ -1341,23 +1294,17 @@
     }
 
     function verifyFromReview() {
-        if (currentRowBeingReviewed) {
-            try {
-                showToast(`Request successfully approved!`, 'success');
-                
-                currentRowBeingReviewed.style.transition = 'all 0.4s ease';
-                currentRowBeingReviewed.style.opacity = '0';
-                currentRowBeingReviewed.style.transform = 'translateX(30px)';
-                
-                setTimeout(() => { 
-                    if(currentRowBeingReviewed.parentNode) currentRowBeingReviewed.parentNode.removeChild(currentRowBeingReviewed); 
-                    updateCounters(); 
-                }, 400);
-            } catch (e) {
-                console.error(e);
-            }
-            setTimeout(() => switchTab('overview'), 500);
+        if (!currentRowBeingReviewed) {
+            showToast('No request selected for review.', 'error');
+            return;
         }
+
+        if (!currentReviewActionUrl) {
+            showToast('This request must be handled by assigned faculty.', 'error');
+            return;
+        }
+
+        window.location.href = currentReviewActionUrl;
     }
 
     // ====================================================

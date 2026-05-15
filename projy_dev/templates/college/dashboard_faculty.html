@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+﻿{% extends 'base.html' %}
 
 {% block title %}Faculty Workspace | Projy{% endblock %}
 
@@ -15,68 +15,32 @@
     }
 
     /* =========================================
-     * 1. DASHBOARD TOKENS (Neon Glassmorphism)
+     * 1. FACULTY PAGE-SPECIFIC TOKENS
+     * (base.html handles core colors/themes)
      * ========================================= */
     :root {
-        --bg-base: #0a0f1c; 
-        --surface-glass: rgba(15, 23, 42, 0.6); 
-        --surface-hover: rgba(30, 41, 59, 0.8);
-        --border-glass: rgba(255, 255, 255, 0.08);
-        
-        --gradient-primary: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
-        --gradient-sidebar: linear-gradient(180deg, rgba(15, 23, 42, 0.8) 0%, rgba(15, 23, 42, 0.4) 100%);
-        
-        /* Bright glowing colors matching HOD */
-        --glow-cyan: rgba(34, 211, 238, 0.45);
+        --surface-hover: var(--surface-heavy);
+        --gradient-sidebar: linear-gradient(180deg, rgba(10,15,30,0.8) 0%, rgba(10,15,30,0.4) 100%);
+        --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.4);
+        --glow-cyan: rgba(0, 240, 255, 0.45);
         --glow-yellow: rgba(250, 204, 21, 0.45);
-        --glow-purple: rgba(168, 85, 247, 0.45);
+        --glow-purple: rgba(176, 38, 255, 0.45);
         --glow-green: rgba(52, 211, 153, 0.45);
-        
-        --accent-cyan: #22d3ee;
-        --accent-purple: #c084fc;
+        --accent-cyan: var(--neon-cyan);
+        --accent-purple: var(--neon-purple);
         --accent-yellow: #facc15;
         --accent-green: #34d399;
-        
-        --text-main: #f8fafc;
-        --text-muted: #94a3b8;
-        
-        --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.4);
-        
         --font-body: 'Inter', sans-serif;
         --font-mono: 'Fira Code', monospace;
     }
 
-    [data-theme="light"] {
-        --bg-base: #f1f5f9; 
-        --surface-glass: rgba(255, 255, 255, 0.7); 
-        --surface-hover: rgba(255, 255, 255, 0.95);
-        --border-glass: rgba(0, 0, 0, 0.05);
-        --text-main: #0f172a;
-        --text-muted: #64748b;
+    body.light-mode {
+        --surface-hover: #e2e8f0;
+        --gradient-sidebar: linear-gradient(180deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.4) 100%);
         --shadow-glass: 0 8px 30px rgba(0, 0, 0, 0.04);
-        --shadow-glow: 0 4px 15px rgba(99, 102, 241, 0.2);
-        
-        /* Light mode sidebar gradient fix */
-        --gradient-sidebar: linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.4) 100%);
     }
 
-    /* Ambient Background Effect - Restored Lighting */
-    body {
-        background-color: var(--bg-base);
-        background-image: 
-            radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.18), transparent 30%),
-            radial-gradient(circle at 85% 30%, rgba(6, 182, 212, 0.18), transparent 30%),
-            radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
-        background-size: 100% 100%, 100% 100%, 24px 24px;
-        background-attachment: fixed;
-        color: var(--text-main);
-        font-family: var(--font-body);
-        margin: 0;
-        padding-bottom: 50px;
-        /* Prevent body from ever overflowing horizontally */
-        overflow-x: hidden;
-        width: 100%;
-    }
+    body { padding-bottom: 50px; overflow-x: hidden; }
 
     /* =========================================
      * 2. MAIN LAYOUT & GLASS PANELS
@@ -94,7 +58,7 @@
         background: var(--surface-hover);
         border-color: rgba(255, 255, 255, 0.15);
     }
-    [data-theme="light"] .glass-panel:hover {
+    body.light-mode .glass-panel:hover {
         border-color: rgba(0, 0, 0, 0.1);
     }
 
@@ -141,10 +105,10 @@
     .user-role { color: var(--accent-cyan); font-weight: 700; font-size: 0.8rem; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1px;}
     
     .info-block { width: 100%; text-align: left; margin-bottom: 30px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; border: 1px solid var(--border-glass);}
-    [data-theme="light"] .info-block { background: rgba(0,0,0,0.03); }
+    body.light-mode .info-block { background: rgba(0,0,0,0.03); }
     
     .info-item { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; padding: 10px 0; font-size: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.05);}
-    [data-theme="light"] .info-item { border-bottom-color: rgba(0,0,0,0.05); }
+    body.light-mode .info-item { border-bottom-color: rgba(0,0,0,0.05); }
     .info-item:last-child { border-bottom: none; padding-bottom: 0;}
     .info-item:first-child { padding-top: 0;}
     .info-label { font-weight: 600; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; }
@@ -153,9 +117,9 @@
     .sidebar-nav { width: 100%; display: flex; flex-direction: column; gap: 12px; }
     .nav-btn { width: 100%; padding: 14px 20px; border-radius: 12px; border: 1px solid transparent; background: transparent; color: var(--text-muted); font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; text-align: left; display: flex; justify-content: space-between; align-items: center;}
     .nav-btn:hover { background: rgba(255,255,255,0.05); color: var(--text-main); transform: translateX(4px);}
-    [data-theme="light"] .nav-btn:hover { background: rgba(0,0,0,0.05); }
+    body.light-mode .nav-btn:hover { background: rgba(0,0,0,0.05); }
     .nav-btn.active { background: var(--gradient-primary); color: #fff; font-weight: 700; box-shadow: 0 4px 15px var(--glow-cyan); border: none;}
-    .nav-btn.active::after { content: '→'; font-family: var(--font-mono); opacity: 0.8;}
+    .nav-btn.active::after { content: ‘\2192’; font-family: var(--font-mono); opacity: 0.8;}
 
     /* =========================================
      * 4. PAGE SECTIONS & GLOWING STAT CARDS
@@ -203,7 +167,7 @@
     .data-card { border-radius: 16px; overflow: hidden; margin-bottom: 30px; border: 1px solid var(--border-glass); width: 100%;}
     
     .data-header { padding: 20px 25px; border-bottom: 1px solid var(--border-glass); font-size: 1.05rem; font-weight: 700; background: rgba(0,0,0,0.2); display: flex; justify-content: space-between; align-items: center; color: var(--text-main); flex-wrap: wrap; gap: 10px;}
-    [data-theme="light"] .data-header { background: rgba(0,0,0,0.03); }
+    body.light-mode .data-header { background: rgba(0,0,0,0.03); }
     
     /* =========================================
      * 5. RESPONSIVE TABLE DESIGN
@@ -237,7 +201,7 @@
     
     tr { transition: background 0.2s ease; cursor: pointer; }
     tr:hover { background: rgba(255,255,255,0.03); }
-    [data-theme="light"] tr:hover { background: rgba(0,0,0,0.02); }
+    body.light-mode tr:hover { background: rgba(0,0,0,0.02); }
     tr:last-child td { border-bottom: none; }
     
     .user-col { display: flex; align-items: center; gap: 10px; }
@@ -294,8 +258,8 @@
         background: rgba(255, 255, 255, 0.05);
         border-color: var(--text-muted);
     }
-    [data-theme="light"] .btn-review { border-color: rgba(0,0,0,0.2); }
-    [data-theme="light"] .btn-review:hover { background: rgba(0,0,0,0.05); }
+    body.light-mode .btn-review { border-color: rgba(0,0,0,0.2); }
+    body.light-mode .btn-review:hover { background: rgba(0,0,0,0.05); }
     
     .btn-approve-solid {
         background: #34d399; 
@@ -319,10 +283,10 @@
      * 6. TERMINAL ACTIVITY LOG
      * ========================================= */
     .terminal-log { background: rgba(0,0,0,0.5); border: 1px solid var(--border-glass); border-radius: 16px; overflow: hidden; backdrop-filter: blur(10px);}
-    [data-theme="light"] .terminal-log { background: rgba(255,255,255,0.8); } 
+    body.light-mode .terminal-log { background: rgba(255,255,255,0.8); } 
     
     .terminal-header { background: rgba(0,0,0,0.8); padding: 12px 18px; border-bottom: 1px solid var(--border-glass); display: flex; gap: 8px; align-items: center;}
-    [data-theme="light"] .terminal-header { background: rgba(0,0,0,0.05); border-bottom-color: rgba(0,0,0,0.05);}
+    body.light-mode .terminal-header { background: rgba(0,0,0,0.05); border-bottom-color: rgba(0,0,0,0.05);}
     
     .terminal-dot { width: 12px; height: 12px; border-radius: 50%; }
     .dot-red { background: #ff5f56; } 
@@ -335,7 +299,7 @@
     .log-list li { margin-bottom: 18px; color: var(--text-muted); display: flex; gap: 12px; align-items: flex-start; line-height: 1.6; font-family: var(--font-mono);}
     .log-list li:last-child { margin-bottom: 0; }
     .log-list li::before { content: '>'; color: var(--accent-cyan); font-weight: 800;}
-    [data-theme="light"] .log-list li::before { color: var(--primary); }
+    body.light-mode .log-list li::before { color: var(--primary); }
     
     .log-time { color: var(--text-muted); min-width: 60px; flex-shrink: 0; font-weight: 600; opacity: 0.7;}
     .log-highlight { color: var(--text-main); font-weight: 700; text-decoration: underline; text-decoration-color: var(--accent-purple); text-underline-offset: 3px;} 
@@ -345,11 +309,11 @@
     .form-label { display: block; color: var(--text-main); font-size: 0.9rem; margin-bottom: 10px; font-weight: 600;}
     .form-input { width: 100%; max-width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-glass); color: var(--text-main); padding: 12px 18px; border-radius: 10px; font-size: 0.95rem; transition: all 0.3s ease; font-family: var(--font-body);}
     .form-input:focus { outline: none; border-color: var(--accent-cyan); box-shadow: 0 0 15px rgba(34, 211, 238, 0.2);}
-    [data-theme="light"] .form-input { background: #fff; border-color: rgba(0,0,0,0.1); }
+    body.light-mode .form-input { background: #fff; border-color: rgba(0,0,0,0.1); }
     
     select.form-input { appearance: auto; cursor: pointer; color: var(--text-main);}
     select.form-input option { background-color: #0f172a; color: #fff; }
-    [data-theme="light"] select.form-input option { background-color: #fff; color: #000; }
+    body.light-mode select.form-input option { background-color: #fff; color: #000; }
 
     @media (max-width: 1100px) {
         .layout-wrapper { grid-template-columns: 250px minmax(0, 1fr); padding: 0 20px;}
@@ -396,11 +360,11 @@
                 <div class="info-block">
                     <div class="info-item">
                         <span class="info-label">College</span>
-                        <span class="info-value">{{ college.name|default:"Silver Oak Univ" }}</span>
+                        <span class="info-value">{{ college.name|default:"—" }}</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Department</span>
-                        <span class="info-value" id="sidebar-dept-val">{{ request.user.staff_profile.department.name|default:"Computer Eng." }}</span>
+                        <span class="info-value" id="sidebar-dept-val">{{ request.user.staff_profile.department.name|default:"—" }}</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Total Mentees</span>
@@ -489,7 +453,16 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="req-details">{{ project.title }}</td>
+                                        <td class="req-details">
+                                            {{ project.title }}
+                                            {% if project.languages.all %}
+                                            <div style="display:flex; height:4px; border-radius:4px; overflow:hidden; margin-top:6px; background: rgba(255,255,255,0.05);">
+                                                {% for lang in project.languages.all %}
+                                                <div style="width:{{ lang.percentage }}%; background:{{ lang.get_color }};" title="{{ lang.language_name }}: {{ lang.percentage }}%"></div>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        </td>
                                         <td><span class="type-fac-req">Project</span></td>
                                         <td class="req-date">{{ project.created_at|date:"M d, Y"|default:"Recent" }}</td>
                                         <td>
@@ -589,6 +562,46 @@
             </div>
         </section>
 
+        <section id="placements" class="page-section">
+            <div class="section-header-box" style="display: flex; justify-content: space-between; align-items: flex-end;">
+                <div>
+                    <h2 class="section-title">Placement Opportunities</h2>
+                    <div class="section-subtitle">View active campus placement drives for your department.</div>
+                </div>
+            </div>
+            <div class="data-card glass-panel" style="margin-bottom: 30px;">
+                <div class="data-header">
+                    <span>Active Placements</span>
+                </div>
+                <div class="table-responsive-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Company</th>
+                                <th>Semester</th>
+                                <th>Applied By Mentees</th>
+                                <th>Open Role</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for placement in department_placements %}
+                            <tr>
+                                <td>{{ placement.company_name }}</td>
+                                <td>Sem {{ placement.semester }}</td>
+                                <td>{{ placement.mentee_registrations }}</td>
+                                <td>{{ placement.position|default:'Open Role' }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" style="text-align:center; color: var(--text-muted); padding: 30px;">No placement drives are active for your department.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
         <section id="students" class="page-section">
             <div class="section-header-box" style="display: flex; justify-content: space-between; align-items: flex-end;">
                 <div>
@@ -638,7 +651,7 @@
                                 </td>
                                 <td>
                                     <div class="action-button-group">
-                                        <a href="{% url 'live_portfolio' username=mentee.user.username enrollment=mentee.enrollment_number|default:'000000' college_name=mentee.college.name|slugify|default:'college' %}" target="_blank" class="btn-review" style="display:inline-block; text-decoration: none;">View Portfolio</a>
+                                        <a href="{% url 'live_portfolio_shared' username=mentee.user.username enrollment=mentee.enrollment_number|default:'000000' college_name=mentee.college.name|slugify|default:'college' %}" target="_blank" class="btn-review" style="display:inline-block; text-decoration: none;">View Portfolio</a>
                                     </div>
                                 </td>
                             </tr>
@@ -699,7 +712,7 @@
                                 <label for="notif-check" style="cursor: pointer;">Enable email webhooks for incoming requests</label>
                             </div>
                         </div>
-                        <button type="submit" class="btn-approve-solid" id="save-settings-btn" style="font-size: 1rem; border: none; padding: 12px 24px; border-radius: var(--radius-md);">Compile & Save</button>
+                        <button type="submit" class="btn-approve-solid" id="save-settings-btn" style="font-size: 1rem; border: none; padding: 12px 24px; border-radius: 8px;">Compile & Save</button>
                     </div>
                 </form>
             </div>
@@ -717,7 +730,7 @@
                         <div style="color: var(--accent-cyan); font-size: 0.85rem; margin-bottom: 10px; text-transform: uppercase; font-weight: 800; letter-spacing: 1px;">Target Payload</div>
                         <h1 id="review-title" style="font-size: 2.2rem; margin-bottom: 20px; color: var(--text-main); font-weight: 800; letter-spacing: -1px;">Request Title</h1>
                         
-                        <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: var(--radius-md); margin-bottom: 30px; border: 1px solid var(--border-glass);">
+                        <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 8px; margin-bottom: 30px; border: 1px solid var(--border-glass);">
                             <div id="review-student-info" style="color: var(--text-main); font-size: 1rem; margin-bottom: 8px; font-weight: 600;">
                                 Origin: Student Name
                             </div>
@@ -739,14 +752,14 @@
                         
                         <form id="review-approve-form" method="POST">
                             {% csrf_token %}
-                            <button type="submit" class="btn-approve-solid" style="width: 100%; padding: 14px; margin-bottom: 20px; font-size: 1rem; border-radius: var(--radius-md);">Approve Request ✓</button>
+                            <button type="submit" class="btn-approve-solid" style="width: 100%; padding: 14px; margin-bottom: 20px; font-size: 1rem; border-radius: 8px;">Approve Request ✓</button>
                         </form>
 
                         <form id="review-reject-form" method="POST" style="display: none;">
                             {% csrf_token %}
                             <label class="form-label" style="font-size: 0.8rem;">Remarks</label>
                             <textarea name="remarks" id="review-remarks" class="form-input" placeholder="Input denial reason or remarks (optional for semester rejection)..." style="width: 100%; min-height: 100px; margin-bottom: 15px; resize: vertical;"></textarea>
-                            <button type="submit" class="btn-danger" style="width: 100%; padding: 14px; font-size: 1rem; border-radius: var(--radius-md); border: none;">Reject / Request Changes ✕</button>
+                            <button type="submit" class="btn-danger" style="width: 100%; padding: 14px; font-size: 1rem; border-radius: 8px; border: none;">Reject / Request Changes ✕</button>
                         </form>
                     </div>
                 </div>

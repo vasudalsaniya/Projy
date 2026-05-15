@@ -1,18 +1,83 @@
 {% extends 'base.html' %}
-{% block title %}Delete Project{% endblock %}
+{% block title %}Delete Project | Projy{% endblock %}
 
 {% block content %}
-<div class="card" style="max-width: 500px; margin: 3rem auto; text-align: center; border: 2px solid #dc3545;">
-    <h2 style="color: #dc3545;">Are you sure?</h2>
-    <p>You are about to delete <strong>"{{ project.title }}"</strong>.</p>
-    <p>This action cannot be undone.</p>
-    
-    <form method="post">
-        {% csrf_token %}
-        <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
-            <button type="submit" class="btn" style="background: #dc3545;">Yes, Delete it</button>
-            <a href="{% url 'student_dashboard' %}" class="btn" style="background: #6c757d;">Cancel</a>
+<style>
+    .confirm-container { max-width: 460px; margin: 80px auto; padding: 0 20px; }
+    .glass-card {
+        background: var(--surface-glass);
+        border: 1px solid rgba(255, 77, 79, 0.25);
+        border-radius: 16px;
+        padding: 45px 40px;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        box-shadow: 0 0 40px rgba(255, 77, 79, 0.08), 0 8px 32px rgba(0,0,0,0.3);
+        text-align: center;
+    }
+    .danger-icon {
+        width: 64px; height: 64px;
+        margin: 0 auto 24px;
+        background: rgba(255, 77, 79, 0.1);
+        border: 1px solid rgba(255, 77, 79, 0.3);
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .confirm-title {
+        color: #ff4d4f;
+        font-size: 1.6rem;
+        font-weight: 800;
+        margin: 0 0 12px;
+        letter-spacing: -0.5px;
+    }
+    .confirm-text {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        line-height: 1.7;
+        margin: 0 0 32px;
+    }
+    .project-name { color: var(--text-main); font-weight: 700; }
+    .btn-row { display: flex; gap: 12px; justify-content: center; }
+    .btn-delete {
+        background: linear-gradient(135deg, #ff4d4f 0%, #c92a2a 100%);
+        color: white; border: none;
+        padding: 12px 28px; border-radius: 8px;
+        font-weight: 700; font-size: 0.9rem;
+        cursor: pointer; transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(255, 77, 79, 0.3);
+    }
+    .btn-delete:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255, 77, 79, 0.5); }
+    .btn-cancel {
+        background: transparent;
+        color: var(--text-muted);
+        border: 1px solid var(--border-glass);
+        padding: 12px 28px; border-radius: 8px;
+        font-weight: 600; font-size: 0.9rem;
+        cursor: pointer; transition: all 0.2s;
+        text-decoration: none; display: inline-block;
+    }
+    .btn-cancel:hover { background: var(--surface-heavy); color: var(--text-main); border-color: rgba(255,255,255,0.15); }
+</style>
+
+<div class="confirm-container">
+    <div class="glass-card">
+        <div class="danger-icon">
+            <svg width="28" height="28" fill="none" stroke="#ff4d4f" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+            </svg>
         </div>
-    </form>
+        <h2 class="confirm-title">Delete Project?</h2>
+        <p class="confirm-text">
+            You are about to permanently delete<br>
+            <span class="project-name">"{{ project.title }}"</span><br>
+            This action cannot be undone.
+        </p>
+        <form method="post">
+            {% csrf_token %}
+            <div class="btn-row">
+                <a href="{% url 'student_dashboard' %}" class="btn-cancel">Cancel</a>
+                <button type="submit" class="btn-delete">Yes, Delete</button>
+            </div>
+        </form>
+    </div>
 </div>
 {% endblock %}

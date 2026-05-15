@@ -37,11 +37,24 @@
 
         <form method="post">
             {% csrf_token %}
-            
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <label>First Name:</label>
+                    {{ form.first_name }}
+                    {{ form.first_name.errors }}
+                </div>
+                <div>
+                    <label>Last Name:</label>
+                    {{ form.last_name }}
+                    {{ form.last_name.errors }}
+                </div>
+            </div>
+
             <label>Username:</label>
             {{ form.username }}
             {{ form.username.errors }}
-            
+
             <label>Email:</label>
             {{ form.email }}
             {{ form.email.errors }}

@@ -38,6 +38,12 @@
         <h1 style="font-size: 3rem; margin: 10px 0; color: var(--text-main); letter-spacing: -1px;">{{ profile.user.get_full_name }}</h1>
         <p style="font-size: 1.1rem; color: var(--neon-cyan); font-weight: 600; margin-bottom: 5px;">{{ profile.job_title|default:"Software Developer" }}</p>
         <p style="font-size: 1rem; color: var(--text-muted);">{{ profile.education_details }} | Semester {{ profile.semester }}</p>
+        {% if career_statement %}
+        <div style="margin: 24px 0 0 0; padding: 24px; border-left: 4px solid var(--neon-cyan); background: rgba(0, 255, 255, 0.06); border-radius: 10px;">
+            <h3 style="margin: 0 0 10px 0; color: var(--text-main); font-size: 1.2rem;">AI Career Summary</h3>
+            <p style="margin: 0; color: var(--text-muted); line-height: 1.8;">{{ career_statement }}</p>
+        </div>
+        {% endif %}
         
         <div style="display: flex; justify-content: center; gap: 15px; margin-top: 25px;">
             {% if profile.github_url %}

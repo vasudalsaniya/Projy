@@ -660,6 +660,12 @@
             <div class="skill-box">
                 <h3 style="margin-bottom: 15px; color: var(--accent-color);">Biography</h3>
                 <p style="color: var(--text-muted); white-space: pre-wrap;">{{ profile.bio|default:"I am a passionate developer focused on solving complex problems." }}</p>
+                {% if career_statement %}
+                <div style="margin-top: 20px; padding: 18px; border: 1px dashed var(--accent-color); border-radius: 12px; background: rgba(0, 255, 255, 0.06);">
+                    <h4 style="margin-bottom: 10px; color: var(--accent-color);">AI Career Summary</h4>
+                    <p style="color: var(--text-muted); white-space: pre-wrap;">{{ career_statement }}</p>
+                </div>
+                {% endif %}
                 
                 <div style="margin-top: 30px; display: flex; gap: 15px;">
                     {% if profile.github_url %}
@@ -736,6 +742,16 @@
                         <a href="mailto:{{ profile.user.email }}">{{ profile.user.email }}</a>
                     </p>
                     {% endif %}
+                    {% if profile.resume %}
+                    <p>
+                        <span class="contact-label">Resume:</span>
+                        <a href="{{ profile.resume.url }}" target="_blank">Download Resume</a>
+                    </p>
+                    {% endif %}
+                    <p>
+                        <span class="contact-label">Build Resume:</span>
+                        <a href="{% url 'generate_resume' %}">Generate Resume</a>
+                    </p>
                 </div>
             </div>
         </div>

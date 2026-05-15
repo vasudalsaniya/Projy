@@ -8,6 +8,5 @@ urlpatterns = [
     path('control-panel/', views.admin_control_panel, name='admin_control_panel'),
     path('signup/recruiter/', views.recruiter_signup, name='signup_recruiter'),
     path('signup/college/', views.college_signup, name='signup_college'),
-    path('control-panel/', views.admin_control_panel, name='admin_control_panel'),
     path('notification/read/<int:notif_id>/', views.read_notification, name='read_notification'),
 ]

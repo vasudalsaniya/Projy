@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block title %}Placement Drives | Projy{% endblock %}
+
+{% block content %}
+<style>
+    .placements-page { max-width: 1200px; margin: 40px auto; padding: 20px; }
+    .placement-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 30px; }
+    .placement-header h1 { margin: 0; font-size: 2rem; color: var(--text-main); }
+    .placement-subtitle { color: var(--text-muted); margin-top: 8px; max-width: 760px; line-height: 1.7; }
+    .placement-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; }
+    .item-card { background: var(--surface-glass); border: 1px solid var(--border-glass); border-radius: 18px; padding: 22px; box-shadow: 0 18px 50px rgba(4, 49, 116, 0.08); display: flex; flex-direction: column; justify-content: space-between; }
+    .card-content { display: flex; flex-direction: column; gap: 16px; }
+    .card-title { font-size: 1.2rem; font-weight: 700; color: var(--text-main); margin: 0; }
+    .card-desc { color: var(--text-muted); margin: 0; line-height: 1.7; }
+    .card-meta { display: flex; flex-wrap: wrap; gap: 10px; color: var(--text-muted); font-size: 0.9rem; }
+    .badge-public { display: inline-block; padding: 7px 12px; border-radius: 999px; border: 1px solid var(--neon-cyan); color: var(--neon-cyan); background: rgba(0, 240, 255, 0.08); font-size: 0.8rem; }
+    .action-btn { background: linear-gradient(135deg, var(--neon-cyan) 0%, var(--neon-purple) 100%); color: white; border: none; padding: 10px 18px; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.25s ease; }
+    .action-btn:hover { transform: translateY(-1px); }
+    .action-btn-outline { background: transparent; border: 1px solid var(--neon-cyan); color: var(--neon-cyan); padding: 10px 18px; border-radius: 10px; font-weight: 600; cursor: pointer; text-decoration: none; }
+    .action-btn-outline:hover { background: rgba(0, 240, 255, 0.08); }
+    .empty-state { text-align: center; padding: 60px 20px; border: 1px dashed var(--border-glass); border-radius: 18px; color: var(--text-muted); }
+</style>
+
+<div class="placements-page">
+    <div class="placement-header">
+        <div>
+            <h1>Placement Drives</h1>
+            <p class="placement-subtitle">Browse the active placement opportunities for your department and semester, then register or withdraw directly from this page.</p>
+        </div>
+        <div class="placement-actions">
+            <a href="{% url 'student_dashboard' %}" class="action-btn-outline">← Back to Dashboard</a>
+        </div>
+    </div>
+
+    <div class="card-grid">
+        {% for placement in placements %}
+        <div class="item-card">
+            <div class="card-content">
+                <div>
+                    <h2 class="card-title">{{ placement.company_name|truncatechars:35 }}</h2>
+                    <p class="card-desc">{{ placement.description|truncatewords:30 }}</p>
+                </div>
+                <div class="card-meta">
+                    <span>{{ placement.position|default:'Open role' }}</span>
+                    <span>Semester {{ placement.semester }}</span>
+                    {% if placement.application_deadline %}
+                    <span>Apply by {{ placement.application_deadline|date:'M d, Y' }}</span>
+                    {% endif %}
+                </div>
+                <span class="badge-public">{{ placement.registration_count }} registered</span>
+            </div>
+            <div style="margin-top: 18px; display:flex; gap:12px; flex-wrap:wrap; align-items:center; justify-content:flex-end;">
+                {% if placement.id in registered_placement_ids %}
+                    <form method="post" style="margin:0;">
+                        {% csrf_token %}
+                        <button type="submit" name="cancel_placement" value="{{ placement.id }}" class="action-btn-outline">Withdraw</button>
+                    </form>
+                {% else %}
+                    <form method="post" style="margin:0;">
+                        {% csrf_token %}
+                        <button type="submit" name="apply_placement" value="{{ placement.id }}" class="action-btn">Register</button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="empty-state">
+            <p>No placement opportunities are available for your semester yet.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

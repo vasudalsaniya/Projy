@@ -1,62 +1,260 @@
 {% extends 'base.html' %}
-{% block title %}{{ student.user.username }} - Profile{% endblock %}
+{% block title %}{{ student.user.first_name }} {{ student.user.last_name }} — Projy{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px 60px;
+        display: grid;
+        grid-template-columns: 300px minmax(0, 1fr);
+        gap: 30px;
+        align-items: start;
+    }
+    @media (max-width: 900px) { .profile-container { grid-template-columns: 1fr; } }
+
+    .glass-card {
+        background: var(--surface-glass);
+        border: 1px solid var(--border-glass);
+        border-radius: 16px;
+        padding: 30px;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    }
+
+    /* --- Sidebar --- */
+    .sidebar-card { position: sticky; top: 100px; }
+    .profile-avatar {
+        width: 100px; height: 100px; border-radius: 50%;
+        background: var(--surface-heavy);
+        border: 3px solid var(--neon-cyan);
+        box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+        margin: 0 auto 20px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 2.5rem; font-weight: 800; color: var(--neon-cyan);
+        overflow: hidden;
+    }
+    .profile-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+
+    .profile-name { font-size: 1.3rem; font-weight: 800; text-align: center; margin-bottom: 4px; letter-spacing: -0.5px; }
+    .profile-enroll {
+        text-align: center; font-size: 0.78rem; color: var(--neon-cyan);
+        font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px;
+    }
+
+    .info-list { display: flex; flex-direction: column; gap: 0; margin-bottom: 24px; }
+    .info-row {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 10px 0; font-size: 0.85rem;
+        border-bottom: 1px solid var(--border-glass);
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-label { color: var(--text-muted); }
+    .info-value { color: var(--text-main); font-weight: 600; text-align: right; }
+
+    .link-btn {
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        width: 100%; padding: 10px; border-radius: 8px; font-weight: 600; font-size: 0.85rem;
+        text-decoration: none; transition: all 0.2s; margin-bottom: 10px; border: 1px solid;
+    }
+    .link-github { border-color: rgba(255,255,255,0.2); color: var(--text-main); }
+    .link-github:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.4); }
+    .link-linkedin { border-color: rgba(0,119,181,0.5); color: #0e76a8; }
+    .link-linkedin:hover { background: rgba(0,119,181,0.1); }
+    .link-resume { background: var(--gradient-primary); color: white; border-color: transparent; }
+    .link-resume:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    /* --- Projects --- */
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .section-title { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.5px; }
+
+    .projects-grid { display: flex; flex-direction: column; gap: 20px; }
+
+    .project-card {
+        background: var(--surface-glass);
+        border: 1px solid var(--border-glass);
+        border-radius: 12px;
+        overflow: hidden;
+        transition: transform 0.3s, border-color 0.3s;
+    }
+    .project-card:hover { transform: translateY(-3px); border-color: rgba(0,240,255,0.3); }
+
+    .project-cover {
+        width: 100%; height: 180px;
+        background: var(--surface-heavy);
+        object-fit: cover;
+        display: block;
+    }
+    .project-cover-placeholder {
+        width: 100%; height: 180px;
+        background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 3rem; font-weight: 800; color: rgba(255,255,255,0.3);
+    }
+
+    .project-body { padding: 24px; }
+    .project-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+    .project-title { font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin: 0; }
+    .badge {
+        padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; white-space: nowrap;
+    }
+    .badge-verified { border: 1px solid var(--neon-green); color: var(--neon-green); background: rgba(0,230,118,0.1); }
+    .badge-pending { border: 1px solid #faad14; color: #faad14; background: rgba(250,173,20,0.1); }
+
+    .project-desc { color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 16px; }
+
+    .lang-bar {
+        height: 8px; border-radius: 4px; overflow: hidden;
+        background: var(--input-bg); display: flex; margin-bottom: 12px;
+        border: 1px solid var(--border-glass);
+    }
+    .lang-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+    .lang-tag {
+        display: flex; align-items: center; gap: 6px;
+        font-size: 0.75rem; color: var(--text-muted);
+    }
+    .lang-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+    .project-links { display: flex; gap: 10px; flex-wrap: wrap; }
+    .proj-link {
+        padding: 7px 14px; border-radius: 6px; font-size: 0.8rem; font-weight: 600;
+        text-decoration: none; transition: 0.2s; display: inline-flex; align-items: center; gap: 5px;
+    }
+    .proj-link-code { border: 1px solid var(--border-glass); color: var(--text-muted); }
+    .proj-link-code:hover { border-color: var(--neon-cyan); color: var(--neon-cyan); }
+    .proj-link-demo { background: linear-gradient(135deg, #ff4d4f, #c92a2a); color: white; }
+    .proj-link-demo:hover { opacity: 0.9; }
+
+    .empty-state { text-align: center; padding: 50px 20px; }
+    .empty-state p { color: var(--text-muted); }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="grid-2">
-    <div class="card">
-        <div class="text-center">
-            <h2>{{ student.user.first_name }} {{ student.user.last_name }}</h2>
-            <p class="text-muted">Enrollment: {{ student.enrollment_number }}</p>
-            <p class="badge badge-success">Verified Student</p>
+<div class="profile-container">
+
+    <aside class="glass-card sidebar-card">
+        <div class="profile-avatar">
+            {% if student.user.profile_pic %}
+                <img src="{{ student.user.profile_pic.url }}" alt="{{ student.user.first_name }}">
+            {% else %}
+                {{ student.user.first_name|slice:":1"|upper }}
+            {% endif %}
         </div>
-        <hr>
-        <p><strong>College:</strong> {{ student.college.name }}</p>
-        <p><strong>Department:</strong> {{ student.department.name }}</p>
-        <p><strong>Semester:</strong> {{ student.semester }}</p>
-        
-        <hr>
-        <h3>Contact / Links</h3>
-        <p><strong>Email:</strong> {{ student.user.email }}</p>
+        <h1 class="profile-name">{{ student.user.first_name }} {{ student.user.last_name }}</h1>
+        <p class="profile-enroll">{{ student.enrollment_number }}</p>
+
+        <div class="info-list">
+            <div class="info-row">
+                <span class="info-label">College</span>
+                <span class="info-value">{{ student.college.name }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Department</span>
+                <span class="info-value">{{ student.department.name }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Semester</span>
+                <span class="info-value">{{ student.semester }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Email</span>
+                <span class="info-value" style="font-size: 0.78rem;">{{ student.user.email }}</span>
+            </div>
+        </div>
+
         {% if student.linkedin_url %}
-            <a href="{{ student.linkedin_url }}" target="_blank" class="btn btn-sm" style="width: 100%; margin-bottom: 5px; background: #0077b5;">LinkedIn</a>
+            <a href="{{ student.linkedin_url }}" target="_blank" class="link-btn link-linkedin">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                LinkedIn
+            </a>
         {% endif %}
         {% if student.github_url %}
-            <a href="{{ student.github_url }}" target="_blank" class="btn btn-sm" style="width: 100%; margin-bottom: 5px; background: #333;">GitHub</a>
+            <a href="{{ student.github_url }}" target="_blank" class="link-btn link-github">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"/></svg>
+                GitHub
+            </a>
         {% endif %}
         {% if student.resume %}
-            <a href="{{ student.resume.url }}" target="_blank" class="btn btn-sm" style="width: 100%; background: #28a745;">Download Resume</a>
+            <a href="{{ student.resume.url }}" target="_blank" class="link-btn link-resume">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                Download Resume
+            </a>
         {% endif %}
-    </div>
+    </aside>
 
-    <div>
-        <h2>Project Portfolio</h2>
-        {% for project in projects %}
-        <div class="card">
-            <div style="display: flex; justify-content: space-between;">
-                <h3>{{ project.title }}</h3>
-                {% if project.is_verified %}
-                    <span class="badge badge-success">Verified</span>
-                {% endif %}
-            </div>
-            
-            <p>{{ project.description }}</p>
-            
-            <div style="margin-bottom: 10px;">
-                {% for lang in project.languages.all %}
-                    <span class="badge badge-warning">{{ lang.language_name }} ({{ lang.percentage }}%)</span>
-                {% endfor %}
-            </div>
-
-            {% if project.github_repo_link %}
-                <a href="{{ project.github_repo_link }}" target="_blank" style="color: blue; text-decoration: underline;">View Code</a>
-            {% endif %}
-            {% if project.video_demo %}
-                | <a href="{{ project.video_demo.url }}" target="_blank" style="color: red; text-decoration: underline;">Watch Demo</a>
-            {% endif %}
+    <main>
+        <div class="section-header">
+            <h2 class="section-title">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-right: 8px; vertical-align: middle; color: var(--neon-cyan);"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
+                Projects
+            </h2>
+            <span style="font-size: 0.85rem; color: var(--text-muted); background: var(--surface-glass); border: 1px solid var(--border-glass); padding: 4px 12px; border-radius: 20px;">{{ projects|length }} public project{{ projects|length|pluralize }}</span>
         </div>
-        {% empty %}
-        <p>This student has not uploaded any public projects yet.</p>
-        {% endfor %}
-    </div>
+
+        <div class="projects-grid">
+            {% for project in projects %}
+            <div class="project-card">
+                {% if project.cover_image %}
+                    <img src="{{ project.cover_image.url }}" alt="{{ project.title }}" class="project-cover">
+                {% else %}
+                    <div class="project-cover-placeholder">{{ project.title|slice:":1"|upper }}</div>
+                {% endif %}
+
+                <div class="project-body">
+                    <div class="project-title-row">
+                        <h3 class="project-title">{{ project.title }}</h3>
+                        {% if project.is_verified %}
+                            <span class="badge badge-verified">Verified</span>
+                        {% else %}
+                            <span class="badge badge-pending">Pending</span>
+                        {% endif %}
+                    </div>
+
+                    <p class="project-desc">{{ project.description|truncatewords:30 }}</p>
+
+                    {% if project.languages.all %}
+                        <div class="lang-bar">
+                            {% for lang in project.languages.all %}
+                                <div style="width: {{ lang.percentage }}%; background: {{ lang.get_color }};" title="{{ lang.language_name }}: {{ lang.percentage }}%"></div>
+                            {% endfor %}
+                        </div>
+                        <div class="lang-tags">
+                            {% for lang in project.languages.all %}
+                                <span class="lang-tag">
+                                    <span class="lang-dot" style="background: {{ lang.get_color }};"></span>
+                                    {{ lang.language_name }} <span style="opacity: 0.6;">{{ lang.percentage }}%</span>
+                                </span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <div class="project-links">
+                        {% if project.github_repo_link %}
+                            <a href="{{ project.github_repo_link }}" target="_blank" class="proj-link proj-link-code">
+                                <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"/></svg>
+                                View Code
+                            </a>
+                        {% endif %}
+                        {% if project.video_demo %}
+                            <a href="{{ project.video_demo.url }}" target="_blank" class="proj-link proj-link-demo">
+                                ▶ Demo
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state glass-card">
+                <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="margin: 0 auto 15px; display: block; color: var(--text-muted);"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
+                <p>This student has no public projects yet.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+
 </div>
 {% endblock %}

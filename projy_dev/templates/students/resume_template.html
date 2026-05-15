@@ -2,17 +2,27 @@
 <html>
 <head>
     <style>
-        body { font-family: 'Arial', sans-serif; line-height: 1.5; color: #333; margin: 0; padding: 40px; }
+        body { font-family: 'Arial', sans-serif; line-height: 1.5; color: #333; margin: 0; padding: 40px; background: #f4f7fb; }
+        body.classic-resume { background: #ffffff; }
+        body.professional-resume { background: #eff7fb; }
+        body.focused-resume { background: #f8f8f8; font-family: 'Verdana', sans-serif; }
         .resume-header { border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
-        .name { font-size: 28px; font-weight: bold; text-transform: uppercase; }
-        .contact-info { font-size: 12px; }
-        .section-title { font-weight: bold; text-transform: uppercase; border-bottom: 1px solid #ddd; margin: 20px 0 10px 0; }
-        .project-item { margin-bottom: 15px; }
-        .project-title { font-weight: bold; }
+        .name { font-size: 28px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.06em; }
+        .contact-info { font-size: 12px; color: #555; line-height: 1.6; }
+        .section-title { font-weight: bold; text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1px solid #ddd; margin: 20px 0 10px 0; color: #111; }
+        .section-subtitle { font-size: 0.95rem; color: #555; margin-bottom: 18px; }
+        .project-item { margin-bottom: 18px; }
+        .project-title { font-weight: bold; font-size: 1rem; }
+        .meta-line { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; font-size: 0.85rem; color: #444; }
+        .meta-pill { display: inline-block; padding: 6px 12px; border-radius: 999px; background: rgba(0, 123, 255, 0.08); color: #0d6efd; border: 1px solid rgba(0, 123, 255, 0.18); }
+        .skill-list { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+        .skill-list li { background: #eef6ff; padding: 8px 12px; border-radius: 999px; font-size: 0.85rem; }
+        .project-description { font-size: 13px; margin: 8px 0 0 0; color: #444; }
+        .resume-note { margin: 20px 0 30px 0; padding: 18px; border-left: 4px solid #0d6efd; background: #e9f2ff; color: #213547; border-radius: 8px; }
         @media print { .no-print { display: none; } }
     </style>
 </head>
-<body>
+<body class="{{ selected_style|default:'classic' }}-resume">
     <div class="no-print" style="background: #f8d7da; padding: 10px; text-align: center; margin-bottom: 20px;">
         <button onclick="window.print()" style="padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer;">
             Download as PDF / Print
@@ -23,25 +33,46 @@
         <div class="name">{{ profile.user.get_full_name }}</div>
         <div class="contact-info">
             {{ profile.user.email }} | {{ profile.user.phone_number }} | {{ profile.college.name }}
+            {% if profile.public_portfolio_url %}<br>
+            Portfolio: <a href="{{ profile.public_portfolio_url }}" target="_blank">{{ profile.public_portfolio_url }}</a>{% endif %}
+        </div>
+        <div class="meta-line">
+            <span class="meta-pill">AI-enhanced resume</span>
+            <span class="meta-pill">Style: {{ selected_style|title }}</span>
         </div>
     </div>
 
+    <div class="resume-note">
+        This resume is powered by AI content generation and automatically pulls your top skills and verified projects.
+    </div>
+
     <div class="section-title">Professional Summary</div>
-    <p>{{ profile.bio }}</p>
+    <p>{% if generated_summary %}{{ generated_summary }}{% else %}{{ profile.bio }}{% endif %}</p>
+
+    <div class="section-title">Key Skills</div>
+    {% if profile.skills_csv %}
+        <p>{{ profile.skills_csv }}</p>
+    {% else %}
+        <p>No skills added yet. Use the portfolio builder to enhance this section.</p>
+    {% endif %}
 
     <div class="section-title">Education</div>
     <p><strong>{{ profile.college.name }}</strong><br>
     {{ profile.education_details }} | Semester {{ profile.semester }}</p>
 
     <div class="section-title">Technical Projects</div>
-    {% for project in projects %}
-    <div class="project-item">
-        <span class="project-title">{{ project.title }}</span> 
-        <p style="font-size: 13px; margin: 5px 0;">{{ project.description|truncatewords:40 }}</p>
-    </div>
-    {% endfor %}
+    {% if projects %}
+        {% for project in projects %}
+        <div class="project-item">
+            <span class="project-title">{{ project.title }}</span>
+            <p class="project-description">{{ project.description|truncatewords:40 }}</p>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p class="project-description">No verified projects available yet.</p>
+    {% endif %}
 
-    <div class="section-title">Skills</div>
-    <p>{{ profile.skills_csv }}</p>
+    <div class="section-title">Skills Summary</div>
+    <p>{{ profile.skills_csv|default:'Add skills in your portfolio builder to make this section stronger.' }}</p>
 </body>
 </html>
