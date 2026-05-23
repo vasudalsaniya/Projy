@@ -42,3 +42,13 @@ logs/
 
 # Added by code-review-graph
 .code-review-graph/
+
+# AI IDE configs (local tool setup, not needed in repo)
+.cursorrules
+.windsurfrules
+.kiro/
+.mcp.json
+.opencode.json
+
+# Webhint config (not relevant for this project)
+.hintrc
