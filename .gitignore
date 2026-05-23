@@ -1,54 +1,108 @@
-# Python bytecode
+# ── Python bytecode & cache ──────────────────────────────────────────────────
 __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
 *.pyc
+.cache/
+cache/
+*.cache
 
-# Django
+# ── Django ────────────────────────────────────────────────────────────────────
 *.sqlite3
 db.sqlite3
 *.db
+local_settings.py
 
-# Environment variables
+# Django cache table (created by createcachetable)
+django_cache/
+cache_table/
+
+# Celery
+celerybeat-schedule
+celerybeat-schedule.db
+celerybeat.pid
+*.pid
+
+# ── Environment variables ─────────────────────────────────────────────────────
 .env
 .env.*
 !.env.example
+*.secret
 
-# Media files (user uploads - keep locally, not in git)
+# ── Media & static files ──────────────────────────────────────────────────────
 projy_dev/media/
-
-# Static files collected by Django
 projy_dev/staticfiles/
 projy_dev/static_root/
+projy_dev/static/
 
-# Windows system files
-desktop.ini
-Thumbs.db
-ehthumbs.db
+# ── Virtual environments ──────────────────────────────────────────────────────
+venv/
+env/
+.venv/
+ENV/
+env.bak/
+venv.bak/
 
-# VS Code
-.vscode/
+# ── Python packaging ──────────────────────────────────────────────────────────
+dist/
+build/
+*.egg-info/
+.eggs/
+*.egg
+pip-log.txt
+pip-delete-this-directory.txt
 
-# JetBrains IDEs
-.idea/
+# ── Testing & coverage ────────────────────────────────────────────────────────
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+nosetests.xml
+test-results/
 
-# macOS
-.DS_Store
+# ── Redis / database dumps ────────────────────────────────────────────────────
+dump.rdb
+redis-data/
+*.rdb
 
-# Logs
+# ── Logs ──────────────────────────────────────────────────────────────────────
 *.log
 logs/
+log/
 
-# Added by code-review-graph
-.code-review-graph/
+# ── OS generated files ────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
 
-# AI IDE configs (local tool setup, not needed in repo)
+# ── IDE & editor configs (local only, not for deployment) ────────────────────
+.vscode/
+.idea/
+*.code-workspace
 .cursorrules
 .windsurfrules
 .kiro/
 .mcp.json
 .opencode.json
-
-# Webhint config (not relevant for this project)
 .hintrc
+
+# ── Claude Code / AI tool configs ────────────────────────────────────────────
+.claude/
+CLAUDE.md
+AGENTS.md
+GEMINI.md
+.code-review-graph/
+
+# ── Misc ──────────────────────────────────────────────────────────────────────
+*.bak
+*.swp
+*.swo
+*~
+node_modules/
+.npm/
