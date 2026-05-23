@@ -1,5 +1,44 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Django
 *.sqlite3
 db.sqlite3
-.hintrc
+*.db
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Media files (user uploads - keep locally, not in git)
+projy_dev/media/
+
+# Static files collected by Django
+projy_dev/staticfiles/
+projy_dev/static_root/
+
+# Windows system files
+desktop.ini
+Thumbs.db
+ehthumbs.db
+
+# VS Code
+.vscode/
+
+# JetBrains IDEs
+.idea/
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
+logs/
+
 # Added by code-review-graph
 .code-review-graph/
