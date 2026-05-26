@@ -1,2 +1,2 @@
-# Projy
-Project Tracker and Portfolio Maker
+# CSquare
+Campus to Career — Project Tracker and Portfolio Maker

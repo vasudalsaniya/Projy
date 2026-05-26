@@ -31,10 +31,10 @@ celerybeat.pid
 *.secret
 
 # ── Media & static files ──────────────────────────────────────────────────────
-projy_dev/media/
-projy_dev/staticfiles/
-projy_dev/static_root/
-projy_dev/static/
+csquare_dev/media/
+csquare_dev/staticfiles/
+csquare_dev/static_root/
+csquare_dev/static/
 
 # ── Virtual environments ──────────────────────────────────────────────────────
 venv/
