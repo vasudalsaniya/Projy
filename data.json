@@ -1,0 +1,2 @@
+CommandError: Unable to serialize database: no such table: django_admin_log
+[
