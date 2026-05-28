@@ -32,7 +32,6 @@ celerybeat.pid
 
 # ── Media & static files ──────────────────────────────────────────────────────
 csquare_dev/media/
-csquare_dev/staticfiles/
 csquare_dev/static_root/
 csquare_dev/static/
 
