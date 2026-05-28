@@ -39,6 +39,6 @@ urlpatterns = [
     path('manifest.json', TemplateView.as_view(template_name="manifest.json", content_type="application/json")),
 ]
 
-# This serves media files (images/zips) during development
-if settings.DEBUG:
+# Serve media files locally in development (S3 handles this in production)
+if not settings.IS_PRODUCTION:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
